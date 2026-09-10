@@ -1,22 +1,25 @@
-Este é um projeto [Next.js](https://nextjs.org) inicializado com [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MVP GirliES
+
+Este projeto é desenvolvido com Node.js e TypeScript.
+
+## Requisitos
+
+- Node.js
+- npm
 
 ## Primeiros Passos
 
-Primeiro, execute o servidor de desenvolvimento:
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Execute o projeto:
 
 ```bash
 npm run dev
-# ou
-yarn dev
-# ou
-pnpm dev
-# ou
-bun dev
 ```
 
-Abra http://localhost:3000 no seu navegador para ver o resultado.
-
-Você pode começar a editar a página modificando o arquivo app/page.tsx. A página será atualizada automaticamente conforme você edita o arquivo.
-
-Este projeto utiliza next/font para otimizar e carregar automaticamente.
+O projeto foi configurado para rodar em TypeScript diretamente com o Node.js, usando o ambiente de execução do TypeScript.
 
