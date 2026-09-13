@@ -1,0 +1,495 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"ChecklistItem": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"atividadeId": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"isCompleted": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"id",
+					"atividadeId",
+					"description",
+					"isCompleted"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LinksAtividade": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"atividadeId": {
+						"type": "string"
+					},
+					"tipo": {
+						"type": "string",
+						"enum": [
+							"Material",
+							"Link Auxiliar"
+						]
+					},
+					"link": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"id",
+					"atividadeId",
+					"tipo",
+					"link"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PlanoAula": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"categoria": {
+						"type": "string"
+					},
+					"dataHora": {
+						"type": "string"
+					},
+					"local": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					},
+					"linkPlanoAula": {
+						"type": "string"
+					},
+					"checklist": {
+						"items": {
+							"$ref": "#/components/schemas/ChecklistItem"
+						},
+						"type": "array"
+					},
+					"links": {
+						"items": {
+							"$ref": "#/components/schemas/LinksAtividade"
+						},
+						"type": "array"
+					},
+					"responsaveisId": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"titulo",
+					"dataHora"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_PlanoAula.Exclude_keyofPlanoAula.id-or-checklist-or-links__": {
+				"properties": {
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"categoria": {
+						"type": "string"
+					},
+					"dataHora": {
+						"type": "string"
+					},
+					"local": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					},
+					"linkPlanoAula": {
+						"type": "string"
+					},
+					"responsaveisId": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"titulo",
+					"dataHora"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_PlanoAula.id-or-checklist-or-links_": {
+				"$ref": "#/components/schemas/Pick_PlanoAula.Exclude_keyofPlanoAula.id-or-checklist-or-links__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__": {
+				"properties": {
+					"description": {},
+					"isCompleted": {}
+				},
+				"required": [
+					"description",
+					"isCompleted"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_ChecklistItem.id-or-atividadeId_": {
+				"$ref": "#/components/schemas/Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__": {
+				"properties": {
+					"tipo": {},
+					"link": {}
+				},
+				"required": [
+					"tipo",
+					"link"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_LinksAtividade.id-or-atividadeId_": {
+				"$ref": "#/components/schemas/Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"CriarPlanoAulaDTO": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Omit_PlanoAula.id-or-checklist-or-links_"
+					},
+					{
+						"properties": {
+							"links": {
+								"items": {
+									"$ref": "#/components/schemas/Omit_LinksAtividade.id-or-atividadeId_"
+								},
+								"type": "array"
+							},
+							"checklist": {
+								"items": {
+									"$ref": "#/components/schemas/Omit_ChecklistItem.id-or-atividadeId_"
+								},
+								"type": "array"
+							}
+						},
+						"type": "object"
+					}
+				]
+			},
+			"Partial_CriarPlanoAulaDTO_": {
+				"properties": {
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"categoria": {
+						"type": "string"
+					},
+					"dataHora": {
+						"type": "string"
+					},
+					"local": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string"
+					},
+					"linkPlanoAula": {
+						"type": "string"
+					},
+					"responsaveisId": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"checklist": {
+						"items": {
+							"$ref": "#/components/schemas/Omit_ChecklistItem.id-or-atividadeId_"
+						},
+						"type": "array"
+					},
+					"links": {
+						"items": {
+							"$ref": "#/components/schemas/Omit_LinksAtividade.id-or-atividadeId_"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"AtualizarPlanoAulaDTO": {
+				"$ref": "#/components/schemas/Partial_CriarPlanoAulaDTO_"
+			},
+			"HealthResponse": {
+				"properties": {
+					"ok": {
+						"type": "boolean"
+					},
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"ok",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "mvp-girlies",
+		"version": "1.0.0",
+		"description": "Este é um projeto inicializado.",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/api/aulas": {
+			"get": {
+				"operationId": "GetAulas",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PlanoAula"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Plano de Aulas"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CriarAula",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PlanoAula"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Plano de Aulas"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CriarPlanoAulaDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/aulas/{id}": {
+			"get": {
+				"operationId": "GetAulaById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PlanoAula"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Aula não encontrada"
+					}
+				},
+				"tags": [
+					"Plano de Aulas"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "AtualizarAula",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PlanoAula"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Aula não encontrada"
+					}
+				},
+				"tags": [
+					"Plano de Aulas"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AtualizarPlanoAulaDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeletarAula",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"success": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"success"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Aula não encontrada"
+					}
+				},
+				"tags": [
+					"Plano de Aulas"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/health": {
+			"get": {
+				"operationId": "GetHealth",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HealthResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health"
+				],
+				"security": [],
+				"parameters": []
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}
