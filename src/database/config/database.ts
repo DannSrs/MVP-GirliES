@@ -3,6 +3,7 @@ import path from 'path';
 import sqlite3 from 'sqlite3';
 import { open, type Database as SqliteDatabase } from 'sqlite';
 import * as dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
@@ -32,7 +33,8 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       funcao_interna TEXT,
       curso TEXT,
       periodo TEXT,
-      role TEXT DEFAULT 'membro'
+      senha TEXT NOT NULL,
+      role TEXT DEFAULT 'voluntaria' CHECK (role IN ('professora', 'voluntaria', 'adm'))
     );
 
     CREATE TABLE IF NOT EXISTS Aulas (
@@ -94,6 +96,22 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Seeding da usuária admin (Leticia)
+  const leticiaEmail = 'mlsb5@discente.ifpe.edu.br';
+  const existingAdmin = await db.get(`SELECT id FROM Usuarios WHERE email = ?`, [leticiaEmail]);
+  if (!existingAdmin) {
+    const ano = new Date().getFullYear();
+    const username = leticiaEmail.split('@')[0].toUpperCase();
+    const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+    await db.run(
+      `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, role) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      ['Leticia', leticiaEmail, 'Administração', 'Não Informado', 'Não Informado', hashedPassword, 'adm']
+    );
+    console.log(`✅ Usuária admin padrão criada com sucesso: ${leticiaEmail} (Senha: ${defaultPassword})`);
+  }
 
   return db;
 }
