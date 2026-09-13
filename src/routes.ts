@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import { PlanoAulaController } from './controllers/PlanoAulaController';
 
 export const router = Router();
+const aulasController = new PlanoAulaController();
 
 /**
  * @openapi
@@ -24,9 +26,6 @@ export const router = Router();
 router.get('/health', (_req, res) => {
   res.json({ ok: true, message: 'API funcionando' });
 });
-
-import { PlanoAulaRepository } from './repositories/PlanoAulaRepository';
-const aulasRepository = new PlanoAulaRepository();
 
 /**
  * @openapi
@@ -88,23 +87,8 @@ const aulasRepository = new PlanoAulaRepository();
  *       201:
  *         description: Aula criada com sucesso
  */
-router.get('/aulas', async (_req, res) => {
-  try {
-    const aulas = await aulasRepository.findAll();
-    res.json(aulas);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
-router.post('/aulas', async (req, res) => {
-  try {
-    const aula = await aulasRepository.create(req.body);
-    res.status(201).json(aula);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
+router.get('/aulas', (req, res) => aulasController.getAulas(req, res));
+router.post('/aulas', (req, res) => aulasController.criarAula(req, res));
 
 /**
  * @openapi
@@ -172,41 +156,6 @@ router.post('/aulas', async (req, res) => {
  *       404:
  *         description: Aula não encontrada
  */
-router.get('/aulas/:id', async (req, res) => {
-  try {
-    const aula = await aulasRepository.findById(req.params.id);
-    if (!aula) {
-      res.status(404).json({ error: 'Aula não encontrada' });
-      return;
-    }
-    res.json(aula);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
-router.put('/aulas/:id', async (req, res) => {
-  try {
-    const aula = await aulasRepository.update(req.params.id, req.body);
-    if (!aula) {
-      res.status(404).json({ error: 'Aula não encontrada' });
-      return;
-    }
-    res.json(aula);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
-router.delete('/aulas/:id', async (req, res) => {
-  try {
-    const success = await aulasRepository.delete(req.params.id);
-    if (!success) {
-      res.status(404).json({ error: 'Aula não encontrada' });
-      return;
-    }
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
+router.get('/aulas/:id', (req, res) => aulasController.getAulaById(req, res));
+router.put('/aulas/:id', (req, res) => aulasController.atualizarAula(req, res));
+router.delete('/aulas/:id', (req, res) => aulasController.deletarAula(req, res));
