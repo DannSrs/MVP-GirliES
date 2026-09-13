@@ -59,6 +59,279 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PostInstagram": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Ideia",
+							"Em Produção",
+							"Concluído",
+							"Publicado"
+						]
+					},
+					"tipoPost": {
+						"type": "string",
+						"enum": [
+							"Carrossel",
+							"Stories",
+							"Post",
+							"Reels"
+						]
+					},
+					"publicoAlvo": {
+						"type": "string"
+					},
+					"deadline": {
+						"type": "string"
+					},
+					"responsavelRoteiroId": {
+						"type": "number",
+						"format": "double"
+					},
+					"responsavelDesignId": {
+						"type": "number",
+						"format": "double"
+					},
+					"checklist": {
+						"items": {
+							"$ref": "#/components/schemas/ChecklistItem"
+						},
+						"type": "array"
+					},
+					"links": {
+						"items": {
+							"$ref": "#/components/schemas/LinksAtividade"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"titulo",
+					"tipoPost",
+					"deadline"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__": {
+				"properties": {
+					"description": {},
+					"isCompleted": {}
+				},
+				"required": [
+					"description",
+					"isCompleted"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_ChecklistItem.id-or-atividadeId_": {
+				"$ref": "#/components/schemas/Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"CriarChecklistItemDTO": {
+				"$ref": "#/components/schemas/Omit_ChecklistItem.id-or-atividadeId_"
+			},
+			"Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__": {
+				"properties": {
+					"tipo": {},
+					"link": {}
+				},
+				"required": [
+					"tipo",
+					"link"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_LinksAtividade.id-or-atividadeId_": {
+				"$ref": "#/components/schemas/Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"CriarLinksAtividadeDTO": {
+				"$ref": "#/components/schemas/Omit_LinksAtividade.id-or-atividadeId_"
+			},
+			"Pick_PostInstagram.Exclude_keyofPostInstagram.id-or-checklist-or-links__": {
+				"properties": {
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Ideia",
+							"Em Produção",
+							"Concluído",
+							"Publicado"
+						]
+					},
+					"tipoPost": {
+						"type": "string",
+						"enum": [
+							"Carrossel",
+							"Stories",
+							"Post",
+							"Reels"
+						]
+					},
+					"publicoAlvo": {
+						"type": "string"
+					},
+					"deadline": {
+						"type": "string"
+					},
+					"responsavelRoteiroId": {
+						"type": "number",
+						"format": "double"
+					},
+					"responsavelDesignId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"titulo",
+					"tipoPost",
+					"deadline"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"CriarPostInstagramDTO": {
+				"properties": {
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Ideia",
+							"Em Produção",
+							"Concluído",
+							"Publicado"
+						]
+					},
+					"tipoPost": {
+						"type": "string",
+						"enum": [
+							"Carrossel",
+							"Stories",
+							"Post",
+							"Reels"
+						]
+					},
+					"publicoAlvo": {
+						"type": "string"
+					},
+					"deadline": {
+						"type": "string"
+					},
+					"responsavelRoteiroId": {
+						"type": "number",
+						"format": "double"
+					},
+					"responsavelDesignId": {
+						"type": "number",
+						"format": "double"
+					},
+					"checklist": {
+						"items": {
+							"$ref": "#/components/schemas/CriarChecklistItemDTO"
+						},
+						"type": "array"
+					},
+					"links": {
+						"items": {
+							"$ref": "#/components/schemas/CriarLinksAtividadeDTO"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"titulo",
+					"tipoPost",
+					"deadline"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_CriarPostInstagramDTO_": {
+				"properties": {
+					"checklist": {
+						"items": {
+							"$ref": "#/components/schemas/CriarChecklistItemDTO"
+						},
+						"type": "array"
+					},
+					"links": {
+						"items": {
+							"$ref": "#/components/schemas/CriarLinksAtividadeDTO"
+						},
+						"type": "array"
+					},
+					"titulo": {
+						"type": "string"
+					},
+					"descricao": {
+						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Ideia",
+							"Em Produção",
+							"Concluído",
+							"Publicado"
+						]
+					},
+					"tipoPost": {
+						"type": "string",
+						"enum": [
+							"Carrossel",
+							"Stories",
+							"Post",
+							"Reels"
+						]
+					},
+					"publicoAlvo": {
+						"type": "string"
+					},
+					"deadline": {
+						"type": "string"
+					},
+					"responsavelRoteiroId": {
+						"type": "number",
+						"format": "double"
+					},
+					"responsavelDesignId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"AtualizarPostInstagramDTO": {
+				"$ref": "#/components/schemas/Partial_CriarPostInstagramDTO_"
+			},
 			"PlanoAula": {
 				"properties": {
 					"id": {
@@ -122,6 +395,9 @@
 					"descricao": {
 						"type": "string"
 					},
+					"status": {
+						"type": "string"
+					},
 					"categoria": {
 						"type": "string"
 					},
@@ -129,9 +405,6 @@
 						"type": "string"
 					},
 					"local": {
-						"type": "string"
-					},
-					"status": {
 						"type": "string"
 					},
 					"linkPlanoAula": {
@@ -154,38 +427,6 @@
 			},
 			"Omit_PlanoAula.id-or-checklist-or-links_": {
 				"$ref": "#/components/schemas/Pick_PlanoAula.Exclude_keyofPlanoAula.id-or-checklist-or-links__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__": {
-				"properties": {
-					"description": {},
-					"isCompleted": {}
-				},
-				"required": [
-					"description",
-					"isCompleted"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_ChecklistItem.id-or-atividadeId_": {
-				"$ref": "#/components/schemas/Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__": {
-				"properties": {
-					"tipo": {},
-					"link": {}
-				},
-				"required": [
-					"tipo",
-					"link"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_LinksAtividade.id-or-atividadeId_": {
-				"$ref": "#/components/schemas/Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__",
 				"description": "Construct a type with the properties of T except for those in type K."
 			},
 			"CriarPlanoAulaDTO": {
@@ -220,6 +461,9 @@
 					"descricao": {
 						"type": "string"
 					},
+					"status": {
+						"type": "string"
+					},
 					"categoria": {
 						"type": "string"
 					},
@@ -227,9 +471,6 @@
 						"type": "string"
 					},
 					"local": {
-						"type": "string"
-					},
-					"status": {
 						"type": "string"
 					},
 					"linkPlanoAula": {
@@ -290,6 +531,180 @@
 		"contact": {}
 	},
 	"paths": {
+		"/api/posts": {
+			"get": {
+				"operationId": "GetPosts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PostInstagram"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Posts Instagram"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CriarPost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PostInstagram"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Posts Instagram"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CriarPostInstagramDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/posts/{id}": {
+			"get": {
+				"operationId": "GetPostById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PostInstagram"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Post não encontrado"
+					}
+				},
+				"tags": [
+					"Posts Instagram"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "AtualizarPost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PostInstagram"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Post não encontrado"
+					}
+				},
+				"tags": [
+					"Posts Instagram"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AtualizarPostInstagramDTO"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "DeletarPost",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"success": {
+											"type": "boolean"
+										}
+									},
+									"required": [
+										"success"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Post não encontrado"
+					}
+				},
+				"tags": [
+					"Posts Instagram"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/api/aulas": {
 			"get": {
 				"operationId": "GetAulas",

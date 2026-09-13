@@ -4,6 +4,8 @@
 import type { TsoaRoute } from '@tsoa/runtime';
 import {  fetchMiddlewares, ExpressTemplateService } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { PostInstagramController } from './controllers/PostInstagramController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PlanoAulaController } from './controllers/PlanoAulaController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { HealthController } from './controllers/HealthController';
@@ -36,6 +38,86 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PostInstagram": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "titulo": {"dataType":"string","required":true},
+            "descricao": {"dataType":"string"},
+            "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Ideia"]},{"dataType":"enum","enums":["Em Produção"]},{"dataType":"enum","enums":["Concluído"]},{"dataType":"enum","enums":["Publicado"]}]},
+            "tipoPost": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Carrossel"]},{"dataType":"enum","enums":["Stories"]},{"dataType":"enum","enums":["Post"]},{"dataType":"enum","enums":["Reels"]}],"required":true},
+            "publicoAlvo": {"dataType":"string"},
+            "deadline": {"dataType":"string","required":true},
+            "responsavelRoteiroId": {"dataType":"double"},
+            "responsavelDesignId": {"dataType":"double"},
+            "checklist": {"dataType":"array","array":{"dataType":"refObject","ref":"ChecklistItem"}},
+            "links": {"dataType":"array","array":{"dataType":"refObject","ref":"LinksAtividade"}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"description":{"dataType":"any","required":true},"isCompleted":{"dataType":"any","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_ChecklistItem.id-or-atividadeId_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CriarChecklistItemDTO": {
+        "dataType": "refAlias",
+        "type": {"ref":"Omit_ChecklistItem.id-or-atividadeId_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tipo":{"dataType":"any","required":true},"link":{"dataType":"any","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Omit_LinksAtividade.id-or-atividadeId_": {
+        "dataType": "refAlias",
+        "type": {"ref":"Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CriarLinksAtividadeDTO": {
+        "dataType": "refAlias",
+        "type": {"ref":"Omit_LinksAtividade.id-or-atividadeId_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Pick_PostInstagram.Exclude_keyofPostInstagram.id-or-checklist-or-links__": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"titulo":{"dataType":"string","required":true},"descricao":{"dataType":"string"},"status":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Ideia"]},{"dataType":"enum","enums":["Em Produção"]},{"dataType":"enum","enums":["Concluído"]},{"dataType":"enum","enums":["Publicado"]}]},"tipoPost":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Carrossel"]},{"dataType":"enum","enums":["Stories"]},{"dataType":"enum","enums":["Post"]},{"dataType":"enum","enums":["Reels"]}],"required":true},"publicoAlvo":{"dataType":"string"},"deadline":{"dataType":"string","required":true},"responsavelRoteiroId":{"dataType":"double"},"responsavelDesignId":{"dataType":"double"}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CriarPostInstagramDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "titulo": {"dataType":"string","required":true},
+            "descricao": {"dataType":"string"},
+            "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Ideia"]},{"dataType":"enum","enums":["Em Produção"]},{"dataType":"enum","enums":["Concluído"]},{"dataType":"enum","enums":["Publicado"]}]},
+            "tipoPost": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Carrossel"]},{"dataType":"enum","enums":["Stories"]},{"dataType":"enum","enums":["Post"]},{"dataType":"enum","enums":["Reels"]}],"required":true},
+            "publicoAlvo": {"dataType":"string"},
+            "deadline": {"dataType":"string","required":true},
+            "responsavelRoteiroId": {"dataType":"double"},
+            "responsavelDesignId": {"dataType":"double"},
+            "checklist": {"dataType":"array","array":{"dataType":"refAlias","ref":"CriarChecklistItemDTO"}},
+            "links": {"dataType":"array","array":{"dataType":"refAlias","ref":"CriarLinksAtividadeDTO"}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Partial_CriarPostInstagramDTO_": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"checklist":{"dataType":"array","array":{"dataType":"refAlias","ref":"CriarChecklistItemDTO"}},"links":{"dataType":"array","array":{"dataType":"refAlias","ref":"CriarLinksAtividadeDTO"}},"titulo":{"dataType":"string"},"descricao":{"dataType":"string"},"status":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Ideia"]},{"dataType":"enum","enums":["Em Produção"]},{"dataType":"enum","enums":["Concluído"]},{"dataType":"enum","enums":["Publicado"]}]},"tipoPost":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":["Carrossel"]},{"dataType":"enum","enums":["Stories"]},{"dataType":"enum","enums":["Post"]},{"dataType":"enum","enums":["Reels"]}]},"publicoAlvo":{"dataType":"string"},"deadline":{"dataType":"string"},"responsavelRoteiroId":{"dataType":"double"},"responsavelDesignId":{"dataType":"double"}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "AtualizarPostInstagramDTO": {
+        "dataType": "refAlias",
+        "type": {"ref":"Partial_CriarPostInstagramDTO_","validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PlanoAula": {
         "dataType": "refObject",
         "properties": {
@@ -56,32 +138,12 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_PlanoAula.Exclude_keyofPlanoAula.id-or-checklist-or-links__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"titulo":{"dataType":"string","required":true},"descricao":{"dataType":"string"},"categoria":{"dataType":"string"},"dataHora":{"dataType":"string","required":true},"local":{"dataType":"string"},"status":{"dataType":"string"},"linkPlanoAula":{"dataType":"string"},"responsaveisId":{"dataType":"array","array":{"dataType":"double"}}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"titulo":{"dataType":"string","required":true},"descricao":{"dataType":"string"},"status":{"dataType":"string"},"categoria":{"dataType":"string"},"dataHora":{"dataType":"string","required":true},"local":{"dataType":"string"},"linkPlanoAula":{"dataType":"string"},"responsaveisId":{"dataType":"array","array":{"dataType":"double"}}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_PlanoAula.id-or-checklist-or-links_": {
         "dataType": "refAlias",
         "type": {"ref":"Pick_PlanoAula.Exclude_keyofPlanoAula.id-or-checklist-or-links__","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"description":{"dataType":"any","required":true},"isCompleted":{"dataType":"any","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_ChecklistItem.id-or-atividadeId_": {
-        "dataType": "refAlias",
-        "type": {"ref":"Pick_ChecklistItem.Exclude_keyofChecklistItem.id-or-atividadeId__","validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"tipo":{"dataType":"any","required":true},"link":{"dataType":"any","required":true}},"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Omit_LinksAtividade.id-or-atividadeId_": {
-        "dataType": "refAlias",
-        "type": {"ref":"Pick_LinksAtividade.Exclude_keyofLinksAtividade.id-or-atividadeId__","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CriarPlanoAulaDTO": {
@@ -91,7 +153,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Partial_CriarPlanoAulaDTO_": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"titulo":{"dataType":"string"},"descricao":{"dataType":"string"},"categoria":{"dataType":"string"},"dataHora":{"dataType":"string"},"local":{"dataType":"string"},"status":{"dataType":"string"},"linkPlanoAula":{"dataType":"string"},"responsaveisId":{"dataType":"array","array":{"dataType":"double"}},"checklist":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_ChecklistItem.id-or-atividadeId_"}},"links":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_LinksAtividade.id-or-atividadeId_"}}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"titulo":{"dataType":"string"},"descricao":{"dataType":"string"},"status":{"dataType":"string"},"categoria":{"dataType":"string"},"dataHora":{"dataType":"string"},"local":{"dataType":"string"},"linkPlanoAula":{"dataType":"string"},"responsaveisId":{"dataType":"array","array":{"dataType":"double"}},"checklist":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_ChecklistItem.id-or-atividadeId_"}},"links":{"dataType":"array","array":{"dataType":"refAlias","ref":"Omit_LinksAtividade.id-or-atividadeId_"}}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AtualizarPlanoAulaDTO": {
@@ -125,6 +187,156 @@ export function RegisterRoutes(app: Router) {
 
 
     
+        const argsPostInstagramController_getPosts: Record<string, TsoaRoute.ParameterSchema> = {
+        };
+        app.get('/api/posts',
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController)),
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController.prototype.getPosts)),
+
+            async function PostInstagramController_getPosts(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPostInstagramController_getPosts, request, response });
+
+                const controller = new PostInstagramController();
+
+              await templateService.apiHandler({
+                methodName: 'getPosts',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPostInstagramController_getPostById: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+        };
+        app.get('/api/posts/:id',
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController)),
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController.prototype.getPostById)),
+
+            async function PostInstagramController_getPostById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPostInstagramController_getPostById, request, response });
+
+                const controller = new PostInstagramController();
+
+              await templateService.apiHandler({
+                methodName: 'getPostById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPostInstagramController_criarPost: Record<string, TsoaRoute.ParameterSchema> = {
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"CriarPostInstagramDTO"},
+        };
+        app.post('/api/posts',
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController)),
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController.prototype.criarPost)),
+
+            async function PostInstagramController_criarPost(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPostInstagramController_criarPost, request, response });
+
+                const controller = new PostInstagramController();
+
+              await templateService.apiHandler({
+                methodName: 'criarPost',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPostInstagramController_atualizarPost: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"AtualizarPostInstagramDTO"},
+        };
+        app.put('/api/posts/:id',
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController)),
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController.prototype.atualizarPost)),
+
+            async function PostInstagramController_atualizarPost(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPostInstagramController_atualizarPost, request, response });
+
+                const controller = new PostInstagramController();
+
+              await templateService.apiHandler({
+                methodName: 'atualizarPost',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPostInstagramController_deletarPost: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+        };
+        app.delete('/api/posts/:id',
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController)),
+            ...(fetchMiddlewares<RequestHandler>(PostInstagramController.prototype.deletarPost)),
+
+            async function PostInstagramController_deletarPost(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPostInstagramController_deletarPost, request, response });
+
+                const controller = new PostInstagramController();
+
+              await templateService.apiHandler({
+                methodName: 'deletarPost',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsPlanoAulaController_getAulas: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/api/aulas',

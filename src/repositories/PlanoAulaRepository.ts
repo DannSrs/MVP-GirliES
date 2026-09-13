@@ -149,6 +149,30 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 id
             ]
         );
+
+        if (changes.checklist !== undefined) {
+            await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
+            if (changes.checklist.length > 0) {
+                for (const item of changes.checklist) {
+                    await db.run(
+                        `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'AULA', ?, ?)`,
+                        [String(id), item.description, item.isCompleted ? 1 : 0]
+                    );
+                }
+            }
+        }
+
+        if (changes.links !== undefined) {
+            await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
+            if (changes.links.length > 0) {
+                for (const link of changes.links) {
+                    await db.run(
+                        `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'AULA', ?, ?, ?)`,
+                        [String(id), link.tipo, link.link, link.link]
+                    );
+                }
+            }
+        }
         return this.findById(id);
     }
 
