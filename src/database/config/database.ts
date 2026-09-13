@@ -68,10 +68,13 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
     CREATE TABLE IF NOT EXISTS Eventos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       titulo TEXT NOT NULL,
-      descricao TEXT,
-      data_hora DATETIME NOT NULL,
+      tipo_evento TEXT NOT NULL,
+      regime_evento TEXT NOT NULL,
+      data TEXT NOT NULL,
+      horario_inicio TEXT NOT NULL,
+      horario_fim TEXT NOT NULL,
       local TEXT,
-      duracao TEXT
+      capacidade INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS Checklists (
