@@ -1,8 +1,7 @@
-export class LinksAtividade {
-    constructor(
-        public id: string,
-        public atividadeId: string,
-        public tipo: 'Material' | 'Link Auxiliar',
-        public link: string
-    ) {}
+export interface LinksAtividade {
+    id?: number | string;
+    atividadeId?: number | string;
+    tipo?: 'Material' | 'Link Auxiliar';
+    titulo?: string;
+    link: string;
 }

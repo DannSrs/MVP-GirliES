@@ -1,12 +1,9 @@
-export class Usuario {
-    constructor(
-        public id: string,
-        public nome: string,
-        public email: string,
-        public funcaoInterna: string,
-        public curso: string,
-        public periodo: string,
-        public role: string,
-
-    ){ }
+export interface Usuario {
+    id?: number | string;
+    nome: string;
+    email: string;
+    funcaoInterna: string;
+    curso: string;
+    periodo: string;
+    role: string;
 }
