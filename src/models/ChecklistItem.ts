@@ -1,13 +1,6 @@
-export class ChecklistItem {
-  constructor(
-    public id: string,
-    public atividadeId: string, // Chave estrangeira que conecta ao Card (Lado '1')
-    public description: string,
-    public isCompleted: boolean
-  ) {}
-
-  // Métodos de domínio específicos do item
-  toggleStatus(): void {
-    this.isCompleted = !this.isCompleted;
-  }
+export interface ChecklistItem {
+  id?: number | string;
+  atividadeId?: number | string;
+  description: string;
+  isCompleted?: boolean;
 }

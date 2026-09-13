@@ -2,19 +2,25 @@ import { Atividade } from "./Atividade";
 import { ChecklistItem } from "./ChecklistItem";
 import { LinksAtividade } from "./LinksAtividade";
 
-export class PlanoAula extends Atividade {
-    public checklist: ChecklistItem[] = [];
-    public links: LinksAtividade[] = [];
-
-    constructor(
-        id: string,
-        titulo: string,
-        public descricao: string,
-        public dateTime: string,
-        public local: string,
-        public responsaveisId: string[]
-    ) {
-    super(id, titulo, 'AULA');
-  }
-
+export interface PlanoAula extends Atividade {
+  id?: number | string;
+  descricao?: string;
+  dataHora: string;
+  local?: string;
+  status?: string;
+  categoria?: string;
+  linkPlanoAula?: string;
+  checklist?: ChecklistItem[];
+  links?: LinksAtividade[];
+  responsaveis?: string[];
 }
+
+export type CriarChecklistItemDTO = Omit<ChecklistItem, 'id' | 'atividadeId'>;
+export type CriarLinksAtividadeDTO = Omit<LinksAtividade, 'id' | 'atividadeId'>;
+
+export interface CriarPlanoAulaDTO extends Omit<PlanoAula, 'id' | 'checklist' | 'links'> {
+  checklist?: CriarChecklistItemDTO[];
+  links?: CriarLinksAtividadeDTO[];
+}
+
+export type AtualizarPlanoAulaDTO = Partial<CriarPlanoAulaDTO>;
