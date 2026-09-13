@@ -14,8 +14,8 @@ export class PostInstagram extends Atividade {
         public tipoPost: 'Carrossel' | 'Stories' | 'Post' | 'Reels',
         public publicoAlvo: string,
         public deadline: Date,
-        public responsavelRoteiro: string,
-        public responsavelDesign: string,
+        public responsavelRoteiroId: string,
+        public responsavelDesignId: string,
     ) {
         super(id, /*tagCategoria,*/ titulo, 'POST');
     }

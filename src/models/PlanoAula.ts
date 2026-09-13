@@ -12,7 +12,7 @@ export class PlanoAula extends Atividade {
         public descricao: string,
         public dateTime: string,
         public local: string,
-        public responsaveis: string[]
+        public responsaveisId: string[]
     ) {
     super(id, titulo, 'AULA');
   }
