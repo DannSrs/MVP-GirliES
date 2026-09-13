@@ -1,7 +1,7 @@
-export interface IRepository<T extends { id: string }> {
-    findAll(): T[];
-    findById(id: string): T | undefined;
-    create(entity: T): T;
-    update(id: string, changes: Partial<T>): T | undefined;
-    delete(id: string): boolean;
+export interface IRepository<T, CreateDTO = Omit<T, 'id'>, UpdateDTO = Partial<CreateDTO>> {
+    findAll(): Promise<T[]>;
+    findById(id: number | string): Promise<T | undefined>;
+    create(entity: CreateDTO): Promise<T>;
+    update(id: number | string, changes: UpdateDTO): Promise<T | undefined>;
+    delete(id: number | string): Promise<boolean>;
 }
