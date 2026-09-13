@@ -2,13 +2,6 @@ import { getDb } from '../database/config/database';
 import { PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO } from '../models/PlanoAula';
 import { IRepository } from './IRepository';
 
-function normalizarTipoLink(tipo?: string): 'Material' | 'Link Auxiliar' {
-    if (!tipo) return 'Link Auxiliar';
-    const lower = tipo.trim().toLowerCase();
-    if (lower === 'material') return 'Material';
-    return 'Link Auxiliar';
-}
-
 export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO> {
     async findAll(): Promise<PlanoAula[]> {
         const db = await getDb();
@@ -19,17 +12,16 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             const checklistRows = await db.all<any[]>(
                 `SELECT id, atividade_id as atividadeId, descricao as description, concluido as isCompleted 
                  FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
-                [r.id]
+                [String(r.id)]
             );
             const linksRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
+                `SELECT id, atividade_id as atividadeId, tipo, link 
                  FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
-                [r.id]
+                [String(r.id)]
             );
 
             aulas.push({
                 id: r.id,
-                tipo: 'AULA',
                 titulo: r.titulo,
                 descricao: r.descricao,
                 categoria: r.categoria,
@@ -38,16 +30,16 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 status: r.status,
                 linkPlanoAula: r.link_plano_aula,
                 checklist: checklistRows.map(c => ({
-                    id: c.id,
+                    id: String(c.id),
                     atividadeId: c.atividadeId,
                     description: c.description,
-                    isCompleted: Boolean(c.isCompleted)
+                    isCompleted: Boolean(c.isCompleted),
+                    toggleStatus() { this.isCompleted = !this.isCompleted; }
                 })),
                 links: linksRows.map(l => ({
-                    id: l.id,
+                    id: String(l.id),
                     atividadeId: l.atividadeId,
-                    tipo: normalizarTipoLink(l.tipo),
-                    titulo: l.titulo || l.link,
+                    tipo: l.tipo,
                     link: l.link
                 }))
             });
@@ -63,17 +55,16 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         const checklistRows = await db.all<any[]>(
             `SELECT id, atividade_id as atividadeId, descricao as description, concluido as isCompleted 
              FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
-            [r.id]
+            [String(r.id)]
         );
         const linksRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
+            `SELECT id, atividade_id as atividadeId, tipo, link 
              FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
-            [r.id]
+            [String(r.id)]
         );
 
         return {
             id: r.id,
-            tipo: 'AULA',
             titulo: r.titulo,
             descricao: r.descricao,
             categoria: r.categoria,
@@ -82,16 +73,16 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             status: r.status,
             linkPlanoAula: r.link_plano_aula,
             checklist: checklistRows.map(c => ({
-                id: c.id,
+                id: String(c.id),
                 atividadeId: c.atividadeId,
                 description: c.description,
-                isCompleted: Boolean(c.isCompleted)
+                isCompleted: Boolean(c.isCompleted),
+                toggleStatus() { this.isCompleted = !this.isCompleted; }
             })),
             links: linksRows.map(l => ({
-                id: l.id,
+                id: String(l.id),
                 atividadeId: l.atividadeId,
-                tipo: normalizarTipoLink(l.tipo),
-                titulo: l.titulo || l.link,
+                tipo: l.tipo,
                 link: l.link
             }))
         };
@@ -113,24 +104,22 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             ]
         );
         const createdId = result.lastID;
-        if (!createdId) throw new Error('Falha ao gerar o ID automático no SQLite');
+        if (!createdId) throw new Error('Falha ao inserir aula no SQLite');
 
         if (data.checklist && data.checklist.length > 0) {
             for (const item of data.checklist) {
                 await db.run(
                     `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'AULA', ?, ?)`,
-                    [createdId, item.description, item.isCompleted ? 1 : 0]
+                    [String(createdId), item.description, item.isCompleted ? 1 : 0]
                 );
             }
         }
 
         if (data.links && data.links.length > 0) {
             for (const link of data.links) {
-                const tipoValido = normalizarTipoLink(link.tipo);
-                const tituloValido = link.titulo || link.link;
                 await db.run(
                     `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'AULA', ?, ?, ?)`,
-                    [createdId, tipoValido, tituloValido, link.link]
+                    [String(createdId), link.tipo, link.link, link.link]
                 );
             }
         }
@@ -160,13 +149,37 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 id
             ]
         );
+
+        if (changes.checklist !== undefined) {
+            await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
+            if (changes.checklist.length > 0) {
+                for (const item of changes.checklist) {
+                    await db.run(
+                        `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'AULA', ?, ?)`,
+                        [String(id), item.description, item.isCompleted ? 1 : 0]
+                    );
+                }
+            }
+        }
+
+        if (changes.links !== undefined) {
+            await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
+            if (changes.links.length > 0) {
+                for (const link of changes.links) {
+                    await db.run(
+                        `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'AULA', ?, ?, ?)`,
+                        [String(id), link.tipo, link.link, link.link]
+                    );
+                }
+            }
+        }
         return this.findById(id);
     }
 
     async delete(id: number | string): Promise<boolean> {
         const db = await getDb();
-        await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [id]);
-        await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [id]);
+        await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
+        await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
         const result = await db.run('DELETE FROM Aulas WHERE id = ?', id);
         return (result.changes ?? 0) > 0;
     }

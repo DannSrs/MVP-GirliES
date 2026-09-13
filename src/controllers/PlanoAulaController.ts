@@ -1,63 +1,56 @@
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Put, Delete, Route, Body, Path, Tags, Response } from 'tsoa';
+import { PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO } from '../models/PlanoAula';
 import { PlanoAulaRepository } from '../repositories/PlanoAulaRepository';
 
-const repository = new PlanoAulaRepository();
+@Route("api/aulas")
+@Tags("Plano de Aulas")
+export class PlanoAulaController extends Controller {
+  private repository = new PlanoAulaRepository();
 
-export class PlanoAulaController {
-    async getAulas(_req: Request, res: Response) {
-        try {
-            const aulas = await repository.findAll();
-            res.json(aulas);
-        } catch (err) {
-            res.status(500).json({ error: String(err) });
-        }
-    }
+  @Get()
+  public async getAulas(): Promise<PlanoAula[]> {
+    return this.repository.findAll();
+  }
 
-    async getAulaById(req: Request, res: Response) {
-        try {
-            const aula = await repository.findById(String(req.params.id));
-            if (!aula) {
-                res.status(404).json({ error: 'Aula não encontrada' });
-                return;
-            }
-            res.json(aula);
-        } catch (err) {
-            res.status(500).json({ error: String(err) });
-        }
+  @Get("{id}")
+  @Response(404, "Aula não encontrada")
+  public async getAulaById(@Path() id: number): Promise<PlanoAula | undefined> {
+    const aula = await this.repository.findById(id);
+    if (!aula) {
+      this.setStatus(404);
+      return undefined;
     }
+    return aula;
+  }
 
-    async criarAula(req: Request, res: Response) {
-        try {
-            const aula = await repository.create(req.body);
-            res.status(201).json(aula);
-        } catch (err) {
-            res.status(500).json({ error: String(err) });
-        }
-    }
+  @Post()
+  public async criarAula(@Body() requestBody: CriarPlanoAulaDTO): Promise<PlanoAula> {
+    this.setStatus(201);
+    return this.repository.create(requestBody);
+  }
 
-    async atualizarAula(req: Request, res: Response) {
-        try {
-            const aula = await repository.update(String(req.params.id), req.body);
-            if (!aula) {
-                res.status(404).json({ error: 'Aula não encontrada' });
-                return;
-            }
-            res.json(aula);
-        } catch (err) {
-            res.status(500).json({ error: String(err) });
-        }
+  @Put("{id}")
+  @Response(404, "Aula não encontrada")
+  public async atualizarAula(
+    @Path() id: number,
+    @Body() requestBody: AtualizarPlanoAulaDTO
+  ): Promise<PlanoAula | undefined> {
+    const updated = await this.repository.update(id, requestBody);
+    if (!updated) {
+      this.setStatus(404);
+      return undefined;
     }
+    return updated;
+  }
 
-    async deletarAula(req: Request, res: Response) {
-        try {
-            const success = await repository.delete(String(req.params.id));
-            if (!success) {
-                res.status(404).json({ error: 'Aula não encontrada' });
-                return;
-            }
-            res.json({ success: true });
-        } catch (err) {
-            res.status(500).json({ error: String(err) });
-        }
+  @Delete("{id}")
+  @Response(404, "Aula não encontrada")
+  public async deletarAula(@Path() id: number): Promise<{ success: boolean }> {
+    const deleted = await this.repository.delete(id);
+    if (!deleted) {
+      this.setStatus(404);
+      return { success: false };
     }
+    return { success: true };
+  }
 }

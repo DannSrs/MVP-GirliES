@@ -1,40 +1,63 @@
-import express, { type Application } from 'express';
+import express, { type Application, type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
-import { router } from './routes';
+import * as dotenv from 'dotenv';
+import { RegisterRoutes } from './routes';
 import { setupSwagger } from './swagger';
+import { initializeDatabase } from './database/config/database';
+
+dotenv.config();
 
 class App {
   public server: Application;
-  private port: number = 3000;
+  private port: number = Number(process.env.PORT) || 3000;
 
   constructor() {
     this.server = express();
     this.middlewares();
     this.routes();
-    setupSwagger(this.server);
+    this.errorHandler();
   }
 
-  // Prepara o servidor para receber dados no formato JSON
   private middlewares(): void {
-    this.server.use(cors()); // Libera o acesso para o front-end
+    const corsOrigin = process.env.CORS_ORIGIN || '*';
+    this.server.use(cors({ origin: corsOrigin }));
     this.server.use(express.json());
-    this.server.use(express.static('public')); // Define a pasta do front-end
+    this.server.use(express.urlencoded({ extended: true }));
+    this.server.use(express.static('public'));
   }
 
-  // Define as rotas (URLs) da sua API
   private routes(): void {
-    this.server.use('/api', router); // Adicionamos '/api' para separar do front
+    setupSwagger(this.server);
+    RegisterRoutes(this.server);
   }
 
-  // Método para ligar o servidor
-  public start(): void {
+  private errorHandler(): void {
+    this.server.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || 500;
+      const message = err.message || 'Erro interno do servidor';
+      console.error(`[Error ${status}]:`, err);
+      res.status(status).json({
+        ok: false,
+        error: message,
+        details: err.fields || undefined
+      });
+    });
+  }
+
+  public async start(): Promise<void> {
+    try {
+      await initializeDatabase();
+      console.log('Conexão com SQLite inicializada com sucesso.');
+    } catch (error) {
+      console.error('Erro ao inicializar o banco de dados SQLite:', error);
+    }
+
     this.server.listen(this.port, () => {
-      console.log(`Servidor rodando em http://localhost:${this.port}`);
-      console.log(`Documentação Swagger em http://localhost:${this.port}/api-docs`);
+      console.log(`🚀 Servidor rodando na porta ${this.port} (http://localhost:${this.port})`);
+      console.log(`📚 Documentação Swagger disponível em http://localhost:${this.port}/api-docs`);
     });
   }
 }
 
-// Instancia a classe e inicia o servidor
 const aplicacao = new App();
 aplicacao.start();

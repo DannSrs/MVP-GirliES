@@ -1,26 +1,23 @@
-import { Atividade } from "./Atividade";
-import { ChecklistItem } from "./ChecklistItem";
-import { LinksAtividade } from "./LinksAtividade";
+import { ChecklistItem } from './ChecklistItem';
+import { LinksAtividade } from './LinksAtividade';
 
-export interface PlanoAula extends Atividade {
-  id?: number | string;
+export interface PlanoAula {
+  id: number;
+  titulo: string;
   descricao?: string;
+  categoria?: string;
   dataHora: string;
   local?: string;
   status?: string;
-  categoria?: string;
   linkPlanoAula?: string;
   checklist?: ChecklistItem[];
   links?: LinksAtividade[];
-  responsaveis?: string[];
+  responsaveisId?: number[];
 }
 
-export type CriarChecklistItemDTO = Omit<ChecklistItem, 'id' | 'atividadeId'>;
-export type CriarLinksAtividadeDTO = Omit<LinksAtividade, 'id' | 'atividadeId'>;
-
-export interface CriarPlanoAulaDTO extends Omit<PlanoAula, 'id' | 'checklist' | 'links'> {
-  checklist?: CriarChecklistItemDTO[];
-  links?: CriarLinksAtividadeDTO[];
-}
+export type CriarPlanoAulaDTO = Omit<PlanoAula, 'id' | 'checklist' | 'links'> & {
+  checklist?: Omit<ChecklistItem, 'id' | 'atividadeId'>[];
+  links?: Omit<LinksAtividade, 'id' | 'atividadeId'>[];
+};
 
 export type AtualizarPlanoAulaDTO = Partial<CriarPlanoAulaDTO>;
