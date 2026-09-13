@@ -1,6 +1,8 @@
 export interface ChecklistItem {
-  id?: number | string;
-  atividadeId?: number | string;
-  description: string;
-  isCompleted?: boolean;
+  id: number;
+  atividadeId: number;
+  descricao: string;
+  isCompleted: boolean;
 }
+
+export type CriarChecklistItemDTO = Omit<ChecklistItem, 'id' | 'atividadeId'>;

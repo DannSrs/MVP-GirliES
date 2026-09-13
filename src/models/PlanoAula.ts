@@ -1,5 +1,5 @@
-import { ChecklistItem } from './ChecklistItem';
-import { LinksAtividade } from './LinksAtividade';
+import { ChecklistItem, CriarChecklistItemDTO } from './ChecklistItem';
+import { LinksAtividade, CriarLinksAtividadeDTO } from './LinksAtividade';
 
 export interface PlanoAula {
   id: number;
@@ -16,8 +16,8 @@ export interface PlanoAula {
 }
 
 export type CriarPlanoAulaDTO = Omit<PlanoAula, 'id' | 'checklist' | 'links'> & {
-  checklist?: Omit<ChecklistItem, 'id' | 'atividadeId'>[];
-  links?: Omit<LinksAtividade, 'id' | 'atividadeId'>[];
+  checklist?: CriarChecklistItemDTO[];
+  links?: CriarLinksAtividadeDTO[];
 };
 
 export type AtualizarPlanoAulaDTO = Partial<CriarPlanoAulaDTO>;

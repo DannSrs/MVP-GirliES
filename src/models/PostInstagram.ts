@@ -1,5 +1,5 @@
-import { ChecklistItem } from "./ChecklistItem";
-import { LinksAtividade } from "./LinksAtividade";
+import { ChecklistItem, CriarChecklistItemDTO } from "./ChecklistItem";
+import { LinksAtividade, CriarLinksAtividadeDTO } from "./LinksAtividade";
 
 export interface PostInstagram {
   id: number;
@@ -15,8 +15,6 @@ export interface PostInstagram {
   links?: LinksAtividade[];
 }
 
-export type CriarChecklistItemDTO = Omit<ChecklistItem, 'id' | 'atividadeId'>;
-export type CriarLinksAtividadeDTO = Omit<LinksAtividade, 'id' | 'atividadeId'>;
 
 export interface CriarPostInstagramDTO extends Omit<PostInstagram, 'id' | 'checklist' | 'links'> {
   checklist?: CriarChecklistItemDTO[];
