@@ -1,19 +1,36 @@
 import { EventoGeral, CriarEventoGeralDTO, AtualizarEventoGeralDTO } from '../models/EventoGeral';
 import { EventoGeralRepository } from '../repositories/EventoGeralRepository';
+import { ConfiguracaoService } from './ConfiguracaoService';
+import { calcularSemana } from '../utils/dateUtils';
 
 export class EventoGeralService {
   private repository: EventoGeralRepository;
+  private configuracaoService: ConfiguracaoService;
 
   constructor() {
     this.repository = new EventoGeralRepository();
+    this.configuracaoService = new ConfiguracaoService();
   }
 
   public async listarTodos(): Promise<EventoGeral[]> {
-    return this.repository.findAll();
+    const eventos = await this.repository.findAll();
+    const config = await this.configuracaoService.getDatasProjeto();
+    
+    return eventos.map(evento => ({
+      ...evento,
+      semana: calcularSemana(evento.data, config.dataInicioProjeto)
+    }));
   }
 
   public async buscarPorId(id: number): Promise<EventoGeral | undefined> {
-    return this.repository.findById(id);
+    const evento = await this.repository.findById(id);
+    if (!evento) return undefined;
+
+    const config = await this.configuracaoService.getDatasProjeto();
+    return {
+      ...evento,
+      semana: calcularSemana(evento.data, config.dataInicioProjeto)
+    };
   }
 
   public async criarEvento(dto: CriarEventoGeralDTO): Promise<EventoGeral> {
@@ -28,7 +45,13 @@ export class EventoGeralService {
       }
     }
 
-    return this.repository.create(dto);
+    const evento = await this.repository.create(dto);
+    const config = await this.configuracaoService.getDatasProjeto();
+    
+    return {
+      ...evento,
+      semana: calcularSemana(evento.data, config.dataInicioProjeto)
+    };
   }
 
   public async atualizarEvento(id: number, dto: AtualizarEventoGeralDTO): Promise<EventoGeral | undefined> {
@@ -44,7 +67,14 @@ export class EventoGeralService {
       }
     }
 
-    return this.repository.update(id, dto);
+    const evento = await this.repository.update(id, dto);
+    if (!evento) return undefined;
+
+    const config = await this.configuracaoService.getDatasProjeto();
+    return {
+      ...evento,
+      semana: calcularSemana(evento.data, config.dataInicioProjeto)
+    };
   }
 
   public async deletarEvento(id: number): Promise<boolean> {
