@@ -117,7 +117,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             for (const link of data.links) {
                 await db.run(
                     `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'AULA', ?, ?, ?)`,
-                    [String(createdId), link.tipo, link.link, link.link]
+                    [String(createdId), link.tipo, link.titulo || null, link.link]
                 );
             }
         }
@@ -166,7 +166,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 for (const link of changes.links) {
                     await db.run(
                         `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'AULA', ?, ?, ?)`,
-                        [String(id), link.tipo, link.link, link.link]
+                        [String(id), link.tipo, link.titulo || null, link.link]
                     );
                 }
             }
