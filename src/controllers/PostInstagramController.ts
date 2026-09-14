@@ -1,21 +1,21 @@
 import { Controller, Get, Post, Put, Delete, Route, Body, Path, Tags, Response } from 'tsoa';
 import { PostInstagram, CriarPostInstagramDTO, AtualizarPostInstagramDTO } from '../models/PostInstagram';
-import { PostInstagramRepository } from '../repositories/PostInstagramRepository';
+import { PostInstagramService } from '../services/PostInstagramService';
 
 @Route("api/posts")
 @Tags("Posts Instagram")
 export class PostInstagramController extends Controller {
-  private repository = new PostInstagramRepository();
+  private service = new PostInstagramService();
 
   @Get()
   public async getPosts(): Promise<PostInstagram[]> {
-    return this.repository.findAll();
+    return this.service.listarTodos();
   }
 
   @Get("{id}")
   @Response(404, "Post não encontrado")
   public async getPostById(@Path() id: number): Promise<PostInstagram | undefined> {
-    const post = await this.repository.findById(id);
+    const post = await this.service.buscarPorId(id);
     if (!post) {
       this.setStatus(404);
       return undefined;
@@ -24,29 +24,41 @@ export class PostInstagramController extends Controller {
   }
 
   @Post()
+  @Response(400, "Erro de Validação")
   public async criarPost(@Body() requestBody: CriarPostInstagramDTO): Promise<PostInstagram> {
-    this.setStatus(201);
-    return this.repository.create(requestBody);
+    try {
+      this.setStatus(201);
+      return await this.service.criarPost(requestBody);
+    } catch (error: any) {
+      this.setStatus(400);
+      throw error;
+    }
   }
 
   @Put("{id}")
   @Response(404, "Post não encontrado")
+  @Response(400, "Erro de Validação")
   public async atualizarPost(
     @Path() id: number,
     @Body() requestBody: AtualizarPostInstagramDTO
   ): Promise<PostInstagram | undefined> {
-    const updated = await this.repository.update(id, requestBody);
-    if (!updated) {
-      this.setStatus(404);
-      return undefined;
+    try {
+      const updated = await this.service.atualizarPost(id, requestBody);
+      if (!updated) {
+        this.setStatus(404);
+        return undefined;
+      }
+      return updated;
+    } catch (error: any) {
+      this.setStatus(400);
+      throw error;
     }
-    return updated;
   }
 
   @Delete("{id}")
   @Response(404, "Post não encontrado")
   public async deletarPost(@Path() id: number): Promise<{ success: boolean }> {
-    const deleted = await this.repository.delete(id);
+    const deleted = await this.service.deletarPost(id);
     if (!deleted) {
       this.setStatus(404);
       return { success: false };
