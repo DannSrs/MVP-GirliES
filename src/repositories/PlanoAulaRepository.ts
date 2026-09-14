@@ -10,7 +10,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         const aulas: PlanoAula[] = [];
         for (const r of rows) {
             const checklistRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, descricao as description, concluido as isCompleted 
+                `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
                  FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
                 [String(r.id)]
             );
@@ -30,15 +30,14 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 status: r.status,
                 linkPlanoAula: r.link_plano_aula,
                 checklist: checklistRows.map(c => ({
-                    id: String(c.id),
-                    atividadeId: c.atividadeId,
-                    description: c.description,
-                    isCompleted: Boolean(c.isCompleted),
-                    toggleStatus() { this.isCompleted = !this.isCompleted; }
+                    id: Number(c.id),
+                    atividadeId: Number(c.atividadeId),
+                    descricao: c.descricao,
+                    isCompleted: Boolean(c.isCompleted)
                 })),
                 links: linksRows.map(l => ({
-                    id: String(l.id),
-                    atividadeId: l.atividadeId,
+                    id: Number(l.id),
+                    atividadeId: Number(l.atividadeId),
                     tipo: l.tipo,
                     link: l.link
                 }))
@@ -53,7 +52,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         if (!r) return undefined;
 
         const checklistRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, descricao as description, concluido as isCompleted 
+            `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
              FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
             [String(r.id)]
         );
@@ -73,15 +72,14 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             status: r.status,
             linkPlanoAula: r.link_plano_aula,
             checklist: checklistRows.map(c => ({
-                id: String(c.id),
-                atividadeId: c.atividadeId,
-                description: c.description,
-                isCompleted: Boolean(c.isCompleted),
-                toggleStatus() { this.isCompleted = !this.isCompleted; }
+                id: Number(c.id),
+                atividadeId: Number(c.atividadeId),
+                descricao: c.descricao,
+                isCompleted: Boolean(c.isCompleted)
             })),
             links: linksRows.map(l => ({
-                id: String(l.id),
-                atividadeId: l.atividadeId,
+                id: Number(l.id),
+                atividadeId: Number(l.atividadeId),
                 tipo: l.tipo,
                 link: l.link
             }))
@@ -110,7 +108,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             for (const item of data.checklist) {
                 await db.run(
                     `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'AULA', ?, ?)`,
-                    [String(createdId), item.description, item.isCompleted ? 1 : 0]
+                    [String(createdId), item.descricao, item.isCompleted ? 1 : 0]
                 );
             }
         }
@@ -156,7 +154,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 for (const item of changes.checklist) {
                     await db.run(
                         `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'AULA', ?, ?)`,
-                        [String(id), item.description, item.isCompleted ? 1 : 0]
+                        [String(id), item.descricao, item.isCompleted ? 1 : 0]
                     );
                 }
             }
