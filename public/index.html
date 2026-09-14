@@ -50,8 +50,11 @@
             font-weight: 600;
         }
 
-        /* Checklist */
-        input[type="checkbox"]:checked + span { text-decoration: line-through; color: #94a3b8; }
+        /* Checklist — estado controlado via JS (dashboard.js) */
+        input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
         input[type="checkbox"] { accent-color: #7c3aed; }
 
         /* Timeline line */
@@ -194,7 +197,7 @@
                         <ul class="space-y-1.5">
                             <li class="flex items-center gap-2">
                                 <input type="checkbox" checked id="ck1" class="w-3.5 h-3.5 rounded flex-shrink-0">
-                                <label for="ck1" class="text-xs text-slate-500 cursor-pointer line-through">Pegar chaves do laboratório na portaria</label>
+                                <label for="ck1" class="text-xs text-slate-500 cursor-pointer">Pegar chaves do laboratório na portaria</label>
                             </li>
                             <li class="flex items-center gap-2">
                                 <input type="checkbox" id="ck2" class="w-3.5 h-3.5 rounded flex-shrink-0">
@@ -292,26 +295,27 @@
                     <div class="px-4 pb-3 flex-1">
                         <div class="flex items-center justify-between mb-2">
                             <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Logística GirliES</p>
-                            <span class="text-xs text-slate-500 font-semibold">3 de 5 concluídas <span class="text-slate-400 font-normal">(60%)</span></span>
+                            <span id="logistica-contador" class="text-xs text-slate-500 font-semibold">3 de 5 concluídas <span class="text-slate-400 font-normal">(60%)</span></span>
                         </div>
                         <!-- Progress bar -->
                         <div class="w-full h-1.5 bg-slate-100 rounded-full mb-3">
-                            <div class="h-1.5 bg-violet-500 rounded-full" style="width: 60%"></div>
+                            <div id="logistica-barra" class="h-1.5 bg-violet-500 rounded-full transition-all duration-500" style="width: 33%"></div>
                         </div>
-                        <ul class="space-y-1.5 text-xs text-slate-500">
-                            <li class="flex items-start gap-2">
-                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5"></i>
-                                2 equipes de garotas formadas e inscritas
+                        <ul id="lista-logistica" class="space-y-1.5 text-xs text-slate-500">
+                            <li class="checklist-logistica flex items-start gap-2 cursor-pointer select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors" data-concluido="true">
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5 icon-status"></i>
+                                <span class="line-through text-slate-400">2 equipes de garotas formadas e inscritas</span>
                             </li>
-                            <li class="flex items-start gap-2">
-                                <i data-lucide="circle" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5"></i>
-                                Oficina preparatória de API da NASA agendada
+                            <li class="checklist-logistica flex items-start gap-2 cursor-pointer select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors" data-concluido="false">
+                                <i data-lucide="circle" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5 icon-status"></i>
+                                <span>Oficina preparatória de API da NASA agendada</span>
                             </li>
-                            <li class="flex items-start gap-2">
-                                <i data-lucide="circle" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5"></i>
-                                Aprovação de auxílio transporte junto à PROEXT
+                            <li class="checklist-logistica flex items-start gap-2 cursor-pointer select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors" data-concluido="false">
+                                <i data-lucide="circle" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5 icon-status"></i>
+                                <span>Aprovação de auxílio transporte junto à PROEXT</span>
                             </li>
                         </ul>
+
                     </div>
                     <div class="px-4 py-3 border-t border-slate-100">
                         <button class="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-2.5 rounded-lg transition-colors shadow-md shadow-violet-500/20">
