@@ -3,9 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>MVP GirliES - Dashboard</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        
+        /* Micro-animations */
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Custom scrollbar for board */
+        .board-scroll::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .board-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .board-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .board-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
 </head>
-<body>
-    
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden antialiased">
+
+    <!-- Sidebar -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <div>
+            <!-- Logo area -->
+            <div class="h-20 flex items-center px-8 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white shadow-lg shadow-pink-500/30">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">GirliES</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="p-4 space-y-1.5 mt-4">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-pink-50 text-pink-600 font-medium transition-colors">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Aulas
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                    Instagram
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                    Eventos
+                </a>
+            </nav>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="p-4 border-t border-slate-100">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                Configurações & Equipe
+            </a>
+            
+            <!-- User Profile -->
+            <div class="mt-4 flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-slate-50 rounded-xl transition-colors">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=fdf2f8&color=db2777" alt="User" class="w-10 h-10 rounded-full border border-pink-100">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-800 truncate">Administrador</p>
+                    <p class="text-xs text-slate-500 truncate">admin@girlies.com</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <!-- Header -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 z-10">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Visão Geral</h1>
+                <p class="text-sm text-slate-500">Acompanhe as atividades da semana</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                </button>
+                <button class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all hover-lift shadow-lg shadow-slate-900/20">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    Nova Atividade
+                </button>
+            </div>
+        </header>
+
+        <!-- Board Area -->
+        <div class="flex-1 overflow-x-auto overflow-y-hidden bg-slate-50/50 board-scroll p-8">
+            <div class="flex gap-6 h-full min-w-max pb-4">
+                
+                <!-- Segunda-feira -->
+                <div class="w-80 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+                            Segunda
+                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">3</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-md">Aula</span>
+                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-1">Marketing Digital 101</h4>
+                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Preparar o material sobre funil de vendas para a próxima turma.</p>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    14:00
+                                </div>
+                                <img src="https://ui-avatars.com/api/?name=Ana&background=e0e7ff&color=4338ca" alt="Avatar" class="w-6 h-6 rounded-full border border-white">
+                            </div>
+                        </div>
+                        
+                        <!-- Card 2 -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-md">Instagram</span>
+                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-1">Post Reels: Dicas de Vendas</h4>
+                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Gravar e editar o reels com as 3 dicas principais para aumentar conversão.</p>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    18:00
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terça-feira -->
+                <div class="w-80 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+                            Terça
+                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">1</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-md">Reunião</span>
+                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-1">Alinhamento Equipe</h4>
+                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Review dos resultados da semana anterior e definição de metas.</p>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    10:00
+                                </div>
+                                <div class="flex -space-x-2">
+                                    <img src="https://ui-avatars.com/api/?name=A&background=e0e7ff&color=4338ca" alt="Avatar" class="w-6 h-6 rounded-full border border-white">
+                                    <img src="https://ui-avatars.com/api/?name=B&background=fce7f3&color=be185d" alt="Avatar" class="w-6 h-6 rounded-full border border-white">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quarta-feira -->
+                <div class="w-80 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+                            Quarta
+                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">2</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab opacity-60">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-md">Evento</span>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-1 line-through">Live de Lançamento</h4>
+                            <p class="text-xs text-slate-500 mb-4">Live no instagram para anunciar novidades.</p>
+                            <div class="flex items-center justify-between mt-auto">
+                                <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Concluído</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Card 2 -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-md">Aula</span>
+                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-1">Sessão de Dúvidas Q&A</h4>
+                            <p class="text-xs text-slate-500 mb-4">Responder perguntas da comunidade no discord.</p>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    20:00
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quinta-feira -->
+                <div class="w-80 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+                            Quinta
+                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">0</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col items-center justify-center text-slate-400 gap-2 border-dashed">
+                        <i data-lucide="inbox" class="w-8 h-8 opacity-50"></i>
+                        <p class="text-sm font-medium">Nenhuma atividade</p>
+                        <button class="text-xs text-pink-600 font-semibold hover:text-pink-700 mt-1">Adicionar +</button>
+                    </div>
+                </div>
+
+                <!-- Sexta-feira -->
+                <div class="w-80 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
+                            Sexta
+                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">1</span>
+                        </h3>
+                    </div>
+                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-md">Financeiro</span>
+                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 mb-1">Fechamento da Semana</h4>
+                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Revisar métricas de conversão e custos de ads.</p>
+                            <div class="flex items-center justify-between mt-auto">
+                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                    16:00
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Adicionar coluna para padding final -->
+                <div class="w-4"></div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Inicializa os ícones do Lucide
+        lucide.createIcons();
+    </script>
 </body>
 </html>
