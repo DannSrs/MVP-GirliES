@@ -13,6 +13,7 @@ export interface PostInstagram {
   responsavelDesignId?: number;
   checklist?: ChecklistItem[];
   links?: LinksAtividade[];
+  semana?: number;
 }
 
 

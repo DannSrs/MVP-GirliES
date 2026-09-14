@@ -12,6 +12,7 @@ export interface EventoGeral extends Atividade {
   capacidade?: number;
   logisticsChecklist?: ChecklistItem[];
   links?: LinksAtividade[];
+  semana?: number;
 }
 
 export interface CriarEventoGeralDTO extends Omit<EventoGeral, 'id' | 'logisticsChecklist' | 'links'> {

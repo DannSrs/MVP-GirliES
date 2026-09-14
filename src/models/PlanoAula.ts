@@ -13,6 +13,7 @@ export interface PlanoAula {
   checklist?: ChecklistItem[];
   links?: LinksAtividade[];
   responsaveisId?: number[];
+  semana?: number;
 }
 
 export type CriarPlanoAulaDTO = Omit<PlanoAula, 'id' | 'checklist' | 'links'> & {

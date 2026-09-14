@@ -26,6 +26,11 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
   await db.exec(`
     PRAGMA foreign_keys = ON;
 
+    CREATE TABLE IF NOT EXISTS ConfiguracoesGlobais (
+      chave TEXT PRIMARY KEY,
+      valor TEXT NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS Usuarios (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,
@@ -99,6 +104,21 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  // Seeding Configurações Globais (Data Início e Data Fim Padrão do MVP)
+  // Definindo datas padrão: Início 01/09, Fim 12/12.
+  const dataInicioAtual = await db.get(`SELECT valor FROM ConfiguracoesGlobais WHERE chave = 'DATA_INICIO_PROJETO'`);
+  if (!dataInicioAtual) {
+    const ano = new Date().getFullYear();
+    // No JavaScript os meses começam em 0 (Janeiro = 0, Setembro = 8, Dezembro = 11)
+    const dataAtual = new Date(ano, 8, 1); // 01 de Setembro
+    const dataFim = new Date(ano, 11, 12); // 12 de Dezembro
+    
+    await db.run(
+      `INSERT INTO ConfiguracoesGlobais (chave, valor) VALUES ('DATA_INICIO_PROJETO', ?), ('DATA_FIM_PROJETO', ?)`,
+      [dataAtual.toISOString(), dataFim.toISOString()]
+    );
+  }
 
   // Seeding da usuária admin (Leticia)
   const leticiaEmail = 'mlsb5@discente.ifpe.edu.br';
