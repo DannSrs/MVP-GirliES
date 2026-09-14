@@ -1,21 +1,21 @@
 import { Controller, Get, Post, Put, Delete, Route, Body, Path, Tags, Response } from 'tsoa';
 import { Usuario, CriarUsuarioDTO, AtualizarUsuarioDTO } from '../models/Usuario';
-import { UsuarioRepository } from '../repositories/UsuarioRepository';
+import { UsuarioService } from '../services/UsuarioService';
 
 @Route("api/usuarios")
 @Tags("Usuários")
 export class UsuarioController extends Controller {
-  private repository = new UsuarioRepository();
+  private service = new UsuarioService();
 
   @Get()
   public async getUsuarios(): Promise<Usuario[]> {
-    return this.repository.findAll();
+    return this.service.listarTodos();
   }
 
   @Get("{id}")
   @Response(404, "Usuário não encontrado")
   public async getUsuarioById(@Path() id: number): Promise<Usuario | undefined> {
-    const usuario = await this.repository.findById(id);
+    const usuario = await this.service.buscarPorId(id);
     if (!usuario) {
       this.setStatus(404);
       return undefined;
@@ -26,34 +26,39 @@ export class UsuarioController extends Controller {
   @Post()
   @Response(400, "Erro de Validação")
   public async criarUsuario(@Body() requestBody: CriarUsuarioDTO): Promise<Usuario & { senhaGerada?: string }> {
-    // Basic validation for ifpe email
-    if (!requestBody.email.endsWith('@discente.ifpe.edu.br')) {
+    try {
+      this.setStatus(201);
+      return await this.service.criarUsuario(requestBody);
+    } catch (error: any) {
       this.setStatus(400);
-      throw new Error("O e-mail deve pertencer ao domínio @discente.ifpe.edu.br");
+      throw error;
     }
-
-    this.setStatus(201);
-    return this.repository.create(requestBody);
   }
 
   @Put("{id}")
   @Response(404, "Usuário não encontrado")
+  @Response(400, "Erro de Validação")
   public async atualizarUsuario(
     @Path() id: number,
     @Body() requestBody: AtualizarUsuarioDTO
   ): Promise<Usuario | undefined> {
-    const updated = await this.repository.update(id, requestBody);
-    if (!updated) {
-      this.setStatus(404);
-      return undefined;
+    try {
+      const updated = await this.service.atualizarUsuario(id, requestBody);
+      if (!updated) {
+        this.setStatus(404);
+        return undefined;
+      }
+      return updated;
+    } catch (error: any) {
+      this.setStatus(400);
+      throw error;
     }
-    return updated;
   }
 
   @Delete("{id}")
   @Response(404, "Usuário não encontrado")
   public async deletarUsuario(@Path() id: number): Promise<{ success: boolean }> {
-    const deleted = await this.repository.delete(id);
+    const deleted = await this.service.deletarUsuario(id);
     if (!deleted) {
       this.setStatus(404);
       return { success: false };
