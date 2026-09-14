@@ -1,7 +1,6 @@
 import { getDb } from '../database/config/database';
 import { Usuario, CriarUsuarioDTO, AtualizarUsuarioDTO } from '../models/Usuario';
 import { IRepository } from './IRepository';
-import bcrypt from 'bcryptjs';
 
 export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, AtualizarUsuarioDTO> {
     async findAll(): Promise<Usuario[]> {
@@ -54,17 +53,8 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
         };
     }
 
-    async create(data: CriarUsuarioDTO): Promise<Usuario & { senhaGerada?: string }> {
+    async create(data: CriarUsuarioDTO, senhaHash?: string): Promise<Usuario> {
         const db = await getDb();
-
-        // Gerar senha padrão
-        const ano = new Date().getFullYear();
-        const roleStr = (data.role || 'voluntaria').toUpperCase();
-        const username = data.email.split('@')[0].toUpperCase();
-        const letraAleatoria = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-        const numeroAleatorio = Math.floor(Math.random() * 10);
-        const senhaGerada = `GIRLIES-IFPE-${ano}-${roleStr}-${username}-${letraAleatoria}${numeroAleatorio}`;
-        const hashedPassword = await bcrypt.hash(senhaGerada, 10);
 
         const result = await db.run(
             `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, role) 
@@ -75,7 +65,7 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
                 data.funcaoInterna,
                 data.curso,
                 data.periodo,
-                hashedPassword,
+                senhaHash || null,
                 data.role || 'voluntaria'
             ]
         );
@@ -86,8 +76,7 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
         const user = await this.findById(createdId);
         if (!user) throw new Error('Falha ao recuperar usuário recém-criado');
 
-        // Retornamos a senha gerada (em texto limpo) apenas no momento da criação para o admin poder copiar.
-        return { ...user, senhaGerada };
+        return user;
     }
 
     async update(id: number | string, changes: AtualizarUsuarioDTO): Promise<Usuario | undefined> {
