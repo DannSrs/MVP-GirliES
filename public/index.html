@@ -3,283 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MVP GirliES - Dashboard</title>
+    <title>GirliES – Dashboard</title>
+    <meta name="description" content="Painel de controle do GirliES – Extensão Universitária Engenharia de Software IFPE">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
         body { font-family: 'Outfit', sans-serif; }
-        
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
+
+        /* Sidebar active glow */
+        .nav-active {
+            background: linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%);
+            box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.35);
+        }
+
         /* Micro-animations */
-        .hover-lift {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .hover-card {
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
-        .hover-lift:hover {
+        .hover-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
-        
-        /* Custom scrollbar for board */
-        .board-scroll::-webkit-scrollbar {
-            height: 8px;
-            width: 8px;
+
+        /* Pulsing green dot */
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
-        .board-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
+        .dot-pulse { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+        /* Tag fade-in */
+        .badge-tag {
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            font-weight: 600;
         }
-        .board-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+
+        /* Checklist */
+        input[type="checkbox"]:checked + span { text-decoration: line-through; color: #94a3b8; }
+        input[type="checkbox"] { accent-color: #7c3aed; }
+
+        /* Timeline line */
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 38px;
+            width: 1px;
+            height: calc(100% - 10px);
+            background: #e2e8f0;
         }
-        .board-scroll::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        .timeline-item { position: relative; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden antialiased">
+<body class="bg-slate-100 text-slate-800 flex h-screen overflow-hidden antialiased">
 
-    <!-- Sidebar -->
-    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-        <div>
-            <!-- Logo area -->
-            <div class="h-20 flex items-center px-8 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white shadow-lg shadow-pink-500/30">
-                        <i data-lucide="sparkles" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600">GirliES</span>
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="w-52 bg-[#1e0a3c] flex flex-col flex-shrink-0 h-screen">
+
+        <!-- Logo -->
+        <div class="px-5 pt-6 pb-5 border-b border-white/10">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-500 to-purple-400 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
                 </div>
+                <span class="text-white font-bold text-lg tracking-tight">GirliES</span>
+                <span class="bg-emerald-400 text-emerald-900 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">CORE</span>
             </div>
-
-            <!-- Navigation -->
-            <nav class="p-4 space-y-1.5 mt-4">
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-pink-50 text-pink-600 font-medium transition-colors">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    Dashboard
-                </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>
-                    Aulas
-                </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
-                    <i data-lucide="instagram" class="w-5 h-5"></i>
-                    Instagram
-                </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
-                    <i data-lucide="calendar" class="w-5 h-5"></i>
-                    Eventos
-                </a>
-            </nav>
+            <p class="text-white/40 text-[10px] font-mono pl-10">Girls in SE • IFPE</p>
         </div>
 
-        <!-- Bottom Navigation -->
-        <div class="p-4 border-t border-slate-100">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium transition-colors">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-                Configurações & Equipe
+        <!-- Nav -->
+        <nav class="flex-1 p-3 space-y-1 mt-2">
+            <a href="#" id="nav-dashboard" class="nav-active flex items-center gap-3 px-3 py-2.5 rounded-lg text-white font-medium text-sm transition-all">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                Dashboard
             </a>
-            
-            <!-- User Profile -->
-            <div class="mt-4 flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-slate-50 rounded-xl transition-colors">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=fdf2f8&color=db2777" alt="User" class="w-10 h-10 rounded-full border border-pink-100">
+            <a href="#" id="nav-aulas" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/8 font-medium text-sm transition-all">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                Aulas
+            </a>
+            <a href="#" id="nav-instagram" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/8 font-medium text-sm transition-all">
+                <i data-lucide="instagram" class="w-4 h-4"></i>
+                Instagram
+            </a>
+            <a href="#" id="nav-eventos" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/8 font-medium text-sm transition-all">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                Eventos
+            </a>
+
+            <div class="pt-4">
+                <a href="#" id="nav-config" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/90 hover:bg-white/8 font-medium text-sm transition-all">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    <span class="leading-tight">Configurações<br><span class="font-normal text-xs">& Equipe</span></span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-2.5 cursor-pointer hover:bg-white/5 rounded-lg p-2 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-violet-400 to-pink-400 flex items-center justify-center text-white text-xs font-bold shadow">L</div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold text-slate-800 truncate">Administrador</p>
-                    <p class="text-xs text-slate-500 truncate">admin@girlies.com</p>
+                    <p class="text-white text-xs font-semibold truncate">Letícia</p>
+                    <p class="text-white/40 text-[10px] truncate">Dev // Infra</p>
                 </div>
+                <i data-lucide="log-out" class="w-3.5 h-3.5 text-white/30 flex-shrink-0"></i>
+            </div>
+            <div class="mt-2 px-2 flex items-center justify-between">
+                <span class="text-white/30 text-[10px] font-mono">GirliES Squad</span>
+                <span class="text-white/30 text-[10px] font-mono">v2.6.2</span>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <!-- Header -->
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 z-10">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">Visão Geral</h1>
-                <p class="text-sm text-slate-500">Acompanhe as atividades da semana</p>
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-50">
+
+        <!-- ── Greeting Banner ── -->
+        <section class="bg-gradient-to-r from-violet-50 via-purple-50 to-slate-50 border-b border-slate-200 px-8 pt-7 pb-6">
+            <!-- Session bar -->
+            <div class="flex items-center gap-2 mb-4 font-mono text-[11px] text-slate-500">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 dot-pulse inline-block"></span>
+                    <span class="text-emerald-600 font-semibold">SYS.ONLINE</span>
+                </span>
+                <span class="text-slate-300">//</span>
+                <span class="bg-violet-100 text-violet-700 px-2 py-0.5 rounded text-[10px] font-semibold">DEV_SESSION</span>
+                <span class="text-slate-400">&lt;girli_es:root&gt;</span>
             </div>
-            <div class="flex items-center gap-4">
-                <button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors">
-                    <i data-lucide="bell" class="w-5 h-5"></i>
-                </button>
-                <button class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all hover-lift shadow-lg shadow-slate-900/20">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    Nova Atividade
-                </button>
+            <!-- Name -->
+            <h1 class="text-3xl font-bold text-slate-800 mb-1.5">Olá, Letícia! <span class="text-pink-500">♥</span></h1>
+            <p class="text-sm text-slate-500">
+                Painel de Extensão Universitária •
+                <a href="#" class="text-violet-600 font-medium hover:underline">Engenharia de Software IFPE</a>
+                • <span class="text-violet-500 font-semibold">Semestre 2026.2</span>
+            </p>
+        </section>
+
+        <!-- ── Operações Prioritárias ── -->
+        <section class="px-8 py-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-semibold text-slate-700 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-violet-500 inline-block"></span>
+                    Operações Prioritárias da Semana
+                </h2>
+                <span class="text-xs text-slate-400 font-mono">Ciclo Ativo: 16-22 Set</span>
             </div>
-        </header>
 
-        <!-- Board Area -->
-        <div class="flex-1 overflow-x-auto overflow-y-hidden bg-slate-50/50 board-scroll p-8">
-            <div class="flex gap-6 h-full min-w-max pb-4">
-                
-                <!-- Segunda-feira -->
-                <div class="w-80 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
-                            Segunda
-                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">3</span>
-                        </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+                <!-- Card 1: Lab Prático -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover-card flex flex-col overflow-hidden">
+                    <div class="px-4 pt-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="badge-tag bg-violet-100 text-violet-700 px-2 py-0.5 rounded uppercase">Lab Prático</span>
+                                <span class="badge-tag text-slate-400 font-mono">• Semana 02</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+                                <i data-lucide="flask-conical" class="w-4 h-4 text-violet-500"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base leading-snug">Sistemas Digitais &amp;<br>Circuitos Lógicos</h3>
                     </div>
-                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
-                        <!-- Card 1 -->
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-md">Aula</span>
-                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-                            </div>
-                            <h4 class="font-semibold text-slate-800 mb-1">Marketing Digital 101</h4>
-                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Preparar o material sobre funil de vendas para a próxima turma.</p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                    14:00
-                                </div>
-                                <img src="https://ui-avatars.com/api/?name=Ana&background=e0e7ff&color=4338ca" alt="Avatar" class="w-6 h-6 rounded-full border border-white">
-                            </div>
+                    <div class="px-4 py-3 flex flex-col gap-2 text-xs text-slate-500">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                            <span>16 de Setembro • 14:00 às 17:38</span>
                         </div>
-                        
-                        <!-- Card 2 -->
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-md">Instagram</span>
-                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-                            </div>
-                            <h4 class="font-semibold text-slate-800 mb-1">Post Reels: Dicas de Vendas</h4>
-                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Gravar e editar o reels com as 3 dicas principais para aumentar conversão.</p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                    18:00
-                                </div>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                            <span>Lab 3, Bloco D (Engenharia de Software)</span>
                         </div>
+                    </div>
+                    <!-- Checklist -->
+                    <div class="px-4 pb-3 flex-1">
+                        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Checklist de Bancada</p>
+                        <ul class="space-y-1.5">
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" checked id="ck1" class="w-3.5 h-3.5 rounded flex-shrink-0">
+                                <label for="ck1" class="text-xs text-slate-500 cursor-pointer line-through">Pegar chaves do laboratório na portaria</label>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" id="ck2" class="w-3.5 h-3.5 rounded flex-shrink-0">
+                                <label for="ck2" class="text-xs text-slate-600 cursor-pointer">Levar massinha de modelar &amp; protoboards</label>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" id="ck3" class="w-3.5 h-3.5 rounded flex-shrink-0">
+                                <label for="ck3" class="text-xs text-slate-600 cursor-pointer">Testar simulador Logisim nos 20 PCs</label>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <input type="checkbox" id="ck4" class="w-3.5 h-3.5 rounded flex-shrink-0">
+                                <label for="ck4" class="text-xs text-slate-600 cursor-pointer">Imprimir apostilas ilustradas de exercícios</label>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Footer -->
+                    <div class="px-4 py-3 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-[10px] text-slate-400 mb-0.5">Líderes do Módulo:</p>
+                            <p class="text-xs text-violet-600 font-semibold">Letícia &amp; Profa. Vitória</p>
+                        </div>
+                        <button class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                            Ver Plano de Aula
+                        </button>
                     </div>
                 </div>
 
-                <!-- Terça-feira -->
-                <div class="w-80 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
-                            Terça
-                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">1</span>
-                        </h3>
-                    </div>
-                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-md">Reunião</span>
-                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                <!-- Card 2: Instagram -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover-card flex flex-col overflow-hidden">
+                    <div class="px-4 pt-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="badge-tag bg-pink-100 text-pink-700 px-2 py-0.5 rounded uppercase">Instagram</span>
+                                <span class="badge-tag text-slate-400">• Carrossel Educativo</span>
                             </div>
-                            <h4 class="font-semibold text-slate-800 mb-1">Alinhamento Equipe</h4>
-                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Review dos resultados da semana anterior e definição de metas.</p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                    10:00
-                                </div>
-                                <div class="flex -space-x-2">
-                                    <img src="https://ui-avatars.com/api/?name=A&background=e0e7ff&color=4338ca" alt="Avatar" class="w-6 h-6 rounded-full border border-white">
-                                    <img src="https://ui-avatars.com/api/?name=B&background=fce7f3&color=be185d" alt="Avatar" class="w-6 h-6 rounded-full border border-white">
-                                </div>
+                            <span class="badge-tag bg-amber-400 text-amber-900 px-2 py-0.5 rounded uppercase">Em Produção</span>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-base leading-snug italic">"O que é<br>Engenharia de Software?"</h3>
+                    </div>
+                    <div class="px-4 py-3 flex-1 space-y-2.5 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400 text-xs">Público Alvo:</span>
+                            <span class="text-slate-700 text-xs font-medium">Garotas do Ensino Médio</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 text-xs">Prazo Final:</span>
+                            <span class="text-xs font-semibold text-amber-600 flex items-center gap-1">
+                                <i data-lucide="alarm-clock" class="w-3 h-3"></i>
+                                Amanhã • 18:00
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-400 text-xs">Design &amp; Copy:</span>
+                            <div class="flex -space-x-1.5">
+                                <div class="w-6 h-6 rounded-full bg-violet-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">LI</div>
+                                <div class="w-6 h-6 rounded-full bg-pink-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">MA</div>
+                                <div class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">BI</div>
                             </div>
                         </div>
+                    </div>
+                    <div class="px-4 py-3 border-t border-slate-100">
+                        <button class="w-full flex items-center justify-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-2.5 rounded-lg transition-colors">
+                            <i data-lucide="layout" class="w-3.5 h-3.5"></i>
+                            Revisar Carrossel
+                        </button>
                     </div>
                 </div>
 
-                <!-- Quarta-feira -->
-                <div class="w-80 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
-                            Quarta
-                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">2</span>
-                        </h3>
-                    </div>
-                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
-                        <!-- Card 1 -->
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab opacity-60">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-md">Evento</span>
+                <!-- Card 3: Hackathon -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover-card flex flex-col overflow-hidden">
+                    <div class="px-4 pt-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="badge-tag bg-slate-100 text-slate-600 px-2 py-0.5 rounded uppercase">Missão Externa</span>
+                                <span class="badge-tag text-slate-400 font-mono">// Hackathon</span>
                             </div>
-                            <h4 class="font-semibold text-slate-800 mb-1 line-through">Live de Lançamento</h4>
-                            <p class="text-xs text-slate-500 mb-4">Live no instagram para anunciar novidades.</p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Concluído</span>
+                            <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+                                <i data-lucide="rocket" class="w-4 h-4 text-slate-500"></i>
                             </div>
                         </div>
-                        
-                        <!-- Card 2 -->
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-md">Aula</span>
-                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-                            </div>
-                            <h4 class="font-semibold text-slate-800 mb-1">Sessão de Dúvidas Q&A</h4>
-                            <p class="text-xs text-slate-500 mb-4">Responder perguntas da comunidade no discord.</p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                    20:00
-                                </div>
-                            </div>
+                        <h3 class="font-bold text-slate-800 text-base leading-snug">NASA Space Apps<br>Caruaru 2026</h3>
+                    </div>
+                    <div class="px-4 py-3 flex flex-col gap-2 text-xs text-slate-500">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                            <span>04 a 06 de Outubro • 48 Horas</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>
+                            <span>Campus IFMaker / Polo Tecnológico</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Quinta-feira -->
-                <div class="w-80 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
-                            Quinta
-                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">0</span>
-                        </h3>
-                    </div>
-                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col items-center justify-center text-slate-400 gap-2 border-dashed">
-                        <i data-lucide="inbox" class="w-8 h-8 opacity-50"></i>
-                        <p class="text-sm font-medium">Nenhuma atividade</p>
-                        <button class="text-xs text-pink-600 font-semibold hover:text-pink-700 mt-1">Adicionar +</button>
-                    </div>
-                </div>
-
-                <!-- Sexta-feira -->
-                <div class="w-80 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="font-semibold text-slate-700 flex items-center gap-2">
-                            Sexta
-                            <span class="bg-slate-200 text-slate-600 text-xs py-0.5 px-2 rounded-full font-medium">1</span>
-                        </h3>
-                    </div>
-                    <div class="flex-1 bg-slate-100/50 border border-slate-200/60 rounded-2xl p-3 flex flex-col gap-3 overflow-y-auto board-scroll">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-grab">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-md">Financeiro</span>
-                                <button class="text-slate-400 hover:text-slate-600"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
-                            </div>
-                            <h4 class="font-semibold text-slate-800 mb-1">Fechamento da Semana</h4>
-                            <p class="text-xs text-slate-500 mb-4 line-clamp-2">Revisar métricas de conversão e custos de ads.</p>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                    16:00
-                                </div>
-                            </div>
+                    <!-- Logística -->
+                    <div class="px-4 pb-3 flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Logística GirliES</p>
+                            <span class="text-xs text-slate-500 font-semibold">3 de 5 concluídas <span class="text-slate-400 font-normal">(60%)</span></span>
                         </div>
+                        <!-- Progress bar -->
+                        <div class="w-full h-1.5 bg-slate-100 rounded-full mb-3">
+                            <div class="h-1.5 bg-violet-500 rounded-full" style="width: 60%"></div>
+                        </div>
+                        <ul class="space-y-1.5 text-xs text-slate-500">
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5"></i>
+                                2 equipes de garotas formadas e inscritas
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="circle" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5"></i>
+                                Oficina preparatória de API da NASA agendada
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i data-lucide="circle" class="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5"></i>
+                                Aprovação de auxílio transporte junto à PROEXT
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="px-4 py-3 border-t border-slate-100">
+                        <button class="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-2.5 rounded-lg transition-colors shadow-md shadow-violet-500/20">
+                            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                            Acessar Painel de Logística
+                        </button>
                     </div>
                 </div>
-                
-                <!-- Adicionar coluna para padding final -->
-                <div class="w-4"></div>
 
             </div>
-        </div>
+        </section>
+
+        <!-- ── Trilha Pedagógica ── -->
+        <section class="px-8 pb-10">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <!-- Section header -->
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="book-marked" class="w-4 h-4 text-violet-500"></i>
+                        <h2 class="font-bold text-slate-800">Trilha Pedagógica <span class="text-slate-400 font-normal">•</span> Semestre 2026.2</h2>
+                    </div>
+                    <span class="bg-violet-50 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full">14 Semanas Totais</span>
+                </div>
+
+                <!-- Timeline list -->
+                <div class="divide-y divide-slate-100">
+
+                    <!-- Semana 01 – Concluída -->
+                    <div class="timeline-item px-6 py-4 flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-xs font-semibold text-emerald-600">Semana 01</span>
+                                <span class="text-slate-300 text-xs">•</span>
+                                <span class="text-sm font-semibold text-slate-700">Acolhida &amp; Mindset Dev</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Apresentação da equipe, dinâmica de quebra-gelo e instalação de ambiente VS Code.</p>
+                        </div>
+                        <span class="text-xs text-emerald-600 font-semibold flex-shrink-0 mt-1">Concluída</span>
+                    </div>
+
+                    <!-- Semana 02 – Em Curso -->
+                    <div class="timeline-item px-6 py-4 flex items-start gap-4 bg-violet-50/40">
+                        <div class="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow shadow-violet-400/30">
+                            <span class="text-white text-xs font-bold">02</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center flex-wrap gap-2 mb-0.5">
+                                <span class="text-xs font-semibold text-violet-600">Semana 02</span>
+                                <span class="text-slate-300 text-xs">•</span>
+                                <span class="text-sm font-semibold text-slate-800">Sistemas Digitais &amp; Lógica Booleana</span>
+                                <span class="badge-tag bg-violet-500 text-white px-2 py-0.5 rounded uppercase">Em Curso</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Portas AND, OR, NOT com circuitos no protoboard físico e exercícios com massinha condutiva.</p>
+                        </div>
+                        <span class="text-xs text-violet-600 font-semibold flex-shrink-0 mt-1">Próx: Quarta</span>
+                    </div>
+
+                    <!-- Semana 03 -->
+                    <div class="timeline-item px-6 py-4 flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span class="text-slate-500 text-xs font-bold">03</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-xs font-semibold text-slate-400">Semana 03</span>
+                                <span class="text-slate-300 text-xs">•</span>
+                                <span class="text-sm font-semibold text-slate-600">Primeiros Passos com Python &amp; Algoritmos</span>
+                            </div>
+                            <p class="text-xs text-slate-400">Variáveis, tipos primitivos, estruturas condicionais e criação do primeiro mini-bot.</p>
+                        </div>
+                        <span class="text-xs text-slate-400 flex-shrink-0 mt-1">23 de Set</span>
+                    </div>
+
+                    <!-- Semana 04 -->
+                    <div class="timeline-item px-6 py-4 flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span class="text-slate-500 text-xs font-bold">04</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-xs font-semibold text-slate-400">Semana 04</span>
+                                <span class="text-slate-300 text-xs">•</span>
+                                <span class="text-sm font-semibold text-slate-600">Git, GitHub &amp; Open-Source Para Todas</span>
+                            </div>
+                            <p class="text-xs text-slate-400">Versionamento em equipe, primeiros pull requests e customização de perfil no GitHub.</p>
+                        </div>
+                        <span class="text-xs text-slate-400 flex-shrink-0 mt-1">30 de Set</span>
+                    </div>
+
+                </div>
+
+                <!-- Footer link -->
+                <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+                    <a href="#" class="text-violet-600 text-sm font-semibold hover:text-violet-700 flex items-center gap-1.5 transition-colors">
+                        Ver ementa completa (42 horas curriculares)
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <span class="text-xs text-slate-400 font-mono">Laboratório 4 – Bloco D IFPE</span>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
-        // Inicializa os ícones do Lucide
         lucide.createIcons();
+
+        // Nav active state
+        document.querySelectorAll('aside nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('aside nav a').forEach(a => {
+                    a.classList.remove('nav-active', 'text-white');
+                    a.classList.add('text-white/50');
+                });
+                this.classList.add('nav-active', 'text-white');
+                this.classList.remove('text-white/50');
+            });
+        });
     </script>
 </body>
 </html>
