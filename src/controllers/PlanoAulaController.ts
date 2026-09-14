@@ -1,21 +1,21 @@
 import { Controller, Get, Post, Put, Delete, Route, Body, Path, Tags, Response } from 'tsoa';
 import { PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO } from '../models/PlanoAula';
-import { PlanoAulaRepository } from '../repositories/PlanoAulaRepository';
+import { PlanoAulaService } from '../services/PlanoAulaService';
 
 @Route("api/aulas")
 @Tags("Plano de Aulas")
 export class PlanoAulaController extends Controller {
-  private repository = new PlanoAulaRepository();
+  private service = new PlanoAulaService();
 
   @Get()
   public async getAulas(): Promise<PlanoAula[]> {
-    return this.repository.findAll();
+    return this.service.listarTodas();
   }
 
   @Get("{id}")
   @Response(404, "Aula não encontrada")
   public async getAulaById(@Path() id: number): Promise<PlanoAula | undefined> {
-    const aula = await this.repository.findById(id);
+    const aula = await this.service.buscarPorId(id);
     if (!aula) {
       this.setStatus(404);
       return undefined;
@@ -24,29 +24,41 @@ export class PlanoAulaController extends Controller {
   }
 
   @Post()
+  @Response(400, "Erro de Validação")
   public async criarAula(@Body() requestBody: CriarPlanoAulaDTO): Promise<PlanoAula> {
-    this.setStatus(201);
-    return this.repository.create(requestBody);
+    try {
+      this.setStatus(201);
+      return await this.service.criarAula(requestBody);
+    } catch (error: any) {
+      this.setStatus(400);
+      throw error;
+    }
   }
 
   @Put("{id}")
   @Response(404, "Aula não encontrada")
+  @Response(400, "Erro de Validação")
   public async atualizarAula(
     @Path() id: number,
     @Body() requestBody: AtualizarPlanoAulaDTO
   ): Promise<PlanoAula | undefined> {
-    const updated = await this.repository.update(id, requestBody);
-    if (!updated) {
-      this.setStatus(404);
-      return undefined;
+    try {
+      const updated = await this.service.atualizarAula(id, requestBody);
+      if (!updated) {
+        this.setStatus(404);
+        return undefined;
+      }
+      return updated;
+    } catch (error: any) {
+      this.setStatus(400);
+      throw error;
     }
-    return updated;
   }
 
   @Delete("{id}")
   @Response(404, "Aula não encontrada")
   public async deletarAula(@Path() id: number): Promise<{ success: boolean }> {
-    const deleted = await this.repository.delete(id);
+    const deleted = await this.service.deletarAula(id);
     if (!deleted) {
       this.setStatus(404);
       return { success: false };

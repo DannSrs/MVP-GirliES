@@ -17,7 +17,7 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
         const posts: PostInstagram[] = [];
         for (const r of rows) {
             const checklistRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, descricao as description, concluido as isCompleted 
+                `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
                  FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'POST'`,
                 [r.id]
             );
@@ -38,15 +38,14 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
                 responsavelRoteiroId: r.responsavel_roteiro,
                 responsavelDesignId: r.responsavel_design,
                 checklist: checklistRows.map(c => ({
-                    id: String(c.id),
-                    atividadeId: String(c.atividadeId),
-                    description: c.description,
-                    isCompleted: Boolean(c.concluido || c.isCompleted),
-                    toggleStatus() { this.isCompleted = !this.isCompleted; }
+                    id: Number(c.id),
+                    atividadeId: Number(c.atividadeId),
+                    descricao: c.descricao,
+                    isCompleted: Boolean(c.concluido || c.isCompleted)
                 })),
                 links: linksRows.map(l => ({
-                    id: String(l.id),
-                    atividadeId: String(l.atividadeId),
+                    id: Number(l.id),
+                    atividadeId: Number(l.atividadeId),
                     tipo: l.tipo,
                     link: l.link
                 }))
@@ -61,7 +60,7 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
         if (!r) return undefined;
 
         const checklistRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, descricao as description, concluido as isCompleted 
+            `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
              FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'POST'`,
             [r.id]
         );
@@ -82,15 +81,14 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
             responsavelRoteiroId: r.responsavel_roteiro,
             responsavelDesignId: r.responsavel_design,
             checklist: checklistRows.map(c => ({
-                id: String(c.id),
-                atividadeId: String(c.atividadeId),
-                description: c.description,
-                isCompleted: Boolean(c.concluido || c.isCompleted),
-                toggleStatus() { this.isCompleted = !this.isCompleted; }
+                id: Number(c.id),
+                atividadeId: Number(c.atividadeId),
+                descricao: c.descricao,
+                isCompleted: Boolean(c.concluido || c.isCompleted)
             })),
             links: linksRows.map(l => ({
-                id: String(l.id),
-                atividadeId: String(l.atividadeId),
+                id: Number(l.id),
+                atividadeId: Number(l.atividadeId),
                 tipo: l.tipo,
                 link: l.link
             }))
@@ -120,7 +118,7 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
             for (const item of data.checklist) {
                 await db.run(
                     `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'POST', ?, ?)`,
-                    [createdId, item.description, item.isCompleted ? 1 : 0]
+                    [createdId, item.descricao, item.isCompleted ? 1 : 0]
                 );
             }
         }
@@ -167,7 +165,7 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
                 for (const item of changes.checklist) {
                     await db.run(
                         `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'POST', ?, ?)`,
-                        [String(id), item.description, item.isCompleted ? 1 : 0]
+                        [String(id), item.descricao, item.isCompleted ? 1 : 0]
                     );
                 }
             }
