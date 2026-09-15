@@ -389,10 +389,10 @@
                             4. Checklist Operacional & Pré-Aula
                         </h2>
                         <div class="flex items-center gap-3">
-                            <span
+                            <span id="checklist-progress-text"
                                 class="bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 shadow-sm">
                                 <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                                6 de 8 Concluídas
+                                0 de 0 Concluídas
                             </span>
                             <span
                                 class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-[10px] font-bold font-mono tracking-widest uppercase border border-slate-200">Operação</span>
@@ -403,89 +403,12 @@
 
                     <!-- Progress Bar -->
                     <div class="w-full bg-slate-100 h-2.5 rounded-full mb-6 overflow-hidden border border-slate-200">
-                        <div class="bg-emerald-400 h-full w-[75%] rounded-full shadow-inner"></div>
+                        <div id="checklist-progress-bar" class="bg-emerald-400 h-full w-[0%] rounded-full shadow-inner transition-all duration-300"></div>
                     </div>
 
                     <!-- Checklist Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                        <!-- Item 1 -->
-                        <label
-                            class="bg-slate-50 hover:bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group">
-                            <input type="checkbox" checked
-                                class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors mb-0.5">
-                                    Testar computadores e ambiente</p>
-                                <p class="text-[10px] text-slate-500 font-mono leading-tight">Python 3.12, VS Code e
-                                    extensões instaladas no Lab D4</p>
-                            </div>
-                        </label>
-                        <!-- Item 2 -->
-                        <label
-                            class="bg-slate-50 hover:bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group">
-                            <input type="checkbox" checked
-                                class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors mb-0.5">
-                                    Chaves e reserva de laboratório</p>
-                                <p class="text-[10px] text-slate-500 font-mono leading-tight">Confirmação liberada junto
-                                    à portaria do Bloco D</p>
-                            </div>
-                        </label>
-                        <!-- Item 3 -->
-                        <label
-                            class="bg-slate-50 hover:bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group">
-                            <input type="checkbox" checked
-                                class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors mb-0.5">
-                                    Imprimir lista de chamada & QR Code</p>
-                                <p class="text-[10px] text-slate-500 font-mono leading-tight">28 alunas cadastradas +
-                                    lista reserva</p>
-                            </div>
-                        </label>
-                        <!-- Item 4 -->
-                        <label
-                            class="bg-slate-50 hover:bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group">
-                            <input type="checkbox" checked
-                                class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors mb-0.5">
-                                    Postar lembrete no Discord & Instagram</p>
-                                <p class="text-[10px] text-slate-500 font-mono leading-tight">Canal #avisos-aulas e
-                                    stories com contagem</p>
-                            </div>
-                        </label>
-                        <!-- Item 5 -->
-                        <label
-                            class="bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group shadow-sm">
-                            <input type="checkbox"
-                                class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors mb-0.5">
-                                    Preparar kits práticos / protoboards</p>
-                                <p class="text-[10px] text-slate-500 font-mono leading-tight">Separar 15 kits para
-                                    atividades em duplas</p>
-                            </div>
-                        </label>
-                        <!-- Item 6 -->
-                        <label
-                            class="bg-slate-50 hover:bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group">
-                            <input type="checkbox" checked
-                                class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
-                            <div class="flex-1">
-                                <p
-                                    class="text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors mb-0.5">
-                                    Validar adaptadores HDMI do projetor</p>
-                                <p class="text-[10px] text-slate-500 font-mono leading-tight">Testado com cabos USB-C e
-                                    HDMI padrão</p>
-                            </div>
-                        </label>
+                    <div id="container-checklist" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                        <!-- Checklists dinâmicos -->
                     </div>
 
                     <!-- Add New Checklist Item -->
@@ -494,10 +417,11 @@
                         <div class="relative flex-1 w-full group">
                             <i data-lucide="plus-square"
                                 class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-girlies-purple transition-colors"></i>
-                            <input type="text" placeholder="Adicionar nova tarefa personalizada ao checklist..."
-                                class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-transparent text-sm focus:outline-none focus:ring-0 text-slate-700 font-medium placeholder-slate-400">
+                            <input type="text" id="nova-tarefa-input" placeholder="Adicionar nova tarefa personalizada ao checklist..."
+                                class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-transparent text-sm focus:outline-none focus:ring-0 text-slate-700 font-medium placeholder-slate-400"
+                                onkeypress="if(event.key==='Enter') adicionarNovaTarefa()">
                         </div>
-                        <button
+                        <button type="button" onclick="adicionarNovaTarefa()"
                             class="bg-girlies-purple hover:bg-[#3d004d] text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md shadow-girlies-purple/20 flex items-center justify-center gap-2 w-full sm:w-auto flex-shrink-0">
                             <i data-lucide="plus" class="w-4 h-4"></i> Adicionar
                         </button>
