@@ -61,7 +61,7 @@ window.atualizarIconeLink = function(input) {
         bgClass = 'bg-blue-100';
         textClass = 'text-blue-600';
     } else if (val.includes('vídeo') || val.includes('video') || val.includes('youtube')) {
-        novoIcone = 'youtube';
+        novoIcone = 'video';
         bgClass = 'bg-red-100';
         textClass = 'text-red-600';
     } else if (val.includes('slide') || val.includes('apresentação') || val.includes('canva') || val.includes('ppt')) {
