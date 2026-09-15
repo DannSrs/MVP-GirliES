@@ -3,6 +3,27 @@
  * Lógica específica da tela de Dashboard.
  */
 
+function dispararConfetes(elementoOrigem) {
+    if (typeof confetti !== 'function') return;
+    
+    let originX = 0.5;
+    let originY = 0.5;
+    
+    if (elementoOrigem) {
+        const rect = elementoOrigem.getBoundingClientRect();
+        originX = (rect.left + rect.width / 2) / window.innerWidth;
+        originY = (rect.top + rect.height / 2) / window.innerHeight;
+    }
+
+    confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { x: originX, y: originY },
+        colors: ['#7c3aed', '#ec4899', '#10b981', '#f59e0b'],
+        disableForReducedMotion: true
+    });
+}
+
 /**
  * Inicializa as checkboxes do checklist:
  * - Aplica transição CSS suave ao label ao marcar/desmarcar.
@@ -28,6 +49,14 @@ function inicializarChecklists() {
                     [{ opacity: 1 }, { opacity: 0.5 }, { opacity: 1 }],
                     { duration: 300, easing: 'ease-in-out' }
                 );
+
+                // Verifica se toda a lista de bancada foi concluída para easter egg
+                const container = this.closest('ul');
+                if (container) {
+                    const allCheckboxes = container.querySelectorAll('input[type="checkbox"]');
+                    const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+                    if (allChecked) dispararConfetes(this);
+                }
             }
         });
     });
@@ -107,6 +136,11 @@ function inicializarChecklistLogistica() {
                     [{ transform: 'scale(1)' }, { transform: 'scale(1.4)' }, { transform: 'scale(1)' }],
                     { duration: 250, easing: 'ease-out' }
                 );
+
+                // Easter egg de confetes se completou logística
+                const todosItens = lista.querySelectorAll('.checklist-logistica');
+                const todosConcluidos = [...todosItens].every(item => item.dataset.concluido === 'true');
+                if (todosConcluidos) dispararConfetes(lista);
             }
 
             atualizarProgresso();
