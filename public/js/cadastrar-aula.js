@@ -83,3 +83,69 @@ window.atualizarIconeLink = function(input) {
         }
     }
 };
+
+// Checklist Functions
+window.atualizarProgressoChecklist = function() {
+    const container = document.getElementById('container-checklist');
+    if (!container) return;
+
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    const total = checkboxes.length;
+    const concluidas = Array.from(checkboxes).filter(cb => cb.checked).length;
+    
+    const progressText = document.getElementById('checklist-progress-text');
+    const progressBar = document.getElementById('checklist-progress-bar');
+    
+    if (progressText) {
+        progressText.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i> ${concluidas} de ${total} Concluídas`;
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons({ root: progressText });
+        }
+    }
+    
+    if (progressBar) {
+        const percentage = total === 0 ? 0 : Math.round((concluidas / total) * 100);
+        progressBar.style.width = `${percentage}%`;
+    }
+};
+
+window.adicionarNovaTarefa = function() {
+    const input = document.getElementById('nova-tarefa-input');
+    const container = document.getElementById('container-checklist');
+    
+    if (!input || !container || !input.value.trim()) return;
+    
+    const textoTarefa = input.value.trim();
+    
+    const label = document.createElement('label');
+    label.className = "bg-white border border-slate-200 hover:border-girlies-purple/30 rounded-xl p-3.5 flex gap-3.5 items-start cursor-pointer transition-all group shadow-sm relative pr-10";
+    
+    label.innerHTML = `
+        <input type="checkbox" onchange="atualizarProgressoChecklist()" class="mt-0.5 w-4 h-4 text-girlies-purple rounded border-slate-300 focus:ring-girlies-purple accent-girlies-purple cursor-pointer">
+        <div class="flex-1 min-w-0">
+            <p class="tarefa-texto text-xs font-bold text-slate-700 group-hover:text-girlies-purple transition-colors break-words"></p>
+        </div>
+        <button type="button" onclick="event.preventDefault(); removerTarefa(this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 hover:bg-red-50 w-7 h-7 rounded flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </button>
+    `;
+    
+    label.querySelector('.tarefa-texto').textContent = textoTarefa;
+    
+    container.appendChild(label);
+    input.value = '';
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ root: label });
+    }
+    
+    window.atualizarProgressoChecklist();
+};
+
+window.removerTarefa = function(button) {
+    const label = button.closest('label');
+    if (label) {
+        label.remove();
+        window.atualizarProgressoChecklist();
+    }
+};
