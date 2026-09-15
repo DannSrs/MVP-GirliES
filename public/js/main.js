@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             document.querySelectorAll('aside nav a').forEach(a => {
                 a.classList.remove('nav-active', 'text-white');
-                a.classList.add('text-white/50');
+                a.classList.add('text-slate-500');
             });
             this.classList.add('nav-active', 'text-white');
-            this.classList.remove('text-white/50');
+            this.classList.remove('text-slate-500');
         });
     });
 });
