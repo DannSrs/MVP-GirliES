@@ -149,3 +149,98 @@ window.removerTarefa = function(button) {
         window.atualizarProgressoChecklist();
     }
 };
+
+// Team Management Functions
+window.atualizarContagemEquipe = function(tipo) {
+    const container = document.getElementById(`container-${tipo}s`);
+    const countSpan = document.getElementById(`count-${tipo}s`);
+    if (container && countSpan) {
+        countSpan.textContent = container.children.length;
+    }
+};
+
+window.toggleDropdown = function(id) {
+    const dropdown = document.getElementById(id);
+    if (!dropdown) return;
+    
+    const isHidden = dropdown.classList.contains('hidden');
+    
+    // Esconde todos os outros dropdowns
+    document.querySelectorAll('[id^="dropdown-"]').forEach(el => {
+        el.classList.add('hidden');
+    });
+    
+    if (isHidden) {
+        dropdown.classList.remove('hidden');
+    }
+    
+    // Fechar ao clicar fora
+    document.addEventListener('click', function closeDropdown(e) {
+        if (!e.target.closest('.relative')) {
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', closeDropdown);
+        }
+    });
+};
+
+window.adicionarMembro = function(tipo, nome, papel, initial) {
+    // Esconde o dropdown
+    const dropdown = document.getElementById(`dropdown-${tipo}s`);
+    if (dropdown) dropdown.classList.add('hidden');
+
+    const container = document.getElementById(`container-${tipo}s`);
+    if (!container) return;
+    
+    const card = document.createElement('div');
+    
+    if (tipo === 'docente') {
+        card.className = "flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:border-girlies-purple/30 transition-all group relative";
+        card.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-sm border-2 border-white avatar-initial">
+                ${initial}
+            </div>
+            <div class="flex-1 min-w-0 pr-6">
+                <p class="text-xs font-bold text-slate-800 mb-0.5 truncate">${nome}</p>
+                <p class="text-[10px] text-slate-500 font-mono truncate">${papel}</p>
+            </div>
+            <button type="button" onclick="removerMembroEquipe(this, 'docente')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 hover:bg-red-50 w-7 h-7 rounded flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+        `;
+    } else {
+        card.className = "flex items-center gap-3 p-2 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all group relative";
+        card.innerHTML = `
+            <div class="w-9 h-9 rounded-full bg-girlies-purple text-white flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-sm avatar-initial">
+                ${initial}
+            </div>
+            <div class="flex-1 min-w-0 pr-20">
+                <p class="text-xs font-bold text-slate-800 mb-0.5 truncate">${nome}</p>
+                <p class="text-[10px] text-slate-500 font-mono truncate">${papel}</p>
+            </div>
+            <div class="absolute right-8 top-1/2 -translate-y-1/2">
+                <select class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer border-none focus:ring-0 outline-none text-center">
+                    <option value="pendente" class="bg-white text-slate-700">Pendente</option>
+                    <option value="confirmada" class="bg-white text-slate-700" selected>Confirmada</option>
+                </select>
+            </div>
+            <button type="button" onclick="removerMembroEquipe(this, 'monitora')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 hover:bg-red-50 w-6 h-6 rounded flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+        `;
+    }
+    
+    container.appendChild(card);
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons({ root: card });
+    }
+    
+    window.atualizarContagemEquipe(tipo);
+};
+
+window.removerMembroEquipe = function(button, tipo) {
+    const card = button.closest('div.flex.items-center.gap-3');
+    if (card) {
+        card.remove();
+        window.atualizarContagemEquipe(tipo);
+    }
+};
