@@ -10,6 +10,8 @@ export interface PlanoAula {
   local?: string;
   status?: string;
   linkPlanoAula?: string;
+  linkSlide?: string;
+  linkRoteiro?: string;
   checklist?: ChecklistItem[];
   links?: LinksAtividade[];
   responsaveisId?: number[];

@@ -19,6 +19,8 @@ CREATE TABLE Aulas (
     local VARCHAR(255),
     status VARCHAR(50) DEFAULT 'Planejada',
     link_plano_aula VARCHAR(255),
+    link_slide VARCHAR(255),
+    link_roteiro VARCHAR(255),
     google_event_id VARCHAR(255)
 );
 
