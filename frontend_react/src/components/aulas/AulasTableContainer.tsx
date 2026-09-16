@@ -73,7 +73,11 @@ export function AulasTableContainer({ aulas }: AulasTableContainerProps) {
                     horario={horarioFormatado}
                     local={aula.local || 'Não definido'}
                     status={aula.status === 'done' || aula.status === 'in-progress' ? 'Confirmada' : 'Em Preparação'}
-                    materiais={{ video: true, pdf: true }} // Mock por enquanto
+                    materiais={{ 
+                      linkSlide: aula.linkSlide, 
+                      linkRoteiro: aula.linkRoteiro, 
+                      linkPlanoAula: aula.linkPlanoAula 
+                    }}
                     professora={{ nome: "Profa. GirliES", cargo: "Docente", letra: "G" }} // Mock por enquanto
                   />
                 );

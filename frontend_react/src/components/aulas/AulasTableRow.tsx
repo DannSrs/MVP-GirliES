@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, MonitorPlay, Code2, FileText, Eye, Clock } from 'lucide-react';
+import { CalendarDays, MapPin, MonitorPlay, Code2, FileText, File, Eye, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface AulasTableRowProps {
@@ -10,9 +10,9 @@ export interface AulasTableRowProps {
   horario: string;
   local: string;
   materiais: {
-    video?: boolean;
-    codigo?: boolean;
-    pdf?: boolean;
+    linkSlide?: string;
+    linkRoteiro?: string;
+    linkPlanoAula?: string;
   };
   professora: {
     nome: string;
@@ -58,6 +58,8 @@ export function AulasTableRow(props: AulasTableRowProps) {
     weekTextNum = "text-slate-500 text-xs font-bold leading-none mt-0.5";
   }
 
+  const hasMateriais = !!(materiais?.linkSlide || materiais?.linkRoteiro || materiais?.linkPlanoAula);
+
   return (
     <div className="grid grid-cols-[80px_2fr_1.5fr_1fr_1.5fr_120px_60px] gap-4 px-6 py-4 items-center hover:bg-slate-50 transition-colors">
       {/* Col 1 */}
@@ -88,26 +90,26 @@ export function AulasTableRow(props: AulasTableRowProps) {
       
       {/* Col 4 */}
       <div className="flex items-center gap-1.5">
-        {status === 'Em Preparação' ? (
+        {(status === 'Em Preparação' || !hasMateriais) ? (
           <span className="text-[10px] text-slate-400 font-medium italic flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" /> Em edição
           </span>
         ) : (
           <>
-            {materiais?.video && (
-              <div className="w-7 h-7 rounded-md bg-girlies-purple/5 border border-girlies-purple/10 flex items-center justify-center text-girlies-purple cursor-pointer hover:bg-girlies-purple/10 transition-colors" title="Apresentação de Slides">
+            {materiais?.linkSlide && (
+              <a href={materiais.linkSlide} target="_blank" rel="noreferrer" className="w-7 h-7 rounded-md bg-girlies-purple/5 border border-girlies-purple/10 flex items-center justify-center text-girlies-purple cursor-pointer hover:bg-girlies-purple/10 transition-colors" title="Apresentação de Slides">
                 <MonitorPlay className="w-3.5 h-3.5" />
-              </div>
+              </a>
             )}
-            {materiais?.codigo && (
-              <div className="w-7 h-7 rounded-md bg-girlies-purple/5 border border-girlies-purple/10 flex items-center justify-center text-girlies-purple cursor-pointer hover:bg-girlies-purple/10 transition-colors" title="Código Fonte">
-                <Code2 className="w-3.5 h-3.5" />
-              </div>
-            )}
-            {materiais?.pdf && (
-              <div className="w-7 h-7 rounded-md bg-girlies-purple/5 border border-girlies-purple/10 flex items-center justify-center text-girlies-purple cursor-pointer hover:bg-girlies-purple/10 transition-colors" title="Apostila em PDF">
+            {materiais?.linkRoteiro && (
+              <a href={materiais.linkRoteiro} target="_blank" rel="noreferrer" className="w-7 h-7 rounded-md bg-girlies-purple/5 border border-girlies-purple/10 flex items-center justify-center text-girlies-purple cursor-pointer hover:bg-girlies-purple/10 transition-colors" title="Roteiro da Aula">
                 <FileText className="w-3.5 h-3.5" />
-              </div>
+              </a>
+            )}
+            {materiais?.linkPlanoAula && (
+              <a href={materiais.linkPlanoAula} target="_blank" rel="noreferrer" className="w-7 h-7 rounded-md bg-girlies-purple/5 border border-girlies-purple/10 flex items-center justify-center text-girlies-purple cursor-pointer hover:bg-girlies-purple/10 transition-colors" title="Plano de Ensino">
+                <File className="w-3.5 h-3.5" />
+              </a>
             )}
           </>
         )}
