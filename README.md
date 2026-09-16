@@ -17,15 +17,21 @@ npm install
 
 ## Como Rodar o Projeto
 
-Criamos um atalho para facilitar o desenvolvimento. Agora, com um único comando, você inicia **tanto o Back-end quanto o Front-end React** simultaneamente:
+Para manter os logs organizados e evitar travamentos no terminal do Windows, o ideal é rodar o back-end e o front-end em abas (terminais) separadas:
 
+### 1. Inicie a API (Back-end)
+Abra o primeiro terminal na raiz do projeto e rode:
 ```bash
 npm run dev
 ```
+*(Isso iniciará o servidor na porta 3000)*
 
-### O que acontece quando você roda esse comando:
-- **API Back-end:** Iniciada em `http://localhost:3000` (com auto-reload).
-- **Painel Novo (React):** Iniciado em `http://localhost:5173` pelo Vite.
+### 2. Inicie o Painel React (Front-end)
+Abra um segundo terminal na raiz do projeto e rode:
+```bash
+npm run dev:react
+```
+*(Isso iniciará o Vite na porta 5173 e abrirá a nova interface)*
 - **Painel Antigo (Estático):** Continua intacto. Para acessá-lo, basta abrir o arquivo `frontend/index.html` em seu navegador ou usar a extensão Live Server do VSCode.
 
 > **Nota:** As chamadas da API do painel React estão configuradas para acessar a porta 3000 (Back-end) automaticamente através do proxy no `vite.config.ts`.
