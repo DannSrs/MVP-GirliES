@@ -1,7 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BookOpen, FileText, FolderCode, Link as LinkIcon, MonitorPlay, Plus } from 'lucide-react';
+import { type CustomLink, CustomLinkItem } from './CustomLinkItem';
 
 export function MaterialsSection() {
+  const [links, setLinks] = useState<CustomLink[]>([]);
+
+  const handleAddLink = () => {
+    const novoLink: CustomLink = {
+      id: crypto.randomUUID(),
+      titulo: '',
+      url: ''
+    };
+    setLinks([...links, novoLink]);
+  };
+
+  const handleUpdateLink = (id: string, field: keyof CustomLink, value: string) => {
+    setLinks(links.map(link =>
+      link.id === id ? { ...link, [field]: value } : link
+    ));
+  };
+
+  const handleRemoveLink = (id: string) => {
+    setLinks(links.filter(link => link.id !== id));
+  };
+
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
       <div className="flex items-center justify-between mb-6">
@@ -51,14 +73,28 @@ export function MaterialsSection() {
             <LinkIcon className="w-4 h-4 text-slate-400" />
             Links Complementares & Dinâmicas (Quiz, Kahoot, Form)
           </h3>
-          <button type="button" className="text-girlies-purple hover:text-[#3d004d] text-xs font-bold flex items-center gap-1.5 hover:bg-girlies-purple/5 px-2.5 py-1.5 rounded-lg transition-colors">
+          <button
+            type="button"
+            onClick={handleAddLink}
+            className="text-girlies-purple hover:text-[#3d004d] text-xs font-bold flex items-center gap-1.5 hover:bg-girlies-purple/5 px-2.5 py-1.5 rounded-lg transition-colors"
+          >
             <Plus className="w-3.5 h-3.5" />
             Novo Link Personalizado
           </button>
         </div>
-        <div id="container-links" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Links adicionados dinamicamente via JS */}
-        </div>
+
+        {links.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {links.map(link => (
+              <CustomLinkItem
+                key={link.id}
+                link={link}
+                onUpdate={handleUpdateLink}
+                onRemove={handleRemoveLink}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
