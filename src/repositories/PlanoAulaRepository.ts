@@ -29,6 +29,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 local: r.local,
                 status: r.status,
                 linkPlanoAula: r.link_plano_aula,
+                linkSlide: r.link_slide,
+                linkRoteiro: r.link_roteiro,
                 checklist: checklistRows.map(c => ({
                     id: Number(c.id),
                     atividadeId: Number(c.atividadeId),
@@ -71,6 +73,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             local: r.local,
             status: r.status,
             linkPlanoAula: r.link_plano_aula,
+            linkSlide: r.link_slide,
+            linkRoteiro: r.link_roteiro,
             checklist: checklistRows.map(c => ({
                 id: Number(c.id),
                 atividadeId: Number(c.atividadeId),
@@ -89,8 +93,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
     async create(data: CriarPlanoAulaDTO): Promise<PlanoAula> {
         const db = await getDb();
         const result = await db.run(
-            `INSERT INTO Aulas (titulo, descricao, categoria, data_hora, local, status, link_plano_aula)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO Aulas (titulo, descricao, categoria, data_hora, local, status, link_plano_aula, link_slide, link_roteiro)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.titulo,
                 data.descricao || null,
@@ -98,7 +102,9 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 data.dataHora,
                 data.local || null,
                 data.status || 'Planejada',
-                data.linkPlanoAula || null
+                data.linkPlanoAula || null,
+                data.linkSlide || null,
+                data.linkRoteiro || null
             ]
         );
         const createdId = result.lastID;
@@ -134,7 +140,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         const updated = { ...existing, ...changes };
         const db = await getDb();
         await db.run(
-            `UPDATE Aulas SET titulo = ?, descricao = ?, categoria = ?, data_hora = ?, local = ?, status = ?, link_plano_aula = ?
+            `UPDATE Aulas SET titulo = ?, descricao = ?, categoria = ?, data_hora = ?, local = ?, status = ?, link_plano_aula = ?, link_slide = ?, link_roteiro = ?
              WHERE id = ?`,
             [
                 updated.titulo,
@@ -144,6 +150,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 updated.local || null,
                 updated.status || 'Planejada',
                 updated.linkPlanoAula || null,
+                updated.linkSlide || null,
+                updated.linkRoteiro || null,
                 id
             ]
         );
