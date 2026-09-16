@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { 
-  Sparkles, 
-  LayoutDashboard, 
-  BookOpen, 
-  Camera, 
+import {
+  Sparkles,
+  LayoutDashboard,
+  BookOpen,
+  Camera,
   Calendar,
-  Settings, 
-  LogOut 
+  Settings,
+  LogOut
 } from 'lucide-react';
 
 export function Sidebar() {
@@ -39,17 +39,17 @@ export function Sidebar() {
           <LayoutDashboard className="w-4 h-4" />
           Dashboard
         </NavLink>
-        
+
         <NavLink to="/aulas" className={getNavClass}>
           <BookOpen className="w-4 h-4" />
           Aulas
         </NavLink>
-        
+
         <NavLink to="/instagram" className={getNavClass}>
           <Camera className="w-4 h-4" />
           Instagram
         </NavLink>
-        
+
         <NavLink to="/eventos" className={getNavClass}>
           <Calendar className="w-4 h-4" />
           Eventos
