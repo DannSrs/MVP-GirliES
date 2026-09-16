@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  FlaskConical, 
-  CalendarDays, 
-  MapPin, 
-  AlarmClock, 
-  Rocket, 
-  CheckCircle2, 
-  Circle, 
-  LayoutGrid, 
-  BookMarked, 
-  Check, 
-  ArrowRight, 
-  FileText, 
-  Layout 
+import {
+  FlaskConical,
+  CalendarDays,
+  MapPin,
+  AlarmClock,
+  Rocket,
+  CheckCircle2,
+  Circle,
+  LayoutGrid,
+  BookMarked,
+  Check,
+  ArrowRight,
+  FileText,
+  Layout
 } from 'lucide-react';
 import { api, type PlanoAula, type PostInstagram, type EventoGeral } from '../services/api';
 
@@ -35,22 +35,22 @@ export function Dashboard() {
         // 1. Calcular a semana atual (cicloAtivo)
         const config = await api.getConfiguracoesDatas();
         let cicloCalculado = cicloAtivo;
-        
+
         if (config.dataInicioProjeto) {
-            const dataInicio = new Date(config.dataInicioProjeto);
-            const hoje = new Date();
-            const diffMs = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).getTime() - 
-                           new Date(dataInicio.getFullYear(), dataInicio.getMonth(), dataInicio.getDate()).getTime();
-            
-            if (diffMs >= 0) {
-                cicloCalculado = Math.floor(diffMs / (1000 * 60 * 60 * 24) / 7) + 1;
-            } else {
-                cicloCalculado = 1;
-            }
+          const dataInicio = new Date(config.dataInicioProjeto);
+          const hoje = new Date();
+          const diffMs = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).getTime() -
+            new Date(dataInicio.getFullYear(), dataInicio.getMonth(), dataInicio.getDate()).getTime();
+
+          if (diffMs >= 0) {
+            cicloCalculado = Math.floor(diffMs / (1000 * 60 * 60 * 24) / 7) + 1;
+          } else {
+            cicloCalculado = 1;
+          }
         }
-        
+
         if (cicloCalculado !== cicloAtivo) {
-            setCicloAtivo(cicloCalculado);
+          setCicloAtivo(cicloCalculado);
         }
 
         // 2. Carrega as aulas da trilha e as coisas do ciclo calculado
@@ -168,7 +168,7 @@ export function Dashboard() {
                   <div className="px-4 py-3 flex flex-col gap-2 text-xs text-slate-500">
                     <div className="flex items-center gap-2">
                       <CalendarDays className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                      <span>{aulaDestaque.dataHora ? new Date(aulaDestaque.dataHora).toLocaleDateString('pt-BR') : '--'} • {aulaDestaque.dataHora ? new Date(aulaDestaque.dataHora).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) : '--'}</span>
+                      <span>{aulaDestaque.dataHora ? new Date(aulaDestaque.dataHora).toLocaleDateString('pt-BR') : '--'} • {aulaDestaque.dataHora ? new Date(aulaDestaque.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
@@ -184,9 +184,9 @@ export function Dashboard() {
                       <ul className="space-y-1.5">
                         {localChecklistAula.map(item => (
                           <li key={item.id} className="flex items-center gap-2">
-                            <input 
-                              type="checkbox" 
-                              id={`aula-chk-${item.id}`} 
+                            <input
+                              type="checkbox"
+                              id={`aula-chk-${item.id}`}
                               checked={item.isCompleted}
                               onChange={() => toggleChecklistAula(item.id)}
                               className="w-3.5 h-3.5 rounded flex-shrink-0 accent-girlies-purple"
@@ -288,7 +288,7 @@ export function Dashboard() {
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Logística GirliES</p>
                       <span className="text-xs text-slate-500 font-semibold">
-                        {localChecklistEvento.filter(i => i.isCompleted).length} de {localChecklistEvento.length} concluídas 
+                        {localChecklistEvento.filter(i => i.isCompleted).length} de {localChecklistEvento.length} concluídas
                         <span className="text-slate-400 font-normal ml-1">
                           ({localChecklistEvento.length > 0 ? Math.round((localChecklistEvento.filter(i => i.isCompleted).length / localChecklistEvento.length) * 100) : 0}%)
                         </span>
@@ -303,8 +303,8 @@ export function Dashboard() {
                     ) : (
                       <ul className="space-y-1.5 text-xs text-slate-500">
                         {localChecklistEvento.map(item => (
-                          <li 
-                            key={item.id} 
+                          <li
+                            key={item.id}
                             onClick={() => toggleChecklistEvento(item.id)}
                             className="flex items-start gap-2 cursor-pointer select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors"
                           >
