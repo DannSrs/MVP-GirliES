@@ -259,7 +259,7 @@ export function Dashboard() {
                       <p className="text-[10px] text-slate-400 mb-0.5">Status:</p>
                       <p className="text-xs text-girlies-purple font-semibold">{aulaDestaque.status || 'Agendado'}</p>
                     </div>
-                    <Link to="/aulas/visualizar" className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">
+                    <Link to={`/aulas/${aulaDestaque.id}`} className="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-colors">
                       <FileText className="w-3.5 h-3.5" />
                       Ver Plano de Aula
                     </Link>
