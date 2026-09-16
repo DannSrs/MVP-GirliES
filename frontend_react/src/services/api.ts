@@ -81,5 +81,13 @@ export const api = {
   getEventosDaSemana: async (semana: number): Promise<EventoGeral[]> => {
     const eventos = await api.getEventos();
     return eventos.filter(e => e.semana === semana);
+  },
+
+  toggleChecklistItem: async (id: number): Promise<ChecklistItem> => {
+    const res = await fetch(`${API_BASE}/checklists/${id}/toggle`, {
+      method: 'PATCH'
+    });
+    if (!res.ok) throw new Error('Erro ao alternar status do checklist');
+    return res.json();
   }
 };

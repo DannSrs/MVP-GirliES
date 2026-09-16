@@ -15,6 +15,7 @@ import {
   FileText,
   Layout
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { api, type PlanoAula, type PostInstagram, type EventoGeral } from '../services/api';
 
 export function Dashboard() {
@@ -81,14 +82,67 @@ export function Dashboard() {
     carregarDados();
   }, []);
 
-  const toggleChecklistAula = (id: number | undefined) => {
-    if (id === undefined) return;
-    setLocalChecklistAula(prev => prev.map(item => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item));
+  const dispararConfetesNoElemento = (e?: React.MouseEvent<any> | React.ChangeEvent<any>) => {
+    let originX = 0.5;
+    let originY = 0.5;
+    
+    if (e && e.currentTarget) {
+      const card = (e.currentTarget as HTMLElement).closest('.hover-card');
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        originX = (rect.left + rect.width / 2) / window.innerWidth;
+        originY = (rect.top + rect.height / 2) / window.innerHeight;
+      }
+    }
+    
+    confetti({
+      particleCount: 80,
+      spread: 60,
+      origin: { x: originX, y: originY },
+      colors: ['#7c3aed', '#ec4899', '#10b981', '#f59e0b']
+    });
   };
 
-  const toggleChecklistEvento = (id: number | undefined) => {
+  const toggleChecklistAula = async (id: number | undefined, e?: React.ChangeEvent<HTMLInputElement>) => {
     if (id === undefined) return;
-    setLocalChecklistEvento(prev => prev.map(item => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item));
+    // Atualização otimista na UI
+    const novoEstado = localChecklistAula.map(item => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item);
+    setLocalChecklistAula(novoEstado);
+    
+    // Easter Egg: Confete se completou todas as tarefas da aula!
+    const recemCompletou = novoEstado.find(i => i.id === id)?.isCompleted;
+    if (recemCompletou && novoEstado.length > 0 && novoEstado.every(item => item.isCompleted)) {
+      dispararConfetesNoElemento(e);
+    }
+
+    try {
+      await api.toggleChecklistItem(id);
+    } catch (err) {
+      console.error("Erro ao salvar no back-end", err);
+      // Reverte o estado caso a API falhe
+      setLocalChecklistAula(prev => prev.map(item => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item));
+    }
+  };
+
+  const toggleChecklistEvento = async (id: number | undefined, e?: React.MouseEvent<HTMLLIElement>) => {
+    if (id === undefined) return;
+    // Atualização otimista na UI
+    const novoEstado = localChecklistEvento.map(item => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item);
+    setLocalChecklistEvento(novoEstado);
+
+    // Easter Egg: Confete se completou todas as tarefas do evento!
+    const recemCompletou = novoEstado.find(i => i.id === id)?.isCompleted;
+    if (recemCompletou && novoEstado.length > 0 && novoEstado.every(item => item.isCompleted)) {
+      dispararConfetesNoElemento(e);
+    }
+
+    try {
+      await api.toggleChecklistItem(id);
+    } catch (err) {
+      console.error("Erro ao salvar no back-end", err);
+      // Reverte o estado caso a API falhe
+      setLocalChecklistEvento(prev => prev.map(item => item.id === id ? { ...item, isCompleted: !item.isCompleted } : item));
+    }
   };
 
   const aulaDestaque = aulas.find(a => a.semana === cicloAtivo);
@@ -188,7 +242,7 @@ export function Dashboard() {
                               type="checkbox"
                               id={`aula-chk-${item.id}`}
                               checked={item.isCompleted}
-                              onChange={() => toggleChecklistAula(item.id)}
+                              onChange={(e) => toggleChecklistAula(item.id, e)}
                               className="w-3.5 h-3.5 rounded flex-shrink-0 accent-girlies-purple"
                             />
                             <label htmlFor={`aula-chk-${item.id}`} className={`text-xs cursor-pointer ${item.isCompleted ? 'text-slate-400 line-through' : 'text-slate-600'}`}>
@@ -305,8 +359,8 @@ export function Dashboard() {
                         {localChecklistEvento.map(item => (
                           <li
                             key={item.id}
-                            onClick={() => toggleChecklistEvento(item.id)}
-                            className="flex items-start gap-2 cursor-pointer select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors"
+                            className="flex items-start gap-2 cursor-pointer group select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors"
+                            onClick={(e) => toggleChecklistEvento(item.id, e)}
                           >
                             {item.isCompleted ? (
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
