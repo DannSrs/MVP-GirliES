@@ -2,6 +2,7 @@ import { CalendarDays, MapPin, MonitorPlay, Code2, FileText, Eye, Clock } from '
 import { Link } from 'react-router-dom';
 
 export interface AulasTableRowProps {
+  id?: number;
   semana: string;
   tema: string;
   descricao: string;
@@ -35,6 +36,7 @@ export function AulasTableRow(props: AulasTableRowProps) {
     professora,
     status,
     isPast,
+    id,
   } = props;
 
   // Determine week badge style based on status/past
@@ -141,9 +143,9 @@ export function AulasTableRow(props: AulasTableRowProps) {
         )}
       </div>
       
-      {/* Col 7 */}
-      <div className="flex justify-center">
-        <Link to="/visualizar-aula" className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-girlies-purple hover:bg-girlies-purple/10 transition-colors" title="Ver Detalhes">
+      {/* Col 7: Actions */}
+      <div className="flex items-center gap-1">
+        <Link to={`/aulas/${id || 'visualizar'}`} className="w-8 h-8 rounded-md bg-transparent border border-transparent flex items-center justify-center text-slate-400 hover:bg-white hover:text-girlies-purple hover:border-girlies-purple/30 hover:shadow-sm cursor-pointer transition-all" title="Visualizar Aula">
           <Eye className="w-4 h-4" />
         </Link>
       </div>

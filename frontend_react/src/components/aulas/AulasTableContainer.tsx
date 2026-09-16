@@ -65,6 +65,7 @@ export function AulasTableContainer({ aulas }: AulasTableContainerProps) {
                 return (
                   <AulasTableRow 
                     key={aula.id} 
+                    id={aula.id}
                     semana={aula.semana?.toString().padStart(2, '0') || '00'}
                     tema={aula.titulo}
                     descricao={aula.descricao || 'Sem descrição'}
