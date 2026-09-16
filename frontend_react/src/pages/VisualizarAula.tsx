@@ -50,7 +50,7 @@ export function VisualizarAula() {
         {/* Left Column (Checklist & Materiais) */}
         <div className="flex-1 flex flex-col gap-6 w-full">
           <ChecklistOperacional aula={aula || undefined} />
-          <MateriaisAnexos />
+          <MateriaisAnexos aula={aula || undefined} />
         </div>
 
         {/* Right Column (Equipe) */}

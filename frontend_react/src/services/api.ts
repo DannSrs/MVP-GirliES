@@ -4,6 +4,13 @@ export interface ChecklistItem {
   isCompleted: boolean;
 }
 
+export interface LinksAtividade {
+  id?: number;
+  tipo: string;
+  titulo?: string;
+  link: string;
+}
+
 export interface PlanoAula {
   id: number;
   titulo: string;
@@ -12,7 +19,11 @@ export interface PlanoAula {
   dataHora: string;
   local?: string;
   status?: string;
+  linkPlanoAula?: string;
+  linkSlide?: string;
+  linkRoteiro?: string;
   checklist?: ChecklistItem[];
+  links?: LinksAtividade[];
   semana?: number;
 }
 
