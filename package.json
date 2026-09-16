@@ -4,6 +4,7 @@
   "description": "Este é um projeto inicializado.",
   "main": "dist/index.js",
   "scripts": {
+    "postinstall": "npm install --prefix frontend_react",
     "swagger": "tsoa spec-and-routes",
     "dev:api": "tsoa spec-and-routes && tsx watch src/index.ts",
     "dev:react": "npm run dev --prefix frontend_react",

@@ -10,16 +10,9 @@ A arquitetura é dividida em um back-end (Node.js + Express + SQLite) e dois fro
 
 ## Instalação
 
-1. Na pasta raiz do projeto, instale as dependências principais:
+Na pasta raiz do projeto, instale as dependências. Esse comando automaticamente instalará também as dependências do painel React:
 ```bash
 npm install
-```
-
-2. Instale as dependências do novo painel React:
-```bash
-cd frontend_react
-npm install
-cd ..
 ```
 
 ## Como Rodar o Projeto
