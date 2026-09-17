@@ -23,6 +23,16 @@ interface AulaFormContextType {
   isSubmitting: boolean;
 }
 
+function getNextWednesday(): string {
+  const date = new Date();
+  const daysUntilWednesday = (3 - date.getDay() + 7) % 7;
+  // If today is Wednesday, it will return today (0 days). 
+  // If we wanted exactly the *next* week when today is Wednesday, we'd change 0 to 7.
+  // But usually, if they register on Wednesday, it's for today's class.
+  date.setDate(date.getDate() + daysUntilWednesday);
+  return date.toISOString().split('T')[0];
+}
+
 const AulaFormContext = createContext<AulaFormContextType | undefined>(undefined);
 
 export function AulaFormProvider({ children }: { children: ReactNode }) {
@@ -30,7 +40,7 @@ export function AulaFormProvider({ children }: { children: ReactNode }) {
     categoria: 'Módulo 2: Python Fundamentos & Estruturas',
     titulo: '',
     descricao: '',
-    dataHora: '2026-10-21', // Default value
+    dataHora: getNextWednesday(),
     local: 'Lab 04 - Bloco D (Linux/VS Code)',
     linkSlide: '',
     linkPlanoAula: '',
