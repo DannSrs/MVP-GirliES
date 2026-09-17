@@ -2,6 +2,10 @@ import { Controller, Get, Post, Put, Patch, Delete, Route, Body, Path, Tags, Res
 import { PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO } from '../models/PlanoAula';
 import { PlanoAulaService } from '../services/PlanoAulaService';
 
+export interface AtualizarStatusAulaDTO {
+  status: 'Em Preparação' | 'Confirmada' | 'Concluída' | 'Cancelada';
+}
+
 @Route("api/aulas")
 @Tags("Plano de Aulas")
 export class PlanoAulaController extends Controller {
@@ -60,7 +64,7 @@ export class PlanoAulaController extends Controller {
   @Response(400, "Erro de Validação")
   public async atualizarStatusAula(
     @Path() id: number,
-    @Body() requestBody: { status: 'Em Preparação' | 'Confirmada' | 'Concluída' | 'Cancelada' }
+    @Body() requestBody: AtualizarStatusAulaDTO
   ): Promise<PlanoAula | undefined> {
     try {
       const updated = await this.service.atualizarAula(id, { status: requestBody.status });

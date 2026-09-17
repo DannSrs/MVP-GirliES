@@ -13,7 +13,9 @@ import {
   Check,
   ArrowRight,
   FileText,
-  Layout
+  Layout,
+  AlertCircle,
+  X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { api, type PlanoAula, type PostInstagram, type EventoGeral } from '../services/api';
@@ -393,31 +395,57 @@ export function Dashboard() {
               [...aulas].sort((a, b) => (a.semana || 0) - (b.semana || 0)).map((aula) => {
                 const isPassada = (aula.semana || 0) < cicloAtivo;
                 const isAtual = (aula.semana || 0) === cicloAtivo;
+                const isConcluida = aula.status === 'Concluída';
+                const isCancelada = aula.status === 'Cancelada';
+                const isEmAberto = isPassada && !isConcluida && !isCancelada;
+
+                let iconBg = 'bg-slate-100';
+                let iconContent = <span className="text-slate-500 text-xs font-bold">{aula.semana ? String(aula.semana).padStart(2, '0') : '--'}</span>;
+                let textColor = 'text-slate-400';
+                let textLabel = aula.dataHora ? new Date(aula.dataHora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : '--';
+
+                if (isAtual) {
+                  iconBg = 'bg-girlies-purple shadow shadow-girlies-purple/30';
+                  iconContent = <span className="text-white text-xs font-bold">{aula.semana ? String(aula.semana).padStart(2, '0') : '--'}</span>;
+                  textColor = 'text-girlies-purple';
+                  textLabel = 'Esta semana';
+                } else if (isPassada) {
+                  if (isConcluida) {
+                    iconBg = 'bg-emerald-100';
+                    iconContent = <Check className="w-4 h-4 text-emerald-600" />;
+                    textColor = 'text-emerald-600';
+                    textLabel = 'Concluída';
+                  } else if (isCancelada) {
+                    iconBg = 'bg-red-50';
+                    iconContent = <X className="w-4 h-4 text-red-400" />;
+                    textColor = 'text-red-400';
+                    textLabel = 'Cancelada';
+                  } else if (isEmAberto) {
+                    iconBg = 'bg-amber-100';
+                    iconContent = <AlertCircle className="w-4 h-4 text-amber-600" />;
+                    textColor = 'text-amber-600';
+                    textLabel = 'Em aberto';
+                  }
+                }
 
                 return (
                   <div key={aula.id} className={`timeline-item px-6 py-4 flex items-start gap-4 ${isAtual ? 'bg-girlies-purple/5' : ''}`}>
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isPassada ? 'bg-emerald-100' : isAtual ? 'bg-girlies-purple shadow shadow-girlies-purple/30' : 'bg-slate-100'}`}>
-                      {isPassada ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
-                      ) : (
-                        <span className={`${isAtual ? 'text-white' : 'text-slate-500'} text-xs font-bold`}>
-                          {aula.semana ? String(aula.semana).padStart(2, '0') : '--'}
-                        </span>
-                      )}
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${iconBg}`}>
+                      {iconContent}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center flex-wrap gap-2 mb-0.5">
-                        <span className={`text-xs font-semibold ${isPassada ? 'text-emerald-600' : isAtual ? 'text-girlies-purple' : 'text-slate-400'}`}>Semana {aula.semana || '--'}</span>
+                        <span className={`text-xs font-semibold ${textColor}`}>Semana {aula.semana || '--'}</span>
                         <span className="text-slate-300 text-xs">•</span>
-                        <span className={`text-sm font-semibold ${isPassada ? 'text-slate-700' : isAtual ? 'text-girlies-purple' : 'text-slate-600'}`}>{aula.titulo}</span>
+                        <span className={`text-sm font-semibold ${isAtual ? 'text-girlies-purple' : 'text-slate-700'}`}>{aula.titulo}</span>
                         {isAtual && <span className="badge-tag bg-girlies-purple text-white px-2 py-0.5 rounded uppercase">Em Curso</span>}
                       </div>
                       <p className={`text-xs ${isPassada ? 'text-slate-500' : isAtual ? 'text-slate-500' : 'text-slate-400'}`}>
                         {aula.descricao || 'Sem descrição cadastrada.'}
                       </p>
                     </div>
-                    <span className={`text-xs font-semibold flex-shrink-0 mt-1 ${isPassada ? 'text-emerald-600' : isAtual ? 'text-girlies-purple' : 'text-slate-400 font-normal'}`}>
-                      {isPassada ? 'Concluída' : isAtual ? 'Esta semana' : (aula.dataHora ? new Date(aula.dataHora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) : '--')}
+                    <span className={`text-xs font-semibold flex-shrink-0 mt-1 ${textColor} ${!isPassada && !isAtual ? 'font-normal' : ''}`}>
+                      {textLabel}
                     </span>
                   </div>
                 );

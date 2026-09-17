@@ -57,8 +57,8 @@ export function AulasTableRow(props: AulasTableRowProps) {
 
   const getStatusStyle = (s: string) => {
     switch (s) {
-      case 'Confirmada': return 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 focus:ring-emerald-500/20';
-      case 'Concluída': return 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 focus:ring-indigo-500/20';
+      case 'Confirmada': return 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 focus:ring-indigo-500/20';
+      case 'Concluída': return 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 focus:ring-emerald-500/20';
       case 'Cancelada': return 'bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-500/20';
       default: return 'bg-girlies-purple/10 text-girlies-purple hover:bg-girlies-purple/20 focus:ring-girlies-purple/20';
     }

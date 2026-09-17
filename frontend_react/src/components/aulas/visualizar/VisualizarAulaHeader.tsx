@@ -12,8 +12,8 @@ export function VisualizarAulaHeader({ aula }: VisualizarAulaHeaderProps) {
 
   const getStatusStyle = (s: string) => {
     switch (s) {
-      case 'Confirmada': return { bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500 animate-pulse' };
-      case 'Concluída': return { bg: 'bg-indigo-100', text: 'text-indigo-700', dot: 'bg-indigo-500' };
+      case 'Confirmada': return { bg: 'bg-indigo-100', text: 'text-indigo-700', dot: 'bg-indigo-500 animate-pulse' };
+      case 'Concluída': return { bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' };
       case 'Cancelada': return { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' };
       default: return { bg: 'bg-girlies-purple/10', text: 'text-girlies-purple', dot: 'bg-girlies-purple' };
     }
