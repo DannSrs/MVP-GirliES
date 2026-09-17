@@ -48,7 +48,7 @@ export function AulasTableRow(props: AulasTableRowProps) {
     setLocalStatus(newStatus);
     if (id) {
       try {
-        await api.updateAula(id, { status: newStatus });
+        await api.updateAulaStatus(id, newStatus);
       } catch (error) {
         console.error('Erro ao atualizar status', error);
       }

@@ -103,7 +103,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 data.categoria || null,
                 data.dataHora,
                 data.local || null,
-                data.status || 'Planejada',
+                data.status || 'Em Preparação',
                 data.linkPlanoAula || null,
                 data.linkSlide || null,
                 data.linkRoteiro || null
@@ -150,7 +150,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 updated.categoria || null,
                 updated.dataHora,
                 updated.local || null,
-                updated.status || 'Planejada',
+                updated.status || 'Em Preparação',
                 updated.linkPlanoAula || null,
                 updated.linkSlide || null,
                 updated.linkRoteiro || null,
