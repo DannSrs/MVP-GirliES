@@ -442,10 +442,10 @@ export function Dashboard() {
 
           {/* Footer link */}
           <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-            <a href="#" className="text-girlies-purple text-sm font-semibold hover:text-[#3d004d] flex items-center gap-1.5 transition-colors">
+            <Link to="/aulas" className="text-girlies-purple text-sm font-semibold hover:text-[#3d004d] flex items-center gap-1.5 transition-colors">
               Ver ementa completa ({aulas.length * 3} horas curriculares estimadas)
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
             <span className="text-xs text-slate-400 font-mono">GirliES CORE</span>
           </div>
         </div>
