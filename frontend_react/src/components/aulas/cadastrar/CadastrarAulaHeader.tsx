@@ -1,7 +1,10 @@
 import { ArrowLeft, BookOpenCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAulaForm } from '../../../contexts/AulaFormContext';
 
 export function CadastrarAulaHeader() {
+  const { isEditing, isLoading } = useAulaForm();
+  
   return (
     <header className="flex flex-col gap-4 mb-6 sticky top-0 bg-slate-50/90 backdrop-blur-md pt-2 pb-4 z-10 border-b border-transparent">
       <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
@@ -11,12 +14,15 @@ export function CadastrarAulaHeader() {
         <span className="text-slate-300">/</span>
         <Link to="/aulas" className="hover:text-girlies-purple transition-colors">Aulas</Link>
         <span className="text-slate-300">/</span>
-        <span className="text-girlies-purple font-bold">Cadastrar Nova Aula</span>
+        <span className="text-girlies-purple font-bold">{isEditing ? 'Editar Aula' : 'Cadastrar Nova Aula'}</span>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold text-girlies-purple tracking-tight">Cadastrar Nova Aula</h1>
+          <h1 className="text-3xl font-bold text-girlies-purple tracking-tight flex items-center gap-3">
+            {isEditing ? 'Editar Aula' : 'Cadastrar Nova Aula'}
+            {isLoading && <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-1 rounded-md animate-pulse">Carregando dados...</span>}
+          </h1>
           <div className="flex items-center gap-1.5 bg-girlies-purple/10 text-girlies-purple px-2.5 py-1 rounded-md text-[10px] font-bold font-mono uppercase tracking-wider border border-girlies-purple/20">
             <BookOpenCheck className="w-3.5 h-3.5" />
             Turma 2026.2 // Módulos Pedagógicos

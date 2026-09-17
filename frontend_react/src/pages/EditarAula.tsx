@@ -1,4 +1,4 @@
-
+import { useParams } from 'react-router-dom';
 import { CadastrarAulaHeader } from '../components/aulas/cadastrar/CadastrarAulaHeader';
 import { BasicInfoSection } from '../components/aulas/cadastrar/BasicInfoSection';
 import { LogisticsSection } from '../components/aulas/cadastrar/LogisticsSection';
@@ -8,10 +8,12 @@ import { TeamSidebar } from '../components/aulas/cadastrar/TeamSidebar';
 import { FooterActions } from '../components/aulas/cadastrar/FooterActions';
 import { AulaFormProvider } from '../contexts/AulaFormContext';
 
-export function CadastrarAula() {
+export function EditarAula() {
+  const { id } = useParams<{ id: string }>();
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-y-auto pr-2 pb-6 relative">
-        <AulaFormProvider>
+        <AulaFormProvider aulaId={id}>
           <CadastrarAulaHeader />
 
           <div className="flex flex-col xl:flex-row gap-6 items-start w-full">

@@ -60,6 +60,33 @@ export const api = {
     return res.json();
   },
   
+  getAulaById: async (id: number | string): Promise<PlanoAula> => {
+    const res = await fetch(`${API_BASE}/aulas/${id}`);
+    if (!res.ok) throw new Error('Erro ao buscar aula');
+    return res.json();
+  },
+
+  updateAula: async (id: number | string, aula: Partial<PlanoAula>): Promise<PlanoAula> => {
+    const res = await fetch(`${API_BASE}/aulas/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(aula)
+    });
+    
+    if (!res.ok) {
+      let errorMsg = 'Erro ao atualizar aula';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    
+    return res.json();
+  },
+  
   createAula: async (aula: Partial<PlanoAula>): Promise<PlanoAula> => {
     const res = await fetch(`${API_BASE}/aulas`, {
       method: 'POST',

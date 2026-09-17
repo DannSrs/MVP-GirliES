@@ -36,13 +36,15 @@ export function VisualizarAulaHeader({ aula }: VisualizarAulaHeaderProps) {
           </div>
         </div>
         
-        <button className="flex items-center gap-2 text-slate-800 hover:text-girlies-purple font-bold text-[10px] transition-all px-4 py-2 rounded-2xl bg-[#f4f2f6] hover:bg-girlies-purple/10 leading-tight">
-          <Edit className="w-4 h-4 text-girlies-purple" />
-          <div className="flex flex-col text-left">
-            <span>Editar</span>
-            <span>Aula</span>
-          </div>
-        </button>
+        {aula?.id && (
+          <Link to={`/aulas/${aula.id}/editar`} className="flex items-center gap-2 text-slate-800 hover:text-girlies-purple font-bold text-[10px] transition-all px-4 py-2 rounded-2xl bg-[#f4f2f6] hover:bg-girlies-purple/10 leading-tight">
+            <Edit className="w-4 h-4 text-girlies-purple" />
+            <div className="flex flex-col text-left">
+              <span>Editar</span>
+              <span>Aula</span>
+            </div>
+          </Link>
+        )}
       </div>
       
       {/* Subtexto da semana */}
