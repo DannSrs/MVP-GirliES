@@ -51,6 +51,8 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       local TEXT,
       status TEXT DEFAULT 'Planejada',
       link_plano_aula TEXT,
+      link_slide TEXT,
+      link_roteiro TEXT,
       google_event_id TEXT
     );
 
