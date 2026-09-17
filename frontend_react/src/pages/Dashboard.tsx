@@ -18,8 +18,9 @@ import {
 import confetti from 'canvas-confetti';
 import { api, type PlanoAula, type PostInstagram, type EventoGeral } from '../services/api';
 
+import { useCicloAtivo } from '../hooks/useCicloAtivo';
+
 export function Dashboard() {
-  const [cicloAtivo, setCicloAtivo] = useState(2); // Atualizado dinamicamente pelo useEffect
   const [aulas, setAulas] = useState<PlanoAula[]>([]);
   const [posts, setPosts] = useState<PostInstagram[]>([]);
   const [eventos, setEventos] = useState<EventoGeral[]>([]);
@@ -29,36 +30,20 @@ export function Dashboard() {
   const [localChecklistAula, setLocalChecklistAula] = useState<any[]>([]);
   const [localChecklistEvento, setLocalChecklistEvento] = useState<any[]>([]);
 
+  const { cicloAtivo, loading: loadingCiclo } = useCicloAtivo();
+
   useEffect(() => {
+    if (loadingCiclo) return;
+
     const carregarDados = async () => {
       try {
         setLoading(true);
-        // 1. Calcular a semana atual (cicloAtivo)
-        const config = await api.getConfiguracoesDatas();
-        let cicloCalculado = cicloAtivo;
-
-        if (config.dataInicioProjeto) {
-          const dataInicio = new Date(config.dataInicioProjeto);
-          const hoje = new Date();
-          const diffMs = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).getTime() -
-            new Date(dataInicio.getFullYear(), dataInicio.getMonth(), dataInicio.getDate()).getTime();
-
-          if (diffMs >= 0) {
-            cicloCalculado = Math.floor(diffMs / (1000 * 60 * 60 * 24) / 7) + 1;
-          } else {
-            cicloCalculado = 1;
-          }
-        }
-
-        if (cicloCalculado !== cicloAtivo) {
-          setCicloAtivo(cicloCalculado);
-        }
 
         // 2. Carrega as aulas da trilha e as coisas do ciclo calculado
         const [todasAulas, postsCiclo, eventosCiclo] = await Promise.all([
           api.getAulas(),
-          api.getPostsDaSemana(cicloCalculado),
-          api.getEventosDaSemana(cicloCalculado)
+          api.getPostsDaSemana(cicloAtivo),
+          api.getEventosDaSemana(cicloAtivo)
         ]);
 
         setAulas(Array.isArray(todasAulas) ? todasAulas : []);
@@ -66,7 +51,7 @@ export function Dashboard() {
         setEventos(Array.isArray(eventosCiclo) ? eventosCiclo : []);
 
         // 3. Inicializa as checklists locais para as prioridades
-        const aulaAtual = Array.isArray(todasAulas) ? todasAulas.find(a => a.semana === cicloCalculado) : null;
+        const aulaAtual = Array.isArray(todasAulas) ? todasAulas.find(a => a.semana === cicloAtivo) : null;
         if (aulaAtual?.checklist) {
           setLocalChecklistAula(aulaAtual.checklist);
         }
@@ -80,7 +65,7 @@ export function Dashboard() {
       }
     };
     carregarDados();
-  }, []);
+  }, [loadingCiclo, cicloAtivo]);
 
   const dispararConfetesNoElemento = (e?: React.MouseEvent<any> | React.ChangeEvent<any>) => {
     let originX = 0.5;

@@ -1,12 +1,15 @@
 import { Search, Terminal } from 'lucide-react';
 import { AulasTableRow } from './AulasTableRow';
 import type { PlanoAula } from '../../services/api';
+import { useCicloAtivo } from '../../hooks/useCicloAtivo';
 
 interface AulasTableContainerProps {
   aulas: PlanoAula[];
 }
 
 export function AulasTableContainer({ aulas }: AulasTableContainerProps) {
+  const { cicloAtivo } = useCicloAtivo();
+
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col flex-1 overflow-hidden min-h-[500px]">
       {/* Tabs & Search */}
@@ -58,11 +61,22 @@ export function AulasTableContainer({ aulas }: AulasTableContainerProps) {
               <div className="p-8 text-center text-slate-500 text-sm">Nenhuma aula encontrada na API.</div>
             ) : (
               aulas.map((aula) => {
-                const dataObj = new Date(aula.dataHora);
-                const dataFormatada = dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
-                const horarioFormatado = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
-                
-                return (
+                  const dataObj = new Date(aula.dataHora);
+                  const dataFormatada = dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+                  const horarioFormatado = dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
+                  
+                  let timeStatus: 'past' | 'current' | 'future' = 'future';
+                  const aulaSemana = aula.semana || 0;
+                  
+                  if (aulaSemana < cicloAtivo) {
+                    timeStatus = 'past';
+                  } else if (aulaSemana === cicloAtivo) {
+                    timeStatus = 'current';
+                  } else {
+                    timeStatus = 'future';
+                  }
+
+                  return (
                   <AulasTableRow 
                     key={aula.id} 
                     id={aula.id}
@@ -79,6 +93,7 @@ export function AulasTableContainer({ aulas }: AulasTableContainerProps) {
                       linkPlanoAula: aula.linkPlanoAula 
                     }}
                     professora={{ nome: "Profa. GirliES", cargo: "Docente", letra: "G" }} // Mock por enquanto
+                    timeStatus={timeStatus}
                   />
                 );
               })
