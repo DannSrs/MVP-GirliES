@@ -1,7 +1,7 @@
 import { Draggable } from '@hello-pangea/dnd';
 import type { TaskCard, CardTag } from '../../contexts/InstagramContext';
 import { Calendar, Clock, BarChart3, GripVertical, Check } from 'lucide-react';
-import { useInstagram } from '../../contexts/InstagramContext';
+
 
 interface KanbanCardProps {
   task: TaskCard;
@@ -30,8 +30,6 @@ const getTagColor = (tag: CardTag) => {
 };
 
 export function KanbanCard({ task, index }: KanbanCardProps) {
-  const { tasks, columns, columnOrder, onDragEnd } = useInstagram(); // just an import to be able to edit task if we had the context action, but we only have drag end. I will keep it simple.
-
   // In a real scenario we would dispatch to context to toggle checklist items
   return (
     <Draggable draggableId={task.id} index={index}>
