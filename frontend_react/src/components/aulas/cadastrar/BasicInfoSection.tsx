@@ -16,21 +16,42 @@ export function BasicInfoSection() {
         <span className="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-[10px] font-bold font-mono tracking-widest uppercase border border-slate-200">Etapa 01</span>
       </div>
 
-      <div className="flex flex-col gap-1.5 mb-5">
-        <label className="text-xs font-semibold text-slate-600 font-mono uppercase tracking-wider">
-          Módulo Temático <span className="text-red-500">*</span>
-        </label>
-        <div className="relative group">
-          <select
-            value={formData.categoria}
-            onChange={(e) => updateField('categoria', e.target.value)}
-            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer"
-          >
-            <option value="Módulo 1: Lógica & Pensamento">Módulo 1: Lógica & Pensamento</option>
-            <option value="Módulo 2: Python Fundamentos & Estruturas">Módulo 2: Python Fundamentos & Estruturas</option>
-            <option value="Módulo 3: Projetos & Git">Módulo 3: Projetos & Git</option>
-          </select>
-          <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-girlies-purple transition-colors" />
+      <div className="grid grid-cols-2 gap-4 mb-5">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-slate-600 font-mono uppercase tracking-wider">
+            Módulo Temático <span className="text-red-500">*</span>
+          </label>
+          <div className="relative group">
+            <select
+              value={formData.categoria}
+              onChange={(e) => updateField('categoria', e.target.value)}
+              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer"
+            >
+              <option value="Módulo 1: Lógica & Pensamento">Módulo 1: Lógica & Pensamento</option>
+              <option value="Módulo 2: Python Fundamentos & Estruturas">Módulo 2: Python Fundamentos & Estruturas</option>
+              <option value="Módulo 3: Projetos & Git">Módulo 3: Projetos & Git</option>
+            </select>
+            <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-girlies-purple transition-colors" />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-slate-600 font-mono uppercase tracking-wider">
+            Status da Aula <span className="text-red-500">*</span>
+          </label>
+          <div className="relative group">
+            <select
+              value={formData.status || 'Em Preparação'}
+              onChange={(e) => updateField('status', e.target.value)}
+              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer"
+            >
+              <option value="Em Preparação">Em Preparação</option>
+              <option value="Confirmada">Confirmada</option>
+              <option value="Concluída">Concluída</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+            <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-girlies-purple transition-colors" />
+          </div>
         </div>
       </div>
 

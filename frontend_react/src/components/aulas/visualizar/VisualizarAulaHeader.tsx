@@ -8,7 +8,18 @@ interface VisualizarAulaHeaderProps {
 
 export function VisualizarAulaHeader({ aula }: VisualizarAulaHeaderProps) {
   const semanaStr = aula?.semana ? String(aula.semana).padStart(2, '0') : '00';
-  const statusAula = aula?.status || 'AGENDADA & CONFIRMADA';
+  const statusAula = aula?.status || 'Em Preparação';
+
+  const getStatusStyle = (s: string) => {
+    switch (s) {
+      case 'Confirmada': return { bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500 animate-pulse' };
+      case 'Concluída': return { bg: 'bg-indigo-100', text: 'text-indigo-700', dot: 'bg-indigo-500' };
+      case 'Cancelada': return { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' };
+      default: return { bg: 'bg-girlies-purple/10', text: 'text-girlies-purple', dot: 'bg-girlies-purple' };
+    }
+  };
+
+  const style = getStatusStyle(statusAula);
 
   return (
     <header className="flex flex-col gap-5 mb-6 sticky top-0 bg-[#f8f9fa]/90 backdrop-blur-md pt-2 pb-4 z-20 border-b border-transparent flex-shrink-0">
@@ -30,8 +41,8 @@ export function VisualizarAulaHeader({ aula }: VisualizarAulaHeaderProps) {
             Voltar ao Cronograma de Aulas
           </Link>
           
-          <div className="flex items-center gap-1.5 bg-[#a6f4c5] text-emerald-900 px-3 py-1.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-bold font-mono uppercase tracking-wider ${style.bg} ${style.text}`}>
+            <span className={`w-2 h-2 rounded-full ${style.dot}`}></span>
             {statusAula}
           </div>
         </div>
