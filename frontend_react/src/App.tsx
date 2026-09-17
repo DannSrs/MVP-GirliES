@@ -6,6 +6,7 @@ import { VisualizarAula } from './pages/VisualizarAula';
 import { CadastrarAula } from './pages/CadastrarAula';
 import { EditarAula } from './pages/EditarAula';
 import { Instagram } from './pages/Instagram';
+import { CadastrarPost } from './pages/CadastrarPost';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="aulas/:id/editar" element={<EditarAula />} />
           <Route path="aulas/:id" element={<VisualizarAula />} />
           <Route path="instagram" element={<Instagram />} />
+          <Route path="instagram/cadastrar" element={<CadastrarPost />} />
         </Route>
       </Routes>
     </BrowserRouter>
