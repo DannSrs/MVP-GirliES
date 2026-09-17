@@ -88,7 +88,7 @@ export function AulasTableRow(props: AulasTableRowProps) {
       
       {/* Col 4 */}
       <div className="flex items-center gap-1.5">
-        {(status === 'Em Preparação' || !hasMateriais) ? (
+        {!hasMateriais ? (
           <span className="text-[10px] text-slate-400 font-medium italic flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" /> Em edição
           </span>
