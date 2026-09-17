@@ -1,4 +1,3 @@
-import React from 'react';
 import { Plus, UserPlus, Users } from 'lucide-react';
 
 export function TeamSidebar() {

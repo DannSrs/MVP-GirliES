@@ -6,7 +6,7 @@ export interface ChecklistItem {
 
 export interface LinksAtividade {
   id?: number;
-  tipo: string;
+  tipo: 'Material' | 'Link Auxiliar';
   titulo?: string;
   link: string;
 }
@@ -57,6 +57,27 @@ export const api = {
   getAulas: async (): Promise<PlanoAula[]> => {
     const res = await fetch(`${API_BASE}/aulas`);
     if (!res.ok) throw new Error('Erro ao buscar aulas');
+    return res.json();
+  },
+  
+  createAula: async (aula: Partial<PlanoAula>): Promise<PlanoAula> => {
+    const res = await fetch(`${API_BASE}/aulas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(aula)
+    });
+    
+    if (!res.ok) {
+      let errorMsg = 'Erro ao criar aula';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    
     return res.json();
   },
   

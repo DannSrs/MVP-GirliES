@@ -1,6 +1,5 @@
-import React from 'react';
-import { 
-  ClipboardList, Code2, FileText, Gamepad2, Link2, MonitorPlay, Trash2, Video 
+import {
+  ClipboardList, Code2, FileText, Gamepad2, Link2, MonitorPlay, Trash2, Video
 } from 'lucide-react';
 
 export interface CustomLink {
@@ -19,7 +18,7 @@ export function CustomLinkItem({ link, onUpdate, onRemove }: CustomLinkItemProps
   // Logic for dynamic icon and styles
   const getIconProps = (title: string) => {
     const val = title.toLowerCase();
-    
+
     if (val.includes('quiz') || val.includes('kahoot') || val.includes('jogo') || val.includes('game')) {
       return { Icon: Gamepad2, bgClass: 'bg-purple-100', textClass: 'text-purple-600' };
     }
@@ -38,7 +37,7 @@ export function CustomLinkItem({ link, onUpdate, onRemove }: CustomLinkItemProps
     if (val.includes('código') || val.includes('code') || val.includes('github') || val.includes('repo')) {
       return { Icon: Code2, bgClass: 'bg-slate-200', textClass: 'text-slate-700' };
     }
-    
+
     // Default
     return { Icon: Link2, bgClass: 'bg-girlies-purple/10', textClass: 'text-girlies-purple' };
   };
@@ -51,23 +50,23 @@ export function CustomLinkItem({ link, onUpdate, onRemove }: CustomLinkItemProps
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={link.titulo}
           onChange={(e) => onUpdate(link.id, 'titulo', e.target.value)}
-          placeholder="Título do link (ex: Quiz Kahoot)" 
-          className="text-xs font-bold text-slate-700 w-full bg-transparent border-none p-0 focus:ring-0 focus:outline-none placeholder-slate-400" 
+          placeholder="Título do link (ex: Quiz Kahoot)"
+          className="text-xs font-bold text-slate-700 w-full bg-transparent border-none p-0 focus:ring-0 focus:outline-none placeholder-slate-400"
         />
-        <input 
-          type="url" 
+        <input
+          type="url"
           value={link.url}
           onChange={(e) => onUpdate(link.id, 'url', e.target.value)}
-          placeholder="https://" 
-          className="text-[10px] text-slate-500 w-full bg-transparent border-none p-0 focus:ring-0 focus:outline-none placeholder-slate-400 font-mono" 
+          placeholder="https://"
+          className="text-[10px] text-slate-500 w-full bg-transparent border-none p-0 focus:ring-0 focus:outline-none placeholder-slate-400 font-mono"
         />
       </div>
-      <button 
-        type="button" 
+      <button
+        type="button"
         onClick={() => onRemove(link.id)}
         className="text-slate-400 hover:text-red-500 hover:bg-red-50 w-7 h-7 rounded flex items-center justify-center transition-colors flex-shrink-0"
       >

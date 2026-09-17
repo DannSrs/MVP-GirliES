@@ -1,7 +1,9 @@
-import React from 'react';
 import { ChevronDown, FileCode2, GraduationCap, Type } from 'lucide-react';
+import { useAulaForm } from '../../../contexts/AulaFormContext';
 
 export function BasicInfoSection() {
+  const { formData, updateField } = useAulaForm();
+
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
       <div className="flex items-center justify-between mb-6">
@@ -19,10 +21,14 @@ export function BasicInfoSection() {
           Módulo Temático <span className="text-red-500">*</span>
         </label>
         <div className="relative group">
-          <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer">
-            <option>Módulo 2: Python Fundamentos & Estruturas</option>
-            <option>Módulo 1: Lógica & Pensamento</option>
-            <option>Módulo 3: Projetos & Git</option>
+          <select
+            value={formData.categoria}
+            onChange={(e) => updateField('categoria', e.target.value)}
+            className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer"
+          >
+            <option value="Módulo 2: Python Fundamentos & Estruturas">Módulo 2: Python Fundamentos & Estruturas</option>
+            <option value="Módulo 1: Lógica & Pensamento">Módulo 1: Lógica & Pensamento</option>
+            <option value="Módulo 3: Projetos & Git">Módulo 3: Projetos & Git</option>
           </select>
           <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-girlies-purple transition-colors" />
         </div>
@@ -34,7 +40,13 @@ export function BasicInfoSection() {
         </label>
         <div className="relative group">
           <Type className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-girlies-purple transition-colors" />
-          <input type="text" placeholder="Programação Orientada a Objetos com Mini-jogos em Python" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all text-slate-700 font-medium bg-slate-50 focus:bg-white" />
+          <input
+            type="text"
+            value={formData.titulo}
+            onChange={(e) => updateField('titulo', e.target.value)}
+            placeholder="Programação Orientada a Objetos com Mini-jogos em Python"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all text-slate-700 font-medium bg-slate-50 focus:bg-white"
+          />
         </div>
       </div>
 
@@ -47,7 +59,13 @@ export function BasicInfoSection() {
             <FileCode2 className="w-3 h-3" /> Markdown habilitado
           </span>
         </div>
-        <textarea rows={5} className="w-full p-4 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all resize-none text-slate-700 font-medium bg-slate-50 focus:bg-white" placeholder="Objetivo: Desmistificar classes e herança construindo as mecânicas de um mini-game estilo Tamagotchi / Mascote Virtual.&#10;&#10;- Abertura com retrospectiva calorosa (15 min)&#10;- Code-along: construindo a classe 'Mascote' com status de energia e humor (50 min)&#10;- Hack-em-duplas: adicionando novos atributos e comandos via CLI (60 min)"></textarea>
+        <textarea
+          rows={5}
+          value={formData.descricao}
+          onChange={(e) => updateField('descricao', e.target.value)}
+          className="w-full p-4 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all resize-none text-slate-700 font-medium bg-slate-50 focus:bg-white"
+          placeholder="Objetivo: Desmistificar classes e herança construindo as mecânicas de um mini-game estilo Tamagotchi / Mascote Virtual.&#10;&#10;- Abertura com retrospectiva calorosa (15 min)&#10;- Code-along: construindo a classe 'Mascote' com status de energia e humor (50 min)&#10;- Hack-em-duplas: adicionando novos atributos e comandos via CLI (60 min)"
+        />
       </div>
     </section>
   );

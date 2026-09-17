@@ -1,7 +1,9 @@
-import React from 'react';
 import { Calendar, CalendarDays, ChevronDown } from 'lucide-react';
+import { useAulaForm } from '../../../contexts/AulaFormContext';
 
 export function LogisticsSection() {
+  const { formData, updateField } = useAulaForm();
+
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
       <div className="flex items-center justify-between mb-6">
@@ -23,7 +25,8 @@ export function LogisticsSection() {
             <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-girlies-purple transition-colors" />
             <input
               type="date"
-              defaultValue="2026-10-21"
+              value={formData.dataHora}
+              onChange={(e) => updateField('dataHora', e.target.value)}
               max="9999-12-31"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -40,10 +43,14 @@ export function LogisticsSection() {
             Espaço / Lab IFPE
           </label>
           <div className="relative group">
-            <select className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer">
-              <option>Lab 04 - Bloco D (Linux/VS Code)</option>
-              <option>Lab Maker (Hardware)</option>
-              <option>Auditório</option>
+            <select
+              value={formData.local}
+              onChange={(e) => updateField('local', e.target.value)}
+              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer"
+            >
+              <option value="Lab 04 - Bloco D (Linux/VS Code)">Lab 04 - Bloco D (Linux/VS Code)</option>
+              <option value="Lab Maker (Hardware)">Lab Maker (Hardware)</option>
+              <option value="Auditório">Auditório</option>
             </select>
             <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-girlies-purple transition-colors" />
           </div>

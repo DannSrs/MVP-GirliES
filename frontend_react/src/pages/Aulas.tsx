@@ -25,7 +25,7 @@ export function Aulas() {
   const { semanasTotais, cargaHorariaTotal } = useMemo(() => {
     let horas = 0;
 
-    aulas.forEach(aula => {
+    aulas.forEach(() => {
       // Como não temos a duração exata na API, vamos assumir 3 horas por aula
       // Ou se a API retornar dataHora, podemos tentar deduzir se houver 'fim', mas vamos assumir 3h padrão.
       horas += 3;
