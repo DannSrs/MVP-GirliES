@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { api } from '../services/api';
 import type { PlanoAula, ChecklistItem, LinksAtividade } from '../services/api';
@@ -21,21 +21,20 @@ interface AulaFormContextType {
   updateField: (field: keyof AulaFormData, value: any) => void;
   submitForm: () => Promise<void>;
   isSubmitting: boolean;
+  isEditing: boolean;
+  isLoading: boolean;
 }
 
 function getNextWednesday(): string {
   const date = new Date();
   const daysUntilWednesday = (3 - date.getDay() + 7) % 7;
-  // If today is Wednesday, it will return today (0 days). 
-  // If we wanted exactly the *next* week when today is Wednesday, we'd change 0 to 7.
-  // But usually, if they register on Wednesday, it's for today's class.
   date.setDate(date.getDate() + daysUntilWednesday);
   return date.toISOString().split('T')[0];
 }
 
 const AulaFormContext = createContext<AulaFormContextType | undefined>(undefined);
 
-export function AulaFormProvider({ children }: { children: ReactNode }) {
+export function AulaFormProvider({ children, aulaId }: { children: ReactNode, aulaId?: number | string }) {
   const [formData, setFormData] = useState<AulaFormData>({
     categoria: 'Módulo 2: Python Fundamentos & Estruturas',
     titulo: '',
@@ -50,6 +49,34 @@ export function AulaFormProvider({ children }: { children: ReactNode }) {
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!aulaId);
+  
+  const isEditing = !!aulaId;
+
+  // Carregar dados se for edição
+  useEffect(() => {
+    if (aulaId) {
+      setIsLoading(true);
+      api.getAulaById(aulaId).then((data) => {
+        setFormData({
+          categoria: data.categoria || 'Módulo 2: Python Fundamentos & Estruturas',
+          titulo: data.titulo,
+          descricao: data.descricao || '',
+          dataHora: data.dataHora,
+          local: data.local || 'Lab 04 - Bloco D (Linux/VS Code)',
+          linkSlide: data.linkSlide || '',
+          linkPlanoAula: data.linkPlanoAula || '',
+          linkRoteiro: data.linkRoteiro || '',
+          checklist: data.checklist || [],
+          links: data.links || []
+        });
+      }).catch(err => {
+        console.error("Erro ao carregar aula para edição:", err);
+      }).finally(() => {
+        setIsLoading(false);
+      });
+    }
+  }, [aulaId]);
 
   const updateField = (field: keyof AulaFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -67,23 +94,27 @@ export function AulaFormProvider({ children }: { children: ReactNode }) {
         linkSlide: formData.linkSlide,
         linkPlanoAula: formData.linkPlanoAula,
         linkRoteiro: formData.linkRoteiro,
-        checklist: formData.checklist.map(({ id, ...rest }) => rest),
-        links: formData.links.map(({ id, ...rest }) => rest),
-        // Equipe enviada vazia por enquanto
+        checklist: formData.checklist.map(({ id, atividadeId, ...rest }: any) => rest),
+        links: formData.links.map(({ id, atividadeId, ...rest }: any) => rest),
       };
       
-      await api.createAula(payload);
+      if (isEditing && aulaId) {
+        await api.updateAula(aulaId, payload);
+      } else {
+        await api.createAula(payload);
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <AulaFormContext.Provider value={{ formData, updateField, submitForm, isSubmitting }}>
+    <AulaFormContext.Provider value={{ formData, updateField, submitForm, isSubmitting, isEditing, isLoading }}>
       {children}
     </AulaFormContext.Provider>
   );
 }
+
 
 export function useAulaForm() {
   const context = useContext(AulaFormContext);

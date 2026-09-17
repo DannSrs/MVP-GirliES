@@ -6,7 +6,7 @@ import { Modal } from '../../Modal';
 
 export function FooterActions() {
   const navigate = useNavigate();
-  const { submitForm, isSubmitting, formData } = useAulaForm();
+  const { submitForm, isSubmitting, formData, isEditing } = useAulaForm();
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
@@ -39,7 +39,7 @@ export function FooterActions() {
           className="bg-girlies-purple hover:bg-[#3d004d] text-white px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-md shadow-girlies-purple/30 flex items-center gap-2.5 hover:-translate-y-0.5"
         >
           <CalendarCheck className="w-5 h-5" />
-          Confirmar e Agendar Aula
+          {isEditing ? 'Salvar Alterações' : 'Confirmar e Agendar Aula'}
         </button>
       </div>
 
@@ -47,13 +47,13 @@ export function FooterActions() {
       <Modal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
-        title="Cancelar Cadastro"
+        title={isEditing ? "Cancelar Edição" : "Cancelar Cadastro"}
         icon={<AlertTriangle className="w-5 h-5" />}
         iconBgClass="bg-red-100 text-red-600"
       >
         <div className="flex flex-col gap-6">
           <p className="text-sm text-slate-600 font-medium">
-            Tem certeza que deseja cancelar o cadastro? Todos os dados preenchidos serão perdidos e não poderão ser recuperados.
+            Tem certeza que deseja cancelar {isEditing ? 'a edição' : 'o cadastro'}? Todos os dados preenchidos serão perdidos e não poderão ser recuperados.
           </p>
           <div className="flex items-center gap-3 justify-end mt-2">
             <button
@@ -78,13 +78,13 @@ export function FooterActions() {
       <Modal
         isOpen={isSubmitModalOpen}
         onClose={() => !isSubmitting && setIsSubmitModalOpen(false)}
-        title="Confirmar Agendamento"
+        title={isEditing ? "Confirmar Alterações" : "Confirmar Agendamento"}
         icon={<CalendarCheck className="w-5 h-5" />}
       >
         <div className="flex flex-col gap-6">
           <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
             <p className="text-sm text-slate-700 font-medium mb-2">
-              Você está prestes a agendar a aula:
+              Você está prestes a {isEditing ? 'salvar as alterações da' : 'agendar a'} aula:
             </p>
             <p className="text-base font-bold text-girlies-purple">
               {formData.titulo || 'Sem título definido'}
@@ -122,7 +122,7 @@ export function FooterActions() {
                   <Loader2 className="w-4 h-4 animate-spin" /> Processando...
                 </>
               ) : (
-                'Agendar'
+                isEditing ? 'Salvar' : 'Agendar'
               )}
             </button>
           </div>

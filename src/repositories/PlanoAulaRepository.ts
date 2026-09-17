@@ -15,7 +15,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 [String(r.id)]
             );
             const linksRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, tipo, link 
+                `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
                  FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
                 [String(r.id)]
             );
@@ -41,6 +41,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                     id: Number(l.id),
                     atividadeId: Number(l.atividadeId),
                     tipo: l.tipo,
+                    titulo: l.titulo,
                     link: l.link
                 }))
             });
@@ -59,7 +60,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             [String(r.id)]
         );
         const linksRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, tipo, link 
+            `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
              FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
             [String(r.id)]
         );
@@ -85,6 +86,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 id: Number(l.id),
                 atividadeId: Number(l.atividadeId),
                 tipo: l.tipo,
+                titulo: l.titulo,
                 link: l.link
             }))
         };
