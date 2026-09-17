@@ -83,6 +83,26 @@ export const api = {
       }
       throw new Error(errorMsg);
     }
+    return res.json();
+  },
+
+  updateAulaStatus: async (id: number | string, status: string): Promise<PlanoAula> => {
+    const res = await fetch(`${API_BASE}/aulas/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    
+    if (!res.ok) {
+      let errorMsg = 'Erro ao atualizar status da aula';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
     
     return res.json();
   },

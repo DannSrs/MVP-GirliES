@@ -8,7 +8,7 @@ export interface PlanoAula {
   categoria?: string;
   dataHora: string;
   local?: string;
-  status?: string;
+  status?: 'Em Preparação' | 'Confirmada' | 'Concluída' | 'Cancelada';
   linkPlanoAula?: string;
   linkSlide?: string;
   linkRoteiro?: string;

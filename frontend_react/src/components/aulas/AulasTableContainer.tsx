@@ -86,7 +86,7 @@ export function AulasTableContainer({ aulas }: AulasTableContainerProps) {
                     data={dataFormatada}
                     horario={horarioFormatado}
                     local={aula.local || 'Não definido'}
-                    status={aula.status === 'Confirmada' || aula.status === 'Concluída' || aula.status === 'done' ? 'Confirmada' : 'Em Preparação'}
+                    status={aula.status || 'Em Preparação'}
                     materiais={{ 
                       linkSlide: aula.linkSlide, 
                       linkRoteiro: aula.linkRoteiro, 

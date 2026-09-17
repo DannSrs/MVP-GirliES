@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Route, Body, Path, Tags, Response } from 'tsoa';
+import { Controller, Get, Post, Put, Patch, Delete, Route, Body, Path, Tags, Response } from 'tsoa';
 import { PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO } from '../models/PlanoAula';
 import { PlanoAulaService } from '../services/PlanoAulaService';
 
@@ -44,6 +44,26 @@ export class PlanoAulaController extends Controller {
   ): Promise<PlanoAula | undefined> {
     try {
       const updated = await this.service.atualizarAula(id, requestBody);
+      if (!updated) {
+        this.setStatus(404);
+        return undefined;
+      }
+      return updated;
+    } catch (error: any) {
+      this.setStatus(400);
+      throw error;
+    }
+  }
+
+  @Patch("{id}/status")
+  @Response(404, "Aula não encontrada")
+  @Response(400, "Erro de Validação")
+  public async atualizarStatusAula(
+    @Path() id: number,
+    @Body() requestBody: { status: 'Em Preparação' | 'Confirmada' | 'Concluída' | 'Cancelada' }
+  ): Promise<PlanoAula | undefined> {
+    try {
+      const updated = await this.service.atualizarAula(id, { status: requestBody.status });
       if (!updated) {
         this.setStatus(404);
         return undefined;
