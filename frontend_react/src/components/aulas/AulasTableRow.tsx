@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, MonitorPlay, Code2, FileText, File, Eye, Clock } from 'lucide-react';
+import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export interface AulasTableRowProps {
@@ -21,7 +21,6 @@ export interface AulasTableRowProps {
     letra?: string;
   };
   status: 'Confirmada' | 'Em Preparação';
-  isPast?: boolean; // if the style is slightly different (like sem 03, 04)
 }
 
 export function AulasTableRow(props: AulasTableRowProps) {
@@ -35,7 +34,6 @@ export function AulasTableRow(props: AulasTableRowProps) {
     materiais,
     professora,
     status,
-    isPast,
     id,
   } = props;
 

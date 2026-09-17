@@ -1,27 +1,33 @@
-import React, { useState } from 'react';
 import { BookOpen, FileText, FolderCode, Link as LinkIcon, MonitorPlay, Plus } from 'lucide-react';
-import { type CustomLink, CustomLinkItem } from './CustomLinkItem';
+import type { CustomLink } from './CustomLinkItem';
+import { CustomLinkItem } from './CustomLinkItem';
+import { useAulaForm } from '../../../contexts/AulaFormContext';
+import type { LinksAtividade } from '../../../services/api';
 
 export function MaterialsSection() {
-  const [links, setLinks] = useState<CustomLink[]>([]);
+  const { formData, updateField } = useAulaForm();
 
   const handleAddLink = () => {
-    const novoLink: CustomLink = {
-      id: crypto.randomUUID(),
+    const novoLink: LinksAtividade = {
+      id: Date.now(), // Temporário para a key do React, não deve ser enviado se mock
+      tipo: 'Link Auxiliar',
       titulo: '',
-      url: ''
+      link: ''
     };
-    setLinks([...links, novoLink]);
+    updateField('links', [...formData.links, novoLink]);
   };
 
-  const handleUpdateLink = (id: string, field: keyof CustomLink, value: string) => {
-    setLinks(links.map(link =>
-      link.id === id ? { ...link, [field]: value } : link
+  const handleUpdateLink = (id: string | number, field: keyof CustomLink, value: string) => {
+    // Adapter mapping 'url' to 'link' for the API interface
+    const apiField = field === 'url' ? 'link' : field;
+
+    updateField('links', formData.links.map(link =>
+      String(link.id) === String(id) ? { ...link, [apiField]: value } : link
     ));
   };
 
-  const handleRemoveLink = (id: string) => {
-    setLinks(links.filter(link => link.id !== id));
+  const handleRemoveLink = (id: string | number) => {
+    updateField('links', formData.links.filter(link => String(link.id) !== String(id)));
   };
 
   return (
@@ -43,7 +49,13 @@ export function MaterialsSection() {
           </label>
           <div className="relative group">
             <MonitorPlay className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-girlies-purple transition-colors" />
-            <input type="url" placeholder="https://canva.com/design/girliES-sem07-slides" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all font-medium text-slate-700 bg-slate-50 focus:bg-white" />
+            <input
+              type="url"
+              value={formData.linkSlide}
+              onChange={(e) => updateField('linkSlide', e.target.value)}
+              placeholder="https://canva.com/design/girliES-sem07-slides"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all font-medium text-slate-700 bg-slate-50 focus:bg-white"
+            />
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -52,7 +64,13 @@ export function MaterialsSection() {
           </label>
           <div className="relative group">
             <FileText className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-girlies-purple transition-colors" />
-            <input type="url" placeholder="https://suap.ifpe.edu.br/documentos/girliES-plano-aula-07-2026.2.pdf" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all font-medium text-slate-700 bg-slate-50 focus:bg-white" />
+            <input
+              type="url"
+              value={formData.linkPlanoAula}
+              onChange={(e) => updateField('linkPlanoAula', e.target.value)}
+              placeholder="https://suap.ifpe.edu.br/documentos/girliES-plano-aula-07-2026.2.pdf"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all font-medium text-slate-700 bg-slate-50 focus:bg-white"
+            />
           </div>
         </div>
       </div>
@@ -63,7 +81,13 @@ export function MaterialsSection() {
         </label>
         <div className="relative group">
           <BookOpen className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-girlies-purple transition-colors" />
-          <input type="url" placeholder="https://notion.so/girliES/Roteiro-Dinamica-Tamagotchi-POO" className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all font-medium text-slate-700 bg-slate-50 focus:bg-white" />
+          <input
+            type="url"
+            value={formData.linkRoteiro}
+            onChange={(e) => updateField('linkRoteiro', e.target.value)}
+            placeholder="https://notion.so/girliES/Roteiro-Dinamica-Tamagotchi-POO"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all font-medium text-slate-700 bg-slate-50 focus:bg-white"
+          />
         </div>
       </div>
 
@@ -83,12 +107,12 @@ export function MaterialsSection() {
           </button>
         </div>
 
-        {links.length > 0 && (
+        {formData.links.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {links.map(link => (
+            {formData.links.map(link => (
               <CustomLinkItem
                 key={link.id}
-                link={link}
+                link={{ id: String(link.id), titulo: link.titulo || '', url: link.link }}
                 onUpdate={handleUpdateLink}
                 onRemove={handleRemoveLink}
               />
