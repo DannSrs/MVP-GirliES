@@ -26,7 +26,7 @@ export type TaskCard = {
   assignees: Assignee[];
   progressLabel?: string;
   progressPercent?: number; // 0 to 100
-  checklist?: { label: string; checked: boolean; strikethrough?: boolean }[];
+  checklist?: { id: number; descricao: string; isCompleted: boolean }[];
   stickers?: string; // e.g., '4 stickers prontos'
 };
 
@@ -85,9 +85,9 @@ const initialTasks: Record<string, TaskCard> = {
     progressLabel: 'Design no Figma',
     progressPercent: 80,
     checklist: [
-      { label: 'Roteiro pedagógico aprovado', checked: true, strikethrough: true },
-      { label: 'Mascotes pixel exportados', checked: true, strikethrough: true },
-      { label: 'Revisão ortográfica final', checked: false },
+      { id: 1, descricao: 'Roteiro pedagógico aprovado', isCompleted: true },
+      { id: 2, descricao: 'Mascotes pixel exportados', isCompleted: true },
+      { id: 3, descricao: 'Revisão ortográfica final', isCompleted: false },
     ],
   },
   'task-5': {

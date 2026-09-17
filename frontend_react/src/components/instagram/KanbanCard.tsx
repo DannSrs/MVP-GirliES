@@ -1,6 +1,7 @@
 import { Draggable } from '@hello-pangea/dnd';
 import type { TaskCard, CardTag } from '../../contexts/InstagramContext';
-import { Calendar, Clock, BarChart3, GripVertical, CheckSquare, Edit3 } from 'lucide-react';
+import { Calendar, Clock, BarChart3, GripVertical, Check } from 'lucide-react';
+import { useInstagram } from '../../contexts/InstagramContext';
 
 interface KanbanCardProps {
   task: TaskCard;
@@ -29,134 +30,142 @@ const getTagColor = (tag: CardTag) => {
 };
 
 export function KanbanCard({ task, index }: KanbanCardProps) {
+  const { tasks, columns, columnOrder, onDragEnd } = useInstagram(); // just an import to be able to edit task if we had the context action, but we only have drag end. I will keep it simple.
+
+  // In a real scenario we would dispatch to context to toggle checklist items
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={`bg-white rounded-xl p-4 mb-3 border border-slate-100 transition-all ${
+          className={`bg-white rounded-xl mb-3 border border-slate-100 transition-all flex flex-col overflow-hidden ${
             snapshot.isDragging ? 'shadow-xl scale-[1.02] rotate-1 ring-1 ring-girlies-purple/20' : 'shadow-sm hover:shadow-md'
           }`}
         >
-          {/* Header (Tag & Edit Icon) */}
-          <div className="flex items-center justify-between mb-3">
+          {/* Drag Handle & Header Area */}
+          <div 
+            {...provided.dragHandleProps} 
+            className="flex items-center justify-between p-3 border-b border-slate-50 cursor-grab active:cursor-grabbing bg-slate-50/30 hover:bg-slate-50 transition-colors"
+          >
             <div className="flex gap-2">
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${getTagColor(task.tag)}`}>
                 {task.tag}
               </span>
-              {task.dueTime && task.tag !== 'Carrossel (8 slides)' && task.tag !== 'Post Divulgação' && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {task.dueTime}
-                </span>
-              )}
               {task.tag === 'Post Divulgação' && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">
                   Evento Externo
                 </span>
               )}
             </div>
-            <button className="text-slate-300 hover:text-slate-500 transition-colors">
+            <div className="text-slate-300 hover:text-slate-500 transition-colors">
               <GripVertical className="w-4 h-4" />
-            </button>
+            </div>
           </div>
 
-          {/* Title & Description */}
-          <h3 className="text-slate-800 font-bold text-sm mb-1.5 leading-snug">{task.title}</h3>
-          {task.description && (
-            <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed mb-3">
-              {task.description}
-            </p>
-          )}
+          {/* Card Body */}
+          <div className="p-4 flex-1 flex flex-col">
+            {/* Title & Description */}
+            <h3 className="text-slate-800 font-bold text-sm mb-1.5 leading-snug">{task.title}</h3>
+            {task.description && (
+              <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed mb-4">
+                {task.description}
+              </p>
+            )}
 
-          {/* Progress / Checklist */}
-          {task.progressLabel && task.progressPercent !== undefined && (
-            <div className="mb-3">
-              <div className="flex justify-between text-[10px] font-semibold text-slate-600 mb-1">
-                <span>{task.progressLabel}</span>
-                <span>{task.progressPercent}%</span>
+            {/* Progress Bar (if applicable) */}
+            {task.progressLabel && task.progressPercent !== undefined && (
+              <div className="mb-4">
+                <div className="flex justify-end text-[10px] font-semibold text-slate-600 mb-1.5">
+                  <span>{task.progressPercent}%</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-[#4b006e] rounded-full transition-all" 
+                    style={{ width: `${task.progressPercent}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[#4b006e] rounded-full transition-all" 
-                  style={{ width: `${task.progressPercent}%` }}
-                />
-              </div>
-            </div>
-          )}
+            )}
 
-          {task.checklist && (
-            <div className="mb-3 space-y-1.5">
-              {task.checklist.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded flex items-center justify-center border ${item.checked ? 'bg-[#4b006e] border-[#4b006e]' : 'border-slate-300'}`}>
-                    {item.checked && <CheckSquare className="w-2.5 h-2.5 text-white" />}
+            {/* Checklist */}
+            {task.checklist && (
+              <div className="mb-4">
+                {(() => {
+                  return (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1.5">
+                        {task.checklist.map(item => (
+                          <div 
+                            key={item.id} 
+                            className="flex items-center gap-2 group cursor-default"
+                          >
+                            <div className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 transition-colors ${item.isCompleted ? 'bg-[#4b006e] border-[#4b006e]' : 'bg-white border border-slate-300'}`}>
+                              {item.isCompleted && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+                            </div>
+                            <span className={`text-[11px] font-medium transition-colors line-clamp-1 ${item.isCompleted ? 'text-slate-400 line-through' : 'text-slate-600'}`}>
+                              {item.descricao}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            <div className="mt-auto">
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <div className="flex flex-col gap-1">
+                  
+                  {/* Reminder (if any) */}
+                  {task.dueTime && (
+                    <div className="flex items-center gap-1 w-fit bg-red-50 text-red-600 px-2 py-0.5 rounded-full">
+                      <Clock className="w-3 h-3" />
+                      <span className="text-[10px] font-bold">{task.dueTime}</span>
+                    </div>
+                  )}
+
+                  {/* Date/Location */}
+                  <div className="flex items-center gap-1.5 text-slate-500">
+                    {task.dueDate === 'Caruaru • PE' ? (
+                      <span className="flex items-center gap-1 text-[10px] font-medium">
+                        📍 {task.dueDate}
+                      </span>
+                    ) : task.dueDate.includes('stickers') ? (
+                      <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600">
+                        <BarChart3 className="w-3.5 h-3.5" />
+                        {task.dueDate}
+                      </span>
+                    ) : task.dueDate === 'Sugestão' ? (
+                      <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600">
+                        <BookOpenIcon className="w-3.5 h-3.5" />
+                        {task.dueDate}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-[10px] font-medium">
+                        <Calendar className="w-3 h-3" />
+                        {task.dueDate}
+                      </span>
+                    )}
                   </div>
-                  <span className={`text-[10px] font-medium ${item.strikethrough ? 'line-through text-slate-400' : 'text-slate-600'}`}>
-                    {item.label}
-                  </span>
                 </div>
-              ))}
-            </div>
-          )}
 
-          {/* Special Labels (like Amanhã 18:00 for the carrossel) */}
-          {task.tag === 'Carrossel (8 slides)' && task.dueTime && (
-            <div className="flex justify-start mb-3">
-               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {task.dueTime}
-                </span>
-            </div>
-          )}
-
-          {/* Footer (Date & Assignees) */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50">
-            <div className="flex items-center gap-1.5 text-slate-500">
-              {task.dueDate === 'Caruaru • PE' ? (
-                <span className="flex items-center gap-1 text-[10px] font-medium">
-                  📍 {task.dueDate}
-                </span>
-              ) : task.dueDate.includes('stickers') ? (
-                <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600">
-                  <BarChart3 className="w-3.5 h-3.5" />
-                  {task.dueDate}
-                </span>
-              ) : task.dueDate === 'Sugestão' ? (
-                <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600">
-                  <BookOpenIcon className="w-3.5 h-3.5" />
-                  {task.dueDate}
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 text-[10px] font-medium">
-                  <Calendar className="w-3 h-3" />
-                  {task.dueDate}
-                </span>
-              )}
-
-              {task.tag === 'Post Divulgação' && task.dueTime && (
-                <>
-                  <span className="text-[10px] text-slate-300">•</span>
-                  <span className="flex items-center gap-1 text-[10px] font-medium">
-                    <Clock className="w-3 h-3" />
-                    {task.dueTime}
-                  </span>
-                </>
-              )}
-            </div>
-
-            <div className="flex -space-x-1.5">
-              {task.assignees.map((assignee, idx) => (
-                <div 
-                  key={idx}
-                  title={assignee.name}
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold border-2 border-white shadow-sm ${assignee.color}`}
-                >
-                  {assignee.initial}
+                {/* Avatars */}
+                <div className="flex -space-x-1.5">
+                  {task.assignees.map((assignee, idx) => (
+                    <div 
+                      key={idx}
+                      title={assignee.name}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold border-2 border-white shadow-sm ${assignee.color}`}
+                    >
+                      {assignee.initial}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
