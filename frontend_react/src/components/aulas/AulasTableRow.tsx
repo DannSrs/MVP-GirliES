@@ -21,6 +21,7 @@ export interface AulasTableRowProps {
     letra?: string;
   };
   status: 'Confirmada' | 'Em Preparação';
+  timeStatus: 'past' | 'current' | 'future';
 }
 
 export function AulasTableRow(props: AulasTableRowProps) {
@@ -35,21 +36,22 @@ export function AulasTableRow(props: AulasTableRowProps) {
     professora,
     status,
     id,
+    timeStatus
   } = props;
 
-  // Determine week badge style based on status/past
   let weekBadgeClass = "";
   let weekTextSem = "";
   let weekTextNum = "";
+  let rowClass = "grid grid-cols-[80px_2fr_1.5fr_1fr_1.5fr_120px_60px] gap-4 px-6 py-4 items-center hover:bg-slate-50 transition-colors";
 
-  if (semana === "01") {
-    weekBadgeClass = "bg-girlies-purple/10 shadow-sm shadow-girlies-purple/5";
-    weekTextSem = "text-girlies-purple text-[9px] font-bold leading-none";
-    weekTextNum = "text-girlies-purple text-xs font-bold leading-none mt-0.5";
-  } else if (semana === "02") {
+  if (timeStatus === 'current') {
     weekBadgeClass = "bg-girlies-purple shadow-md shadow-girlies-purple/20";
     weekTextSem = "text-white text-[9px] font-bold leading-none";
     weekTextNum = "text-white text-xs font-bold leading-none mt-0.5";
+  } else if (timeStatus === 'past') {
+    weekBadgeClass = "bg-girlies-purple/10 shadow-sm shadow-girlies-purple/5";
+    weekTextSem = "text-girlies-purple text-[9px] font-bold leading-none";
+    weekTextNum = "text-girlies-purple text-xs font-bold leading-none mt-0.5";
   } else {
     weekBadgeClass = "bg-slate-100 border border-slate-200";
     weekTextSem = "text-slate-400 text-[9px] font-bold leading-none";
@@ -59,7 +61,7 @@ export function AulasTableRow(props: AulasTableRowProps) {
   const hasMateriais = !!(materiais?.linkSlide || materiais?.linkRoteiro || materiais?.linkPlanoAula);
 
   return (
-    <div className="grid grid-cols-[80px_2fr_1.5fr_1fr_1.5fr_120px_60px] gap-4 px-6 py-4 items-center hover:bg-slate-50 transition-colors">
+    <div className={rowClass}>
       {/* Col 1 */}
       <div>
         <div className={`w-10 h-10 rounded-full flex flex-col items-center justify-center ${weekBadgeClass}`}>

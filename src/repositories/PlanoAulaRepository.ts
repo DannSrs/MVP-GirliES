@@ -5,7 +5,7 @@ import { IRepository } from './IRepository';
 export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO> {
     async findAll(): Promise<PlanoAula[]> {
         const db = await getDb();
-        const rows = await db.all<any[]>('SELECT * FROM Aulas');
+        const rows = await db.all<any[]>('SELECT * FROM Aulas ORDER BY data_hora ASC');
         
         const aulas: PlanoAula[] = [];
         for (const r of rows) {
