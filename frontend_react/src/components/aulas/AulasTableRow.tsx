@@ -1,5 +1,7 @@
-import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock } from 'lucide-react';
+import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { api } from '../../services/api';
 
 export interface AulasTableRowProps {
   id?: number;
@@ -20,7 +22,7 @@ export interface AulasTableRowProps {
     avatarUrl?: string;
     letra?: string;
   };
-  status: 'Confirmada' | 'Em Preparação';
+  status: string;
   timeStatus: 'past' | 'current' | 'future';
 }
 
@@ -38,6 +40,29 @@ export function AulasTableRow(props: AulasTableRowProps) {
     id,
     timeStatus
   } = props;
+
+  const [localStatus, setLocalStatus] = useState(status || 'Em Preparação');
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+
+  const handleStatusChange = async (newStatus: string) => {
+    setLocalStatus(newStatus);
+    if (id) {
+      try {
+        await api.updateAula(id, { status: newStatus });
+      } catch (error) {
+        console.error('Erro ao atualizar status', error);
+      }
+    }
+  };
+
+  const getStatusStyle = (s: string) => {
+    switch (s) {
+      case 'Confirmada': return 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 focus:ring-emerald-500/20';
+      case 'Concluída': return 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 focus:ring-indigo-500/20';
+      case 'Cancelada': return 'bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-500/20';
+      default: return 'bg-girlies-purple/10 text-girlies-purple hover:bg-girlies-purple/20 focus:ring-girlies-purple/20';
+    }
+  };
 
   let weekBadgeClass = "";
   let weekTextSem = "";
@@ -133,15 +158,35 @@ export function AulasTableRow(props: AulasTableRowProps) {
       </div>
       
       {/* Col 6 */}
-      <div>
-        {status === 'Confirmada' ? (
-          <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Confirmada
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1.5 bg-girlies-purple/10 text-girlies-purple px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-girlies-purple"></span> Em Preparação
-          </span>
+      <div className="relative">
+        <button
+          onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+          onBlur={() => setTimeout(() => setIsStatusDropdownOpen(false), 200)}
+          className={`inline-flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-transparent transition-all outline-none focus:ring-2 focus:ring-offset-1 w-[130px] ${getStatusStyle(localStatus)}`}
+        >
+          <span className="truncate">{localStatus}</span>
+          <ChevronDown className={`w-3 h-3 flex-shrink-0 transition-transform ${isStatusDropdownOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isStatusDropdownOpen && (
+          <div className="absolute top-full left-0 mt-1 w-[140px] bg-white rounded-lg shadow-xl shadow-slate-200/50 border border-slate-100 py-1 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+            {['Em Preparação', 'Confirmada', 'Concluída', 'Cancelada'].map((opt) => (
+              <button
+                key={opt}
+                onClick={() => {
+                  handleStatusChange(opt);
+                  setIsStatusDropdownOpen(false);
+                }}
+                className={`text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                  localStatus === opt
+                    ? 'bg-slate-50 text-slate-800'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
         )}
       </div>
       

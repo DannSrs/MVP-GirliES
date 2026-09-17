@@ -107,6 +107,8 @@ export const api = {
     
     return res.json();
   },
+
+
   
   getPosts: async (): Promise<PostInstagram[]> => {
     const res = await fetch(`${API_BASE}/posts`);

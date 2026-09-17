@@ -14,6 +14,7 @@ interface AulaFormData {
   linkRoteiro: string;
   checklist: ChecklistItem[];
   links: LinksAtividade[];
+  status: string;
 }
 
 interface AulaFormContextType {
@@ -45,7 +46,8 @@ export function AulaFormProvider({ children, aulaId }: { children: ReactNode, au
     linkPlanoAula: '',
     linkRoteiro: '',
     checklist: [],
-    links: []
+    links: [],
+    status: 'Em Preparação'
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +70,8 @@ export function AulaFormProvider({ children, aulaId }: { children: ReactNode, au
           linkPlanoAula: data.linkPlanoAula || '',
           linkRoteiro: data.linkRoteiro || '',
           checklist: data.checklist || [],
-          links: data.links || []
+          links: data.links || [],
+          status: data.status || 'Em Preparação'
         });
       }).catch(err => {
         console.error("Erro ao carregar aula para edição:", err);
@@ -96,6 +99,7 @@ export function AulaFormProvider({ children, aulaId }: { children: ReactNode, au
         linkRoteiro: formData.linkRoteiro,
         checklist: formData.checklist.map(({ id, atividadeId, ...rest }: any) => rest),
         links: formData.links.map(({ id, atividadeId, ...rest }: any) => rest),
+        status: formData.status,
       };
       
       if (isEditing && aulaId) {
