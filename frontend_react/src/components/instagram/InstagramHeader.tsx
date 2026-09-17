@@ -1,0 +1,49 @@
+import { Plus } from 'lucide-react';
+
+export function InstagramHeader() {
+  return (
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="bg-purple-100 text-girlies-purple text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+              INSTA LAB • IFPE
+            </span>
+            <span className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 uppercase tracking-wider">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Feed Ativo
+            </span>
+          </div>
+          <h1 className="text-3xl font-extrabold text-slate-800 mb-2">
+            Pipeline de Conteúdo <span className="text-girlies-purple">@girli.es</span>
+          </h1>
+          <p className="text-slate-500 text-sm max-w-2xl leading-relaxed">
+            Fluxo editorial de publicações, carrosséis educativos, stories e reels para fortalecer garotas na Engenharia de Software.
+          </p>
+        </div>
+        <button className="bg-[#4b006e] hover:bg-[#3a0055] transition-colors text-white text-sm font-medium py-2.5 px-5 rounded-full flex items-center gap-2 shadow-lg shadow-[#4b006e]/30">
+          <Plus className="w-4 h-4" />
+          Nova Ideia de Post
+        </button>
+      </div>
+
+      <div className="flex items-center gap-3 mt-6">
+        <button className="bg-[#4b006e] text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
+          Todos (10)
+        </button>
+        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
+          Reels • Vídeo
+        </button>
+        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
+          Post Estático
+        </button>
+        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
+          Stories
+        </button>
+        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
+          Carrossel
+        </button>
+      </div>
+    </div>
+  );
+}
