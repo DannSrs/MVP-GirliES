@@ -1,19 +1,29 @@
+import { useState, useEffect } from 'react';
 import { Plus, UserPlus, Users } from 'lucide-react';
 import { usePostForm } from '../../../contexts/PostFormContext';
-
-const TEAM_MEMBERS = [
-  'Nenhum',
-  'Letícia',
-  'Vitória',
-  'Clara',
-  'Maria Eduarda',
-  'Ana Júlia',
-  'Beatriz',
-  'Coordenação',
-];
+import { api, type Usuario } from '../../../services/api';
 
 export function PostTeamSidebar() {
   const { formData, updateField } = usePostForm();
+  const [users, setUsers] = useState<Usuario[]>([]);
+
+  useEffect(() => {
+    api.getUsuarios()
+      .then(data => setUsers(data))
+      .catch(err => console.error('Erro ao carregar usuarios:', err));
+  }, []);
+
+  const getInitials = (idStr: string) => {
+    if (!idStr) return '';
+    const u = users.find(u => u.id.toString() === idStr);
+    return u ? u.nome.charAt(0).toUpperCase() : '?';
+  };
+
+  const getName = (idStr: string) => {
+    if (!idStr) return '';
+    const u = users.find(u => u.id.toString() === idStr);
+    return u ? u.nome : 'Desconhecido';
+  };
 
   return (
     <div className="w-full xl:w-80 flex-shrink-0 flex flex-col gap-4">
@@ -39,8 +49,9 @@ export function PostTeamSidebar() {
                 value={formData.redacao}
                 onChange={(e) => updateField('redacao', e.target.value)}
               >
-                {TEAM_MEMBERS.map(member => (
-                  <option key={`redacao-${member}`} value={member === 'Nenhum' ? '' : member}>{member}</option>
+                <option value="">Nenhum</option>
+                {users.map(member => (
+                  <option key={`redacao-${member.id}`} value={member.id.toString()}>{member.nome}</option>
                 ))}
               </select>
               <button type="button" className="flex items-center gap-1.5 bg-girlies-purple/10 text-girlies-purple px-2 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider hover:bg-girlies-purple/20 transition-colors pointer-events-none">
@@ -53,9 +64,9 @@ export function PostTeamSidebar() {
             {formData.redacao && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-2 rounded-lg">
                 <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[9px] font-bold">
-                  {formData.redacao.charAt(0)}
+                  {getInitials(formData.redacao)}
                 </div>
-                <span className="text-xs font-medium text-slate-700">{formData.redacao}</span>
+                <span className="text-xs font-medium text-slate-700">{getName(formData.redacao)}</span>
               </div>
             )}
           </div>
@@ -72,8 +83,9 @@ export function PostTeamSidebar() {
                 value={formData.designer}
                 onChange={(e) => updateField('designer', e.target.value)}
               >
-                {TEAM_MEMBERS.map(member => (
-                  <option key={`designer-${member}`} value={member === 'Nenhum' ? '' : member}>{member}</option>
+                <option value="">Nenhum</option>
+                {users.map(member => (
+                  <option key={`designer-${member.id}`} value={member.id.toString()}>{member.nome}</option>
                 ))}
               </select>
               <button type="button" className="text-girlies-purple hover:text-[#3d004d] text-[10px] font-bold flex items-center gap-1 uppercase tracking-wider hover:bg-girlies-purple/5 px-2 py-1 rounded transition-colors pointer-events-none">
@@ -86,9 +98,9 @@ export function PostTeamSidebar() {
             {formData.designer && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-2 rounded-lg">
                 <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] font-bold">
-                  {formData.designer.charAt(0)}
+                  {getInitials(formData.designer)}
                 </div>
-                <span className="text-xs font-medium text-slate-700">{formData.designer}</span>
+                <span className="text-xs font-medium text-slate-700">{getName(formData.designer)}</span>
               </div>
             )}
           </div>

@@ -87,9 +87,9 @@ export function PostBasicInfoSection() {
             value={formData.etapa}
             onChange={(e) => updateField('etapa', e.target.value)}
           >
-            <option value="Backlog / Ideias">Backlog / Ideias</option>
-            <option value="Em Produção / Design">Em Produção / Design</option>
-            <option value="Pronto / Aprovado">Pronto / Aprovado</option>
+            <option value="Backlog">Backlog</option>
+            <option value="Produção">Produção</option>
+            <option value="Pronto">Pronto</option>
           </select>
         </div>
       </div>

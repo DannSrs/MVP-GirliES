@@ -1,6 +1,6 @@
 import { Draggable } from '@hello-pangea/dnd';
 import type { TaskCard, CardTag } from '../../contexts/InstagramContext';
-import { Calendar, Clock, BarChart3, GripVertical } from 'lucide-react';
+import { Calendar, Clock, GripVertical } from 'lucide-react';
 import { useInstagram } from '../../contexts/InstagramContext';
 import { MiniChecklist } from '../MiniChecklist';
 

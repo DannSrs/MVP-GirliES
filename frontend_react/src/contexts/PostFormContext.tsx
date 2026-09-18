@@ -35,7 +35,7 @@ interface PostFormContextType {
 const defaultFormData: PostFormData = {
   titulo: '',
   formato: 'Stories',
-  etapa: 'Backlog / Ideias',
+  etapa: 'Backlog',
   descricao: '',
   data: '',
   horario: '',

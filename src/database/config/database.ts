@@ -66,7 +66,7 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       titulo TEXT NOT NULL,
       descricao TEXT,
-      status TEXT DEFAULT 'Ideia',
+      status TEXT DEFAULT 'Backlog',
       data_programada DATETIME,
       tipo_post TEXT,
       publico_alvo TEXT,

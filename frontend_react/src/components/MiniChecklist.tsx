@@ -1,7 +1,7 @@
 import { Check, CheckCircle2, Circle } from 'lucide-react';
 
 export interface ChecklistItemType {
-  id: string | number;
+  id?: string | number;
   descricao: string;
   isCompleted: boolean;
 }
@@ -38,11 +38,11 @@ export function MiniChecklist({ items, onToggle, showProgress, variant = 'defaul
 
       {/* List */}
       <div className="flex flex-col gap-1.5">
-        {items.map(item => (
+        {items.map((item, index) => (
           <div 
-            key={item.id} 
+            key={item.id ?? index} 
             className={`flex items-start gap-2 cursor-pointer select-none group rounded-md transition-colors ${variant === 'circle' ? 'px-1 py-0.5 -mx-1 hover:bg-slate-50' : ''}`}
-            onClick={() => onToggle(item.id)}
+            onClick={() => item.id !== undefined && onToggle(item.id)}
           >
             {variant === 'default' ? (
               <div className={`mt-0.5 w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 transition-colors ${item.isCompleted ? 'bg-[#4b006e] border-[#4b006e]' : 'bg-white border border-slate-300'}`}>

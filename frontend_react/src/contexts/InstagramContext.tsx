@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { DropResult } from '@hello-pangea/dnd';
+import { api } from '../services/api';
+import type { PostInstagram, ChecklistItem } from '../services/api';
 
 export type Assignee = {
   initial: string;
@@ -26,7 +28,7 @@ export type TaskCard = {
   assignees: Assignee[];
   progressLabel?: string;
   progressPercent?: number; // 0 to 100
-  checklist?: { id: number; descricao: string; isCompleted: boolean }[];
+  checklist?: ChecklistItem[];
   stickers?: string; // e.g., '4 stickers prontos'
 };
 
@@ -47,114 +49,121 @@ export type InstagramContextType = {
 
 const InstagramContext = createContext<InstagramContextType | undefined>(undefined);
 
-// --- Mock Data ---
-const initialTasks: Record<string, TaskCard> = {
-  'task-1': {
-    id: 'task-1',
-    tag: 'Stories',
-    title: 'Diferença entre Frontend, Backend e Fullstack',
-    description: 'Explicação didática com metáforas fáceis, código em Python/React e...',
-    dueDate: '28/Set',
-    assignees: [{ initial: 'C', name: 'Clara', color: 'bg-indigo-100 text-indigo-700' }],
-  },
-  'task-2': {
-    id: 'task-2',
-    tag: 'Reels / Vídeo Curto',
-    title: 'Como foi a Acolhida das Calouras 2026.2',
-    description: 'Montagem com takes dinâmicos dos kits de boas-vindas, dinâmicas de...',
-    dueDate: '30/Set',
-    assignees: [{ initial: 'L', name: 'Letícia', color: 'bg-girlies-purple text-white' }],
-  },
-  'task-3': {
-    id: 'task-3',
-    tag: 'Post Estático',
-    title: 'Dica de Livro: Mulheres na Tecnologia',
-    description: 'Recomendação de obras inspiradoras para a biblioteca comunitária do...',
-    dueDate: '20/Out', // Standardized date
-    assignees: [{ initial: 'B', name: 'Beatriz', color: 'bg-emerald-100 text-emerald-700' }],
-  },
-  'task-4': {
-    id: 'task-4',
-    tag: 'Carrossel (8 slides)',
-    title: 'O que é Engenharia de Software?',
-    dueTime: 'Amanhã 18:00', // Em Produção special label
-    dueDate: '28/Set',
-    assignees: [
-      { initial: 'L', name: 'Letícia', color: 'bg-girlies-purple text-white' },
-      { initial: 'V', name: 'Vitória', color: 'bg-purple-900 text-white' }
-    ],
-    progressLabel: 'Design no Figma',
-    progressPercent: 80,
-    checklist: [
-      { id: 1, descricao: 'Roteiro pedagógico aprovado', isCompleted: true },
-      { id: 2, descricao: 'Mascotes pixel exportados', isCompleted: true },
-      { id: 3, descricao: 'Revisão ortográfica final', isCompleted: false },
-    ],
-  },
-  'task-5': {
-    id: 'task-5',
-    tag: 'Post Estático',
-    title: 'Mulheres Históricas: Margaret Hamilton',
-    description: 'A cientista que cunhou o termo Engenharia de Software e levou a...',
-    dueDate: '28/Set',
-    assignees: [{ initial: 'M', name: 'Maria Eduarda', color: 'bg-purple-100 text-purple-700' }],
-    progressLabel: 'Status da Ilustração',
-    progressPercent: 40,
-  },
-  'task-6': {
-    id: 'task-6',
-    tag: 'Reels / Vídeo Curto',
-    title: 'Dia a Dia no Laboratório Maker IFPE',
-    description: 'Bastidores de prototipagem, café gelado, resolução de bugs e...',
-    dueDate: '28/Set',
-    assignees: [{ initial: 'A', name: 'Ana Júlia', color: 'bg-indigo-200 text-indigo-800' }],
-  },
-  'task-7': {
-    id: 'task-7',
-    tag: 'Post Divulgação', // Also 'Evento Externo'
-    title: 'REC\'n\'Play Caruaru 2026 – Convocação da Equipe',
-    description: 'Chamada das estudantes para o maior festival de tecnologia do...',
-    dueDate: '25/Out', // Standardized date
-    dueTime: 'Sexta-feira • 12:00',
-    assignees: [{ initial: 'C', name: 'Coordenação', color: 'bg-slate-500 text-white' }],
-  },
-  'task-8': {
-    id: 'task-8',
-    tag: 'Story Interativo',
-    title: 'Quiz Rápido: Qual seu editor de código favorito?',
-    description: 'Enquete nos stories (VS Code vs Neovim vs IntelliJ) com figurinhas...',
-    dueDate: '30/Out', // Standardized date
-    assignees: [{ initial: 'V', name: 'Vitória', color: 'bg-purple-900 text-white' }],
+// Helper for generating deterministic avatars for backend users
+const AVATAR_COLORS = [
+  'bg-purple-100 text-purple-700',
+  'bg-girlies-purple text-white',
+  'bg-emerald-100 text-emerald-700',
+  'bg-indigo-100 text-indigo-700',
+  'bg-pink-100 text-pink-700',
+  'bg-orange-100 text-orange-700'
+];
+
+function getMockAvatarForUser(id?: number, roleName: string = 'User'): Assignee | null {
+  if (!id) return null;
+  // Simple deterministic pick
+  const colorIndex = id % AVATAR_COLORS.length;
+  // Since we don't have the user's real name from the backend yet, we use a placeholder initial
+  const initial = roleName.charAt(0).toUpperCase();
+  return {
+    initial,
+    name: `${roleName} (ID: ${id})`,
+    color: AVATAR_COLORS[colorIndex]
+  };
+}
+
+function formatDate(isoString: string): string {
+  if (!isoString) return '';
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return isoString;
+  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return `${d.getDate()}/${meses[d.getMonth()]}`;
+}
+
+function mapPostToTaskCard(post: PostInstagram): TaskCard {
+  const assignees: Assignee[] = [];
+  const rot = getMockAvatarForUser(post.responsavelRoteiroId, 'Roteiro');
+  if (rot) assignees.push(rot);
+  
+  const des = getMockAvatarForUser(post.responsavelDesignId, 'Design');
+  if (des) assignees.push(des);
+
+  // If no specific assignees, maybe add a fallback or leave empty. 
+  // Let's leave empty if none assigned.
+
+  let progressPercent: number | undefined = undefined;
+  if (post.checklist && post.checklist.length > 0) {
+    const completed = post.checklist.filter(c => c.isCompleted).length;
+    progressPercent = Math.round((completed / post.checklist.length) * 100);
   }
-};
+
+  return {
+    id: post.id.toString(),
+    title: post.titulo,
+    description: post.descricao,
+    tag: post.tipoPost as CardTag,
+    dueDate: formatDate(post.deadline),
+    assignees,
+    progressPercent,
+    checklist: post.checklist
+  };
+}
 
 const initialColumns: Record<string, ColumnData> = {
-  'column-1': {
-    id: 'column-1',
-    title: 'Backlog / Ideias',
-    taskIds: ['task-1', 'task-2', 'task-3'],
+  'Backlog': {
+    id: 'Backlog',
+    title: 'Backlog',
+    taskIds: [],
     colorClass: 'bg-purple-300',
   },
-  'column-2': {
-    id: 'column-2',
-    title: 'Em Produção / Design',
-    taskIds: ['task-4', 'task-5', 'task-6'],
+  'Produção': {
+    id: 'Produção',
+    title: 'Produção',
+    taskIds: [],
     colorClass: 'bg-girlies-purple',
   },
-  'column-3': {
-    id: 'column-3',
-    title: 'Pronto / Aprovado',
-    taskIds: ['task-7', 'task-8'],
+  'Pronto': {
+    id: 'Pronto',
+    title: 'Pronto',
+    taskIds: [],
     colorClass: 'bg-emerald-400',
   },
 };
 
-const initialColumnOrder = ['column-1', 'column-2', 'column-3'];
+const initialColumnOrder = ['Backlog', 'Produção', 'Pronto'];
 
 export function InstagramProvider({ children }: { children: ReactNode }) {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState<Record<string, TaskCard>>({});
   const [columns, setColumns] = useState(initialColumns);
-  const [columnOrder, setColumnOrder] = useState(initialColumnOrder);
+  const [columnOrder] = useState(initialColumnOrder);
+
+  const fetchPosts = useCallback(async () => {
+    try {
+      const posts = await api.getPosts();
+      
+      const newTasks: Record<string, TaskCard> = {};
+      const newColumns = JSON.parse(JSON.stringify(initialColumns)) as Record<string, ColumnData>;
+
+      posts.forEach(post => {
+        const task = mapPostToTaskCard(post);
+        newTasks[task.id] = task;
+        
+        const colId = post.status || 'Backlog';
+        if (newColumns[colId]) {
+          newColumns[colId].taskIds.push(task.id);
+        }
+      });
+
+      setTasks(newTasks);
+      setColumns(newColumns);
+    } catch (err) {
+      console.error('Erro ao carregar posts:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -211,6 +220,13 @@ export function InstagramProvider({ children }: { children: ReactNode }) {
       [newStart.id]: newStart,
       [newFinish.id]: newFinish,
     });
+
+    // Update backend (Fire and forget, but could handle rollback on error)
+    api.atualizarPost(draggableId, { status: destination.droppableId as any }).catch(err => {
+      console.error('Erro ao atualizar status do post:', err);
+      // Optional: reload posts here to revert state
+      // fetchPosts();
+    });
   };
 
   const toggleChecklistItem = (taskId: string, checklistId: number) => {
@@ -237,6 +253,13 @@ export function InstagramProvider({ children }: { children: ReactNode }) {
         }
       };
     });
+
+    // Sincroniza com backend (assumindo que api.toggleChecklistItem já existe para POST e AULA)
+    // Se não existir o método de toggle específico, usaríamos um PUT de todo o array.
+    // Aqui assumimos que ele altera globalmente
+    if (typeof api.toggleChecklistItem === 'function') {
+      api.toggleChecklistItem(checklistId).catch(err => console.error('Falha ao dar toggle no checklist', err));
+    }
   };
 
   return (
