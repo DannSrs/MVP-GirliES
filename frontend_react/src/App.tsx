@@ -11,12 +11,15 @@ import { Eventos } from './pages/Eventos';
 import { CadastrarEvento } from './pages/CadastrarEvento';
 import { VisualizarEvento } from './pages/VisualizarEvento';
 import { Configuracoes } from './pages/Configuracoes';
+import { Login } from './pages/Login';
 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<Login />} />
+        
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="aulas" element={<Aulas />} />

@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Settings, UserPlus, Home } from 'lucide-react';
 
-export function ConfiguracoesHeader() {
+interface ConfiguracoesHeaderProps {
+  onAddClick: () => void;
+}
+
+export function ConfiguracoesHeader({ onAddClick }: ConfiguracoesHeaderProps) {
   return (
     <header className="bg-gradient-to-br from-girlies-purple/5 via-white to-emerald-50/30 rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
       {/* Breadcrumb */}
@@ -36,7 +40,7 @@ export function ConfiguracoesHeader() {
         {/* Botão de adicionar */}
         <button
           type="button"
-          onClick={() => alert('Modal de Adicionar Membra será aberto aqui!')}
+          onClick={onAddClick}
           className="flex items-center gap-2 bg-[#9ef0d2] hover:bg-[#85e8c3] text-emerald-900 px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm whitespace-nowrap self-start md:self-auto"
         >
           <UserPlus className="w-4 h-4" />
