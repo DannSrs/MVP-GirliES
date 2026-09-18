@@ -7,6 +7,7 @@ import { CadastrarAula } from './pages/CadastrarAula';
 import { EditarAula } from './pages/EditarAula';
 import { Instagram } from './pages/Instagram';
 import { CadastrarPost } from './pages/CadastrarPost';
+import { VisualizarPost } from './pages/VisualizarPost';
 import { Eventos } from './pages/Eventos';
 import { CadastrarEvento } from './pages/CadastrarEvento';
 import { VisualizarEvento } from './pages/VisualizarEvento';
@@ -28,6 +29,8 @@ function App() {
           <Route path="aulas/:id" element={<VisualizarAula />} />
           <Route path="instagram" element={<Instagram />} />
           <Route path="instagram/cadastrar" element={<CadastrarPost />} />
+          <Route path="instagram/:id/editar" element={<CadastrarPost />} />
+          <Route path="instagram/:id" element={<VisualizarPost />} />
           <Route path="eventos" element={<Eventos />} />
           <Route path="eventos/cadastrar" element={<CadastrarEvento />} />
           <Route path="eventos/:id" element={<VisualizarEvento />} />

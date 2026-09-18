@@ -1,4 +1,5 @@
 import { Draggable } from '@hello-pangea/dnd';
+import { Link } from 'react-router-dom';
 import type { TaskCard, CardTag } from '../../contexts/InstagramContext';
 import { Calendar, Clock, GripVertical } from 'lucide-react';
 import { useInstagram } from '../../contexts/InstagramContext';
@@ -66,7 +67,11 @@ export function KanbanCard({ task, index }: KanbanCardProps) {
           {/* Card Body */}
           <div className="p-4 flex-1 flex flex-col">
             {/* Title & Description */}
-            <h3 className="text-slate-800 font-bold text-sm mb-1.5 leading-snug">{task.title}</h3>
+            <Link to={`/instagram/${task.id}`} className="group mb-1.5 flex items-start justify-between gap-2">
+              <h3 className="text-slate-800 font-bold text-sm leading-snug group-hover:text-girlies-purple transition-colors">
+                {task.title}
+              </h3>
+            </Link>
             {task.description && (
               <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed mb-4">
                 {task.description}

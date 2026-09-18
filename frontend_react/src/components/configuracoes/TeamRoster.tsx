@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, MoreVertical, Edit2, Key, Trash2 } from 'lucide-react';
-import type { Usuario } from '../../../services/api';
+import { api, type Usuario } from '../../services/api';
 
 interface TeamRosterProps {
   usuarios: Usuario[];
