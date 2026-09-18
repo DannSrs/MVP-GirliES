@@ -28,7 +28,7 @@ export function AulasHeader() {
         </div>
         
         <Link 
-          to="/aulas/cadastrar-aula" 
+          to="/aulas/cadastrar" 
           className="flex items-center justify-center gap-2 bg-girlies-purple hover:bg-[#3d004d] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-md shadow-girlies-purple/20 whitespace-nowrap"
         >
           <PlusCircle className="w-4 h-4" />
