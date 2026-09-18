@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock, ChevronDown } from 'lucide-react';
+import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock, ChevronDown, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { api } from '../../services/api';
@@ -61,6 +61,21 @@ export function AulasTableRow(props: AulasTableRowProps) {
       case 'Concluída': return 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 focus:ring-emerald-500/20';
       case 'Cancelada': return 'bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-500/20';
       default: return 'bg-girlies-purple/10 text-girlies-purple hover:bg-girlies-purple/20 focus:ring-girlies-purple/20';
+    }
+  };
+
+  const handleDeleteAula = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (id && confirm('Tem certeza que deseja excluir esta aula?')) {
+      try {
+        await api.deletarAula(id);
+        window.location.reload();
+      } catch (error) {
+        console.error('Erro ao excluir aula', error);
+        alert('Erro ao excluir a aula.');
+      }
     }
   };
 
@@ -195,6 +210,15 @@ export function AulasTableRow(props: AulasTableRowProps) {
         <Link to={`/aulas/${id || 'visualizar'}`} className="w-8 h-8 rounded-md bg-transparent border border-transparent flex items-center justify-center text-slate-400 hover:bg-white hover:text-girlies-purple hover:border-girlies-purple/30 hover:shadow-sm cursor-pointer transition-all" title="Visualizar Aula">
           <Eye className="w-4 h-4" />
         </Link>
+        {id && (
+          <button 
+            onClick={handleDeleteAula}
+            className="w-8 h-8 rounded-md bg-transparent border border-transparent flex items-center justify-center text-slate-400 hover:bg-white hover:text-red-500 hover:border-red-200 hover:shadow-sm cursor-pointer transition-all" 
+            title="Excluir Aula"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   );

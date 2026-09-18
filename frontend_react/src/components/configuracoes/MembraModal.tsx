@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Save, UserCircle, Loader2 } from 'lucide-react';
-import type { Usuario } from '../../../services/api';
+import { api, type Usuario } from '../../services/api';
 
 interface MembraModalProps {
   isOpen: boolean;

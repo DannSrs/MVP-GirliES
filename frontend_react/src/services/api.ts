@@ -141,6 +141,11 @@ export const api = {
     return res.json();
   },
 
+  deletarAula: async (id: number | string): Promise<void> => {
+    const res = await fetch(`${API_BASE}/aulas/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Erro ao deletar aula');
+  },
+
 
   
   getPosts: async (): Promise<PostInstagram[]> => {
