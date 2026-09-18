@@ -7,6 +7,11 @@ import { CadastrarAula } from './pages/CadastrarAula';
 import { EditarAula } from './pages/EditarAula';
 import { Instagram } from './pages/Instagram';
 import { CadastrarPost } from './pages/CadastrarPost';
+import { Eventos } from './pages/Eventos';
+import { CadastrarEvento } from './pages/CadastrarEvento';
+import { VisualizarEvento } from './pages/VisualizarEvento';
+import { Configuracoes } from './pages/Configuracoes';
+
 
 function App() {
   return (
@@ -15,11 +20,15 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="aulas" element={<Aulas />} />
-          <Route path="aulas/cadastrar-aula" element={<CadastrarAula />} />
+          <Route path="aulas/cadastrar" element={<CadastrarAula />} />
           <Route path="aulas/:id/editar" element={<EditarAula />} />
           <Route path="aulas/:id" element={<VisualizarAula />} />
           <Route path="instagram" element={<Instagram />} />
           <Route path="instagram/cadastrar" element={<CadastrarPost />} />
+          <Route path="eventos" element={<Eventos />} />
+          <Route path="eventos/cadastrar" element={<CadastrarEvento />} />
+          <Route path="eventos/:id" element={<VisualizarEvento />} />
+          <Route path="configuracoes" element={<Configuracoes />} />
         </Route>
       </Routes>
     </BrowserRouter>

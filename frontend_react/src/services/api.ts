@@ -51,6 +51,16 @@ export interface EventoGeral {
   semana?: number;
 }
 
+export interface Usuario {
+  id: number;
+  nome: string;
+  email: string;
+  funcaoInterna: string;
+  curso: string;
+  periodo: string;
+  role: 'professora' | 'voluntaria' | 'adm';
+}
+
 const API_BASE = '/api';
 
 export const api = {
@@ -142,6 +152,49 @@ export const api = {
     return res.json();
   },
 
+  criarEvento: async (evento: Omit<EventoGeral, 'id' | 'semana'>): Promise<EventoGeral> => {
+    const res = await fetch(`${API_BASE}/eventos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(evento)
+    });
+    if (!res.ok) {
+      let errorMsg = 'Erro ao criar evento';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    return res.json();
+  },
+
+  atualizarEvento: async (id: number, evento: Partial<EventoGeral>): Promise<EventoGeral> => {
+    const res = await fetch(`${API_BASE}/eventos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(evento)
+    });
+    if (!res.ok) {
+      let errorMsg = 'Erro ao atualizar evento';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    return res.json();
+  },
+
+  deletarEvento: async (id: number): Promise<void> => {
+    const res = await fetch(`${API_BASE}/eventos/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Erro ao deletar evento');
+  },
+
   getConfiguracoesDatas: async (): Promise<{ dataInicioProjeto?: string, dataFimProjeto?: string }> => {
     const res = await fetch(`${API_BASE}/configuracoes/projeto/datas`);
     if (!res.ok) throw new Error('Erro ao buscar configurações');
@@ -170,5 +223,11 @@ export const api = {
     });
     if (!res.ok) throw new Error('Erro ao alternar status do checklist');
     return res.json();
-  }
+  },
+
+  getUsuarios: async (): Promise<Usuario[]> => {
+    const res = await fetch(`${API_BASE}/usuarios`);
+    if (!res.ok) throw new Error('Erro ao buscar usuários');
+    return res.json();
+  },
 };
