@@ -5,8 +5,8 @@ export interface PostInstagram {
   id: number;
   titulo: string;
   descricao?: string;
-  status?: 'Ideia' | 'Em Produção' | 'Concluído' | 'Publicado';
-  tipoPost: 'Carrossel' | 'Stories' | 'Post' | 'Reels';
+  status?: 'Backlog' | 'Produção' | 'Pronto';
+  tipoPost: string;
   publicoAlvo?: string;
   deadline: string; // ISO date string
   responsavelRoteiroId?: number;

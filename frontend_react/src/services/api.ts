@@ -36,6 +36,9 @@ export interface PostInstagram {
   publicoAlvo?: string;
   deadline: string;
   semana?: number;
+  responsavelRoteiroId?: number;
+  responsavelDesignId?: number;
+  checklist?: ChecklistItem[];
 }
 
 export interface EventoGeral {
@@ -143,6 +146,48 @@ export const api = {
   getPosts: async (): Promise<PostInstagram[]> => {
     const res = await fetch(`${API_BASE}/posts`);
     if (!res.ok) throw new Error('Erro ao buscar posts');
+    return res.json();
+  },
+
+  criarPost: async (data: Omit<PostInstagram, 'id'>): Promise<PostInstagram> => {
+    const res = await fetch(`${API_BASE}/posts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    if (!res.ok) {
+      let errorMsg = 'Erro ao criar post';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    
+    return res.json();
+  },
+
+  atualizarPost: async (id: number | string, data: Partial<PostInstagram>): Promise<PostInstagram> => {
+    const res = await fetch(`${API_BASE}/posts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    if (!res.ok) {
+      let errorMsg = 'Erro ao atualizar post';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    
     return res.json();
   },
 

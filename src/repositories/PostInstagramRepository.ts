@@ -103,7 +103,7 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
             [
                 data.titulo,
                 data.descricao || null,
-                data.status || 'Ideia',
+                data.status || 'Backlog',
                 data.deadline,
                 data.tipoPost,
                 data.publicoAlvo || null,
@@ -149,7 +149,7 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
             [
                 updated.titulo,
                 updated.descricao || null,
-                updated.status || 'Ideia',
+                updated.status || 'Backlog',
                 updated.deadline,
                 updated.tipoPost,
                 updated.publicoAlvo || null,
