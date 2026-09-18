@@ -20,10 +20,12 @@ export function CadastrarPost() {
             <PostDescriptionSection />
             <PostScheduleSection />
             <PostAssignmentSection />
-            <PostChecklistSection />
           </div>
 
-          <PostTeamSidebar />
+          <div className="w-full xl:w-80 flex-shrink-0 flex flex-col gap-6">
+            <PostChecklistSection />
+            <PostTeamSidebar />
+          </div>
         </div>
         
         <PostFooterActions />
