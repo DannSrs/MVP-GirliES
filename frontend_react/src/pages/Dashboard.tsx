@@ -6,8 +6,6 @@ import {
   MapPin,
   AlarmClock,
   Rocket,
-  CheckCircle2,
-  Circle,
   LayoutGrid,
   BookMarked,
   Check,
@@ -21,6 +19,7 @@ import confetti from 'canvas-confetti';
 import { api, type PlanoAula, type PostInstagram, type EventoGeral } from '../services/api';
 
 import { useCicloAtivo } from '../hooks/useCicloAtivo';
+import { MiniChecklist } from '../components/MiniChecklist';
 
 export function Dashboard() {
   const [aulas, setAulas] = useState<PlanoAula[]>([]);
@@ -222,22 +221,11 @@ export function Dashboard() {
                     {localChecklistAula.length === 0 ? (
                       <p className="text-xs text-slate-400 italic">Sem checklist para esta aula.</p>
                     ) : (
-                      <ul className="space-y-1.5">
-                        {localChecklistAula.map(item => (
-                          <li key={item.id} className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id={`aula-chk-${item.id}`}
-                              checked={item.isCompleted}
-                              onChange={(e) => toggleChecklistAula(item.id, e)}
-                              className="w-3.5 h-3.5 rounded flex-shrink-0 accent-girlies-purple"
-                            />
-                            <label htmlFor={`aula-chk-${item.id}`} className={`text-xs cursor-pointer ${item.isCompleted ? 'text-slate-400 line-through' : 'text-slate-600'}`}>
-                              {item.descricao}
-                            </label>
-                          </li>
-                        ))}
-                      </ul>
+                      <MiniChecklist 
+                        items={localChecklistAula}
+                        onToggle={(id) => toggleChecklistAula(Number(id))}
+                        showProgress={true}
+                      />
                     )}
                   </div>
                   {/* Footer */}
@@ -328,36 +316,17 @@ export function Dashboard() {
                   <div className="px-4 pb-3 flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Logística GirliES</p>
-                      <span className="text-xs text-slate-500 font-semibold">
-                        {localChecklistEvento.filter(i => i.isCompleted).length} de {localChecklistEvento.length} concluídas
-                        <span className="text-slate-400 font-normal ml-1">
-                          ({localChecklistEvento.length > 0 ? Math.round((localChecklistEvento.filter(i => i.isCompleted).length / localChecklistEvento.length) * 100) : 0}%)
-                        </span>
-                      </span>
                     </div>
-                    {/* Progress bar */}
-                    <div className="w-full h-1.5 bg-slate-100 rounded-full mb-3 overflow-hidden">
-                      <div className="h-full bg-girlies-purple rounded-full transition-all duration-500" style={{ width: `${localChecklistEvento.length > 0 ? (localChecklistEvento.filter(i => i.isCompleted).length / localChecklistEvento.length) * 100 : 0}%` }}></div>
-                    </div>
+                    
                     {localChecklistEvento.length === 0 ? (
                       <p className="text-xs text-slate-400 italic">Sem tarefas de logística listadas.</p>
                     ) : (
-                      <ul className="space-y-1.5 text-xs text-slate-500">
-                        {localChecklistEvento.map(item => (
-                          <li
-                            key={item.id}
-                            className="flex items-start gap-2 cursor-pointer group select-none rounded-md px-1 py-0.5 -mx-1 hover:bg-slate-50 transition-colors"
-                            onClick={(e) => toggleChecklistEvento(item.id, e)}
-                          >
-                            {item.isCompleted ? (
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                            ) : (
-                              <Circle className="w-3.5 h-3.5 text-slate-300 flex-shrink-0 mt-0.5" />
-                            )}
-                            <span className={item.isCompleted ? 'line-through text-slate-400' : ''}>{item.descricao}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <MiniChecklist 
+                        items={localChecklistEvento}
+                        onToggle={(id) => toggleChecklistEvento(Number(id))}
+                        showProgress={true}
+                        variant="circle"
+                      />
                     )}
                   </div>
                   <div className="px-4 py-3 border-t border-slate-100">

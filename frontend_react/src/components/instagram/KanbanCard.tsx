@@ -1,7 +1,8 @@
 import { Draggable } from '@hello-pangea/dnd';
 import type { TaskCard, CardTag } from '../../contexts/InstagramContext';
-import { Calendar, Clock, BarChart3, GripVertical, Check } from 'lucide-react';
-
+import { Calendar, Clock, BarChart3, GripVertical } from 'lucide-react';
+import { useInstagram } from '../../contexts/InstagramContext';
+import { MiniChecklist } from '../MiniChecklist';
 
 interface KanbanCardProps {
   task: TaskCard;
@@ -30,7 +31,8 @@ const getTagColor = (tag: CardTag) => {
 };
 
 export function KanbanCard({ task, index }: KanbanCardProps) {
-  // In a real scenario we would dispatch to context to toggle checklist items
+  const { toggleChecklistItem } = useInstagram();
+
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
@@ -71,8 +73,8 @@ export function KanbanCard({ task, index }: KanbanCardProps) {
               </p>
             )}
 
-            {/* Progress Bar (if applicable) */}
-            {task.progressLabel && task.progressPercent !== undefined && (
+            {/* Progress Bar (if applicable and no checklist) */}
+            {!task.checklist && task.progressPercent !== undefined && (
               <div className="mb-4">
                 <div className="flex justify-end text-[10px] font-semibold text-slate-600 mb-1.5">
                   <span>{task.progressPercent}%</span>
@@ -89,27 +91,11 @@ export function KanbanCard({ task, index }: KanbanCardProps) {
             {/* Checklist */}
             {task.checklist && (
               <div className="mb-4">
-                {(() => {
-                  return (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-col gap-1.5">
-                        {task.checklist.map(item => (
-                          <div 
-                            key={item.id} 
-                            className="flex items-center gap-2 group cursor-default"
-                          >
-                            <div className={`w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 transition-colors ${item.isCompleted ? 'bg-[#4b006e] border-[#4b006e]' : 'bg-white border border-slate-300'}`}>
-                              {item.isCompleted && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
-                            </div>
-                            <span className={`text-[11px] font-medium transition-colors line-clamp-1 ${item.isCompleted ? 'text-slate-400 line-through' : 'text-slate-600'}`}>
-                              {item.descricao}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })()}
+                <MiniChecklist 
+                  items={task.checklist}
+                  onToggle={(itemId) => toggleChecklistItem(task.id, Number(itemId))}
+                  showProgress={true}
+                />
               </div>
             )}
 
@@ -126,28 +112,12 @@ export function KanbanCard({ task, index }: KanbanCardProps) {
                     </div>
                   )}
 
-                  {/* Date/Location */}
+                  {/* Date */}
                   <div className="flex items-center gap-1.5 text-slate-500">
-                    {task.dueDate === 'Caruaru • PE' ? (
-                      <span className="flex items-center gap-1 text-[10px] font-medium">
-                        📍 {task.dueDate}
-                      </span>
-                    ) : task.dueDate.includes('stickers') ? (
-                      <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600">
-                        <BarChart3 className="w-3.5 h-3.5" />
-                        {task.dueDate}
-                      </span>
-                    ) : task.dueDate === 'Sugestão' ? (
-                      <span className="flex items-center gap-1 text-[10px] font-medium text-emerald-600">
-                        <BookOpenIcon className="w-3.5 h-3.5" />
-                        {task.dueDate}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-[10px] font-medium">
-                        <Calendar className="w-3 h-3" />
-                        {task.dueDate}
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1 text-[10px] font-medium">
+                      <Calendar className="w-3 h-3" />
+                      {task.dueDate}
+                    </span>
                   </div>
                 </div>
 
@@ -172,23 +142,4 @@ export function KanbanCard({ task, index }: KanbanCardProps) {
   );
 }
 
-// A simple icon fallback for BookOpen
-function BookOpenIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-    </svg>
-  );
-}
+
