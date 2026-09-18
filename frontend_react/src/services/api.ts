@@ -230,4 +230,24 @@ export const api = {
     if (!res.ok) throw new Error('Erro ao buscar usuários');
     return res.json();
   },
+
+  criarUsuario: async (data: Omit<Usuario, 'id'>): Promise<Usuario> => {
+    const res = await fetch(`${API_BASE}/usuarios`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Erro ao criar usuário');
+    return res.json();
+  },
+
+  atualizarUsuario: async (id: number, data: Partial<Usuario>): Promise<Usuario> => {
+    const res = await fetch(`${API_BASE}/usuarios/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Erro ao atualizar usuário');
+    return res.json();
+  }
 };

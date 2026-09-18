@@ -5,6 +5,7 @@ import type { Usuario } from '../../../services/api';
 interface TeamRosterProps {
   usuarios: Usuario[];
   onDelete: (id: number) => void;
+  onEdit: (usuario: Usuario) => void;
 }
 
 const CORES_AVATAR = [
@@ -12,7 +13,7 @@ const CORES_AVATAR = [
   'bg-pink-500', 'bg-amber-500', 'bg-rose-500',
 ];
 
-export function TeamRoster({ usuarios, onDelete }: TeamRosterProps) {
+export function TeamRoster({ usuarios, onDelete, onEdit }: TeamRosterProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
 
@@ -143,7 +144,13 @@ export function TeamRoster({ usuarios, onDelete }: TeamRosterProps) {
                   {/* Dropdown Menu */}
                   {isMenuOpen && (
                     <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-10 animate-in fade-in zoom-in-95 duration-100">
-                      <button className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-girlies-purple transition-colors">
+                      <button
+                        onClick={() => {
+                          setMenuOpenId(null);
+                          onEdit(u);
+                        }}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-girlies-purple transition-colors"
+                      >
                         <Edit2 className="w-3.5 h-3.5" />
                         Editar perfil
                       </button>
