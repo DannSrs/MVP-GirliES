@@ -19,10 +19,12 @@ export function CadastrarAula() {
               <BasicInfoSection />
               <LogisticsSection />
               <MaterialsSection />
-              <ChecklistSection />
             </div>
 
-            <TeamSidebar />
+            <div className="w-full xl:w-80 flex-shrink-0 flex flex-col gap-6">
+              <ChecklistSection />
+              <TeamSidebar />
+            </div>
           </div>
           
           <FooterActions />
