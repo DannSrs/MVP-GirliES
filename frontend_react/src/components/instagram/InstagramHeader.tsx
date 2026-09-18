@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function InstagramHeader() {
   return (
@@ -21,10 +22,10 @@ export function InstagramHeader() {
             Fluxo editorial de publicações, carrosséis educativos, stories e reels para fortalecer garotas na Engenharia de Software.
           </p>
         </div>
-        <button className="bg-[#4b006e] hover:bg-[#3a0055] transition-colors text-white text-sm font-medium py-2.5 px-5 rounded-full flex items-center gap-2 shadow-lg shadow-[#4b006e]/30">
+        <Link to="/instagram/cadastrar" className="bg-[#4b006e] hover:bg-[#3a0055] transition-colors text-white text-sm font-medium py-2.5 px-5 rounded-full flex items-center gap-2 shadow-lg shadow-[#4b006e]/30">
           <Plus className="w-4 h-4" />
           Nova Ideia de Post
-        </button>
+        </Link>
       </div>
 
       <div className="flex items-center gap-3 mt-6">
