@@ -42,6 +42,7 @@ export type InstagramContextType = {
   columns: Record<string, ColumnData>;
   columnOrder: string[];
   onDragEnd: (result: DropResult) => void;
+  toggleChecklistItem: (taskId: string, checklistId: number) => void;
 };
 
 const InstagramContext = createContext<InstagramContextType | undefined>(undefined);
@@ -69,7 +70,7 @@ const initialTasks: Record<string, TaskCard> = {
     tag: 'Post Estático',
     title: 'Dica de Livro: Mulheres na Tecnologia',
     description: 'Recomendação de obras inspiradoras para a biblioteca comunitária do...',
-    dueDate: 'Sugestão', // Representing suggestive state instead of exact date
+    dueDate: '20/Out', // Standardized date
     assignees: [{ initial: 'B', name: 'Beatriz', color: 'bg-emerald-100 text-emerald-700' }],
   },
   'task-4': {
@@ -113,7 +114,7 @@ const initialTasks: Record<string, TaskCard> = {
     tag: 'Post Divulgação', // Also 'Evento Externo'
     title: 'REC\'n\'Play Caruaru 2026 – Convocação da Equipe',
     description: 'Chamada das estudantes para o maior festival de tecnologia do...',
-    dueDate: 'Caruaru • PE', // using this slot for location for now
+    dueDate: '25/Out', // Standardized date
     dueTime: 'Sexta-feira • 12:00',
     assignees: [{ initial: 'C', name: 'Coordenação', color: 'bg-slate-500 text-white' }],
   },
@@ -122,7 +123,7 @@ const initialTasks: Record<string, TaskCard> = {
     tag: 'Story Interativo',
     title: 'Quiz Rápido: Qual seu editor de código favorito?',
     description: 'Enquete nos stories (VS Code vs Neovim vs IntelliJ) com figurinhas...',
-    dueDate: '4 stickers prontos',
+    dueDate: '30/Out', // Standardized date
     assignees: [{ initial: 'V', name: 'Vitória', color: 'bg-purple-900 text-white' }],
   }
 };
@@ -212,8 +213,34 @@ export function InstagramProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const toggleChecklistItem = (taskId: string, checklistId: number) => {
+    setTasks(prevTasks => {
+      const task = prevTasks[taskId];
+      if (!task || !task.checklist) return prevTasks;
+
+      const newChecklist = task.checklist.map(item => 
+        item.id === checklistId 
+          ? { ...item, isCompleted: !item.isCompleted } 
+          : item
+      );
+
+      // Also update progressPercent based on completed items
+      const completedCount = newChecklist.filter(item => item.isCompleted).length;
+      const progressPercent = Math.round((completedCount / newChecklist.length) * 100);
+
+      return {
+        ...prevTasks,
+        [taskId]: {
+          ...task,
+          checklist: newChecklist,
+          progressPercent
+        }
+      };
+    });
+  };
+
   return (
-    <InstagramContext.Provider value={{ tasks, columns, columnOrder, onDragEnd }}>
+    <InstagramContext.Provider value={{ tasks, columns, columnOrder, onDragEnd, toggleChecklistItem }}>
       {children}
     </InstagramContext.Provider>
   );
