@@ -51,6 +51,8 @@ export interface EventoGeral {
   horarioInicio: string;
   horarioFim: string;
   local?: string;
+  descricao?: string;
+  responsaveisId?: number[];
   logisticsChecklist?: ChecklistItem[];
   semana?: number;
 }
@@ -214,6 +216,11 @@ export const api = {
     }
     
     return res.json();
+  },
+
+  deletarPost: async (id: number | string): Promise<void> => {
+    const res = await fetch(`${API_BASE}/posts/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Erro ao deletar post');
   },
 
   getEventos: async (): Promise<EventoGeral[]> => {

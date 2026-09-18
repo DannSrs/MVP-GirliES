@@ -25,8 +25,9 @@ export function BasicInfoSection() {
             <select
               value={formData.categoria}
               onChange={(e) => updateField('categoria', e.target.value)}
-              className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none text-slate-700 font-medium bg-slate-50 focus:bg-white cursor-pointer"
+              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none font-medium bg-slate-50 focus:bg-white cursor-pointer ${formData.categoria ? 'text-slate-700' : 'text-slate-400'}`}
             >
+              <option value="" disabled hidden>Selecione um módulo...</option>
               <option value="Módulo 1: Lógica & Pensamento">Módulo 1: Lógica & Pensamento</option>
               <option value="Módulo 2: Python Fundamentos & Estruturas">Módulo 2: Python Fundamentos & Estruturas</option>
               <option value="Módulo 3: Projetos & Git">Módulo 3: Projetos & Git</option>

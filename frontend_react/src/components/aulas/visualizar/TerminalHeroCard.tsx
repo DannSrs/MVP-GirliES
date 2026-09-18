@@ -6,15 +6,21 @@ interface TerminalHeroCardProps {
 }
 
 export function TerminalHeroCard({ aula }: TerminalHeroCardProps) {
-  // Configuração padrão ou fallback (dados mockados iguais ao HTML)
-  const titulo = aula?.titulo || "Programação Orientada a Objetos com Mini-jogos em Python";
-  const descricao = aula?.descricao || "Construção interativa da arquitetura orientada a objetos desenvolvendo um pet virtual estilo Tamagotchi inspirado no mascote Pip. Hands-on em duplas, encapsulamento prático e mini-hackathon de encerramento.";
-  const modulo = aula?.categoria || "MÓDULO 2";
+  // Configuração padrão ou fallback
+  const titulo = aula?.titulo || "Aula Não Definida";
+  const descricao = aula?.descricao || "";
+  
+  // Extrair prefixo (ex: Módulo 1) e sufixo (nome completo)
+  const categoriaFull = aula?.categoria || "Módulo 0: Sem Categoria";
+  const catParts = categoriaFull.split(':');
+  const moduloBadge = catParts[0].trim();
+  const moduloSuffix = catParts.length > 1 ? catParts.slice(1).join(':').trim() : "";
+  
   const local = aula?.local || "Lab 04 — Bloco D";
   
   // Formatando data se existir
-  let dataStr = "Qua, 21/10/2026";
-  let horaStr = "14h00 às 17h00 (3h)";
+  let dataStr = "Não definida";
+  let horaStr = "--:-- às --:--";
   
   if (aula?.dataHora) {
     const dataObj = new Date(aula.dataHora);
@@ -23,7 +29,7 @@ export function TerminalHeroCard({ aula }: TerminalHeroCardProps) {
   }
   
   const semanaStr = aula?.semana ? String(aula.semana).padStart(2, '0') : '00';
-  const fileNameSlug = aula?.titulo ? aula.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : 'poo-minigame';
+  const fileNameSlug = aula?.titulo ? aula.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : 'aula-indefinida';
   const fileName = `semana-${semanaStr}_${fileNameSlug}.py`;
 
   return (
@@ -49,8 +55,8 @@ export function TerminalHeroCard({ aula }: TerminalHeroCardProps) {
         <div className="flex-1 flex flex-col gap-4">
           {/* Modulo e Área */}
           <div className="flex items-center gap-2 font-mono text-[10px] font-bold">
-            <span className="bg-girlies-purple/10 text-girlies-purple px-2 py-0.5 rounded tracking-wider uppercase">{modulo}</span>
-            <span className="text-slate-500 tracking-widest font-medium">Python Fundamentos & Estruturas</span>
+            <span className="bg-girlies-purple/10 text-girlies-purple px-2 py-0.5 rounded tracking-wider uppercase">{moduloBadge}</span>
+            {moduloSuffix && <span className="text-slate-500 tracking-widest font-medium">{moduloSuffix}</span>}
           </div>
           
           {/* Título */}
@@ -59,8 +65,8 @@ export function TerminalHeroCard({ aula }: TerminalHeroCardProps) {
           </h1>
           
           {/* Descrição */}
-          <p className="text-slate-500 text-sm leading-relaxed max-w-3xl font-medium">
-            {descricao}
+          <p className={`text-sm leading-relaxed max-w-3xl ${descricao ? 'text-slate-500 font-medium' : 'text-slate-400 italic'}`}>
+            {descricao || "Sem descrição"}
           </p>
         </div>
 

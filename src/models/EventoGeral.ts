@@ -10,6 +10,8 @@ export interface EventoGeral extends Atividade {
   horarioFim: string;
   local?: string;
   capacidade?: number;
+  descricao?: string;
+  responsaveisId?: number[];
   logisticsChecklist?: ChecklistItem[];
   links?: LinksAtividade[];
   semana?: number;

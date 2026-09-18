@@ -1,7 +1,23 @@
 import { Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useInstagram } from '../../contexts/InstagramContext';
 
 export function InstagramHeader() {
+  const { filterTag, setFilterTag, tasks } = useInstagram();
+  
+  const tasksArray = Object.values(tasks);
+  const totalPosts = tasksArray.length;
+
+  const getCount = (tag: string) => tasksArray.filter(t => t.tag === tag).length;
+
+  const filters = [
+    { label: 'Todos', value: null },
+    { label: 'Carrossel', value: 'Carrossel' },
+    { label: 'Reels', value: 'Reels' },
+    { label: 'Post Estático', value: 'Post Estático' },
+    { label: 'Story Interativo', value: 'Story Interativo' },
+  ];
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 mb-6">
       <div className="flex items-start justify-between">
@@ -28,22 +44,22 @@ export function InstagramHeader() {
         </Link>
       </div>
 
-      <div className="flex items-center gap-3 mt-6">
-        <button className="bg-[#4b006e] text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
-          Todos (10)
-        </button>
-        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
-          Reels • Vídeo
-        </button>
-        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
-          Post Estático
-        </button>
-        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
-          Stories
-        </button>
-        <button className="bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-semibold px-4 py-1.5 rounded-full transition-colors">
-          Carrossel
-        </button>
+      <div className="flex items-center gap-3 mt-6 flex-wrap">
+        {filters.map(filter => {
+          const isActive = filterTag === filter.value;
+          const count = filter.value === null ? totalPosts : getCount(filter.value);
+          const displayLabel = isActive ? `${filter.label} (${count})` : filter.label;
+          
+          return (
+            <button 
+              key={filter.label}
+              onClick={() => setFilterTag(filter.value)}
+              className={`${isActive ? 'bg-[#4b006e] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'} text-xs font-semibold px-4 py-1.5 rounded-full transition-colors`}
+            >
+              {displayLabel}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

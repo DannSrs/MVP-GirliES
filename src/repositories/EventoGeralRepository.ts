@@ -19,6 +19,10 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
                  FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`,
                 [String(r.id)]
             );
+            const responsaveisRows = await db.all<any[]>(
+                `SELECT usuario_id FROM Evento_Responsavel WHERE evento_id = ?`,
+                [r.id]
+            );
 
             eventos.push({
                 id: r.id,
@@ -31,6 +35,8 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
                 horarioFim: r.horario_fim,
                 local: r.local,
                 capacidade: r.capacidade,
+                descricao: r.descricao,
+                responsaveisId: responsaveisRows.map(rv => Number(rv.usuario_id)),
                 logisticsChecklist: checklistRows.map(c => ({
                     id: Number(c.id),
                     atividadeId: Number(c.atividadeId),
@@ -64,6 +70,10 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
              FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`,
             [String(r.id)]
         );
+        const responsaveisRows = await db.all<any[]>(
+            `SELECT usuario_id FROM Evento_Responsavel WHERE evento_id = ?`,
+            [r.id]
+        );
 
         return {
             id: r.id,
@@ -76,6 +86,8 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
             horarioFim: r.horario_fim,
             local: r.local,
             capacidade: r.capacidade,
+            descricao: r.descricao,
+            responsaveisId: responsaveisRows.map(rv => Number(rv.usuario_id)),
             logisticsChecklist: checklistRows.map(c => ({
                 id: Number(c.id),
                 atividadeId: Number(c.atividadeId),
@@ -95,8 +107,8 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
     async create(data: CriarEventoGeralDTO): Promise<EventoGeral> {
         const db = await getDb();
         const result = await db.run(
-            `INSERT INTO Eventos (titulo, tipo_evento, regime_evento, data, horario_inicio, horario_fim, local, capacidade)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO Eventos (titulo, tipo_evento, regime_evento, data, horario_inicio, horario_fim, local, capacidade, descricao)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.titulo,
                 data.tipoEvento,
@@ -105,11 +117,21 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
                 data.horarioInicio,
                 data.horarioFim,
                 data.local || null,
-                data.capacidade || null
+                data.capacidade || null,
+                data.descricao || null
             ]
         );
         const createdId = result.lastID;
         if (!createdId) throw new Error('Falha ao inserir evento no SQLite');
+
+        if (data.responsaveisId && data.responsaveisId.length > 0) {
+            for (const respId of data.responsaveisId) {
+                await db.run(
+                    `INSERT INTO Evento_Responsavel (evento_id, usuario_id) VALUES (?, ?)`,
+                    [createdId, respId]
+                );
+            }
+        }
 
         if (data.logisticsChecklist && data.logisticsChecklist.length > 0) {
             for (const item of data.logisticsChecklist) {
@@ -141,7 +163,7 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
         const updated = { ...existing, ...changes };
         const db = await getDb();
         await db.run(
-            `UPDATE Eventos SET titulo = ?, tipo_evento = ?, regime_evento = ?, data = ?, horario_inicio = ?, horario_fim = ?, local = ?, capacidade = ?
+            `UPDATE Eventos SET titulo = ?, tipo_evento = ?, regime_evento = ?, data = ?, horario_inicio = ?, horario_fim = ?, local = ?, capacidade = ?, descricao = ?
              WHERE id = ?`,
             [
                 updated.titulo,
@@ -152,9 +174,22 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
                 updated.horarioFim,
                 updated.local || null,
                 updated.capacidade || null,
+                updated.descricao || null,
                 id
             ]
         );
+
+        if (changes.responsaveisId !== undefined) {
+            await db.run(`DELETE FROM Evento_Responsavel WHERE evento_id = ?`, [id]);
+            if (changes.responsaveisId.length > 0) {
+                for (const respId of changes.responsaveisId) {
+                    await db.run(
+                        `INSERT INTO Evento_Responsavel (evento_id, usuario_id) VALUES (?, ?)`,
+                        [id, respId]
+                    );
+                }
+            }
+        }
 
         if (changes.logisticsChecklist !== undefined) {
             await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
@@ -187,6 +222,7 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
         const db = await getDb();
         await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
         await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
+        await db.run(`DELETE FROM Evento_Responsavel WHERE evento_id = ?`, [id]);
         const result = await db.run('DELETE FROM Eventos WHERE id = ?', id);
         return (result.changes ?? 0) > 0;
     }

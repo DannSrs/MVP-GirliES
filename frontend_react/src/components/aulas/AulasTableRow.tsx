@@ -1,13 +1,16 @@
-import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock, ChevronDown, Trash2 } from 'lucide-react';
+import { CalendarDays, MapPin, MonitorPlay, FileText, File, Eye, Clock, ChevronDown, Trash2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { api } from '../../services/api';
+import { Modal } from '../Modal';
 
 export interface AulasTableRowProps {
   id?: number;
   semana: string;
   tema: string;
-  descricao: string;
+  descricao?: string;
+  categoria?: string;
   data: string;
   horario: string;
   local: string;
@@ -31,6 +34,7 @@ export function AulasTableRow(props: AulasTableRowProps) {
     semana,
     tema,
     descricao,
+    categoria,
     data,
     horario,
     local,
@@ -43,6 +47,22 @@ export function AulasTableRow(props: AulasTableRowProps) {
 
   const [localStatus, setLocalStatus] = useState(status || 'Em Preparação');
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const handleToggleDropdown = () => {
+    if (!isStatusDropdownOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+    setIsStatusDropdownOpen(!isStatusDropdownOpen);
+  };
 
   const handleStatusChange = async (newStatus: string) => {
     setLocalStatus(newStatus);
@@ -64,18 +84,25 @@ export function AulasTableRow(props: AulasTableRowProps) {
     }
   };
 
-  const handleDeleteAula = async (e: React.MouseEvent) => {
+  const handleDeleteAula = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (id && confirm('Tem certeza que deseja excluir esta aula?')) {
-      try {
-        await api.deletarAula(id);
-        window.location.reload();
-      } catch (error) {
-        console.error('Erro ao excluir aula', error);
-        alert('Erro ao excluir a aula.');
-      }
+    if (id) {
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!id) return;
+    setIsDeleting(true);
+    try {
+      await api.deletarAula(id);
+      window.location.reload();
+    } catch (error) {
+      console.error('Erro ao excluir aula', error);
+      alert('Erro ao excluir a aula.');
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -99,6 +126,7 @@ export function AulasTableRow(props: AulasTableRowProps) {
   }
 
   const hasMateriais = !!(materiais?.linkSlide || materiais?.linkRoteiro || materiais?.linkPlanoAula);
+  const moduloShort = categoria ? categoria.split(':')[0].trim() : 'Módulo ?';
 
   return (
     <div className={rowClass}>
@@ -112,8 +140,12 @@ export function AulasTableRow(props: AulasTableRowProps) {
       
       {/* Col 2 */}
       <div className="pr-4">
-        <h3 className="text-sm font-bold text-slate-800 leading-snug mb-1">{tema}</h3>
-        <p className="text-[11px] text-slate-500 leading-tight">{descricao}</p>
+        <h3 className="text-sm font-bold text-slate-800 leading-snug line-clamp-2" title={tema}>
+          {tema} / {moduloShort}
+        </h3>
+        <p className={`text-[11px] leading-tight mt-1 ${descricao ? 'text-slate-500' : 'text-slate-400 italic'}`}>
+          {descricao || 'Sem descrição'}
+        </p>
       </div>
       
       {/* Col 3 */}
@@ -173,9 +205,10 @@ export function AulasTableRow(props: AulasTableRowProps) {
       </div>
       
       {/* Col 6 */}
-      <div className="relative">
+      <div>
         <button
-          onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+          ref={buttonRef}
+          onClick={handleToggleDropdown}
           onBlur={() => setTimeout(() => setIsStatusDropdownOpen(false), 200)}
           className={`inline-flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-transparent transition-all outline-none focus:ring-2 focus:ring-offset-1 w-[130px] ${getStatusStyle(localStatus)}`}
         >
@@ -183,12 +216,20 @@ export function AulasTableRow(props: AulasTableRowProps) {
           <ChevronDown className={`w-3 h-3 flex-shrink-0 transition-transform ${isStatusDropdownOpen ? 'rotate-180' : ''}`} />
         </button>
 
-        {isStatusDropdownOpen && (
-          <div className="absolute top-full left-0 mt-1 w-[140px] bg-white rounded-lg shadow-xl shadow-slate-200/50 border border-slate-100 py-1 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+        {isStatusDropdownOpen && createPortal(
+          <div 
+            className="absolute bg-white rounded-lg shadow-xl shadow-slate-200/50 border border-slate-100 py-1 z-[9999] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-100"
+            style={{ 
+              top: dropdownPos.top + 4, 
+              left: dropdownPos.left,
+              width: Math.max(140, dropdownPos.width)
+            }}
+          >
             {['Em Preparação', 'Confirmada', 'Concluída', 'Cancelada'].map((opt) => (
               <button
                 key={opt}
-                onClick={() => {
+                onMouseDown={(e) => {
+                  e.preventDefault(); // Impede que o onBlur do botão principal dispare antes do clique
                   handleStatusChange(opt);
                   setIsStatusDropdownOpen(false);
                 }}
@@ -201,7 +242,8 @@ export function AulasTableRow(props: AulasTableRowProps) {
                 {opt}
               </button>
             ))}
-          </div>
+          </div>,
+          document.body
         )}
       </div>
       
@@ -220,6 +262,42 @@ export function AulasTableRow(props: AulasTableRowProps) {
           </button>
         )}
       </div>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => !isDeleting && setIsDeleteModalOpen(false)}
+        title="Excluir Aula"
+        icon={<AlertTriangle className="w-5 h-5" />}
+        iconBgClass="bg-red-100 text-red-600"
+      >
+        <div className="space-y-6">
+          <div>
+            <p className="text-sm text-slate-600">
+              Tem certeza que deseja excluir a aula <strong className="text-slate-800">{tema}</strong>?
+            </p>
+            <p className="text-sm text-slate-600 mt-2">
+              Esta ação não pode ser desfeita e todos os dados associados serão perdidos.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={isDeleting}
+              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors shadow-sm shadow-red-500/20 disabled:opacity-50 flex items-center gap-2"
+            >
+              {isDeleting ? 'Excluindo...' : 'Sim, excluir aula'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

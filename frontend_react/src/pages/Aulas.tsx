@@ -6,20 +6,32 @@ import { AulasTableContainer } from '../components/aulas/AulasTableContainer';
 
 export function Aulas() {
   const [aulas, setAulas] = useState<PlanoAula[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [monitorasTotais, setMonitorasTotais] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadAulas() {
+    async function loadData() {
       try {
-        const data = await api.getAulas();
-        setAulas(data);
+        const [aulasData, usuariosData] = await Promise.all([
+          api.getAulas(),
+          api.getUsuarios()
+        ]);
+        setAulas(Array.isArray(aulasData) ? aulasData : []);
+        setUsuarios(Array.isArray(usuariosData) ? usuariosData : []);
+        
+        const monitoras = Array.isArray(usuariosData) 
+          ? usuariosData.filter(u => u.role === 'voluntaria' || u.funcaoInterna?.toLowerCase().includes('monitora'))
+          : [];
+          
+        setMonitorasTotais(monitoras.length);
       } catch (error) {
-        console.error("Erro ao buscar aulas:", error);
+        console.error("Erro ao buscar dados:", error);
       } finally {
         setLoading(false);
       }
     }
-    loadAulas();
+    loadData();
   }, []);
 
   const { semanasTotais, cargaHorariaTotal } = useMemo(() => {
@@ -43,13 +55,14 @@ export function Aulas() {
       <AulasStats
         semanasTotais={semanasTotais}
         cargaHorariaTotal={cargaHorariaTotal}
+        monitorasVoluntarias={monitorasTotais}
       />
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-slate-400">Carregando aulas...</p>
         </div>
       ) : (
-        <AulasTableContainer aulas={aulas} />
+        <AulasTableContainer aulas={aulas} usuarios={usuarios} />
       )}
     </div>
   );

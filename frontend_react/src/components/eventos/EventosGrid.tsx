@@ -31,6 +31,7 @@ export function EventosGrid({ eventos, onRefresh }: EventosGridProps) {
           key={evento.id}
           evento={evento}
           onChecklistToggle={onRefresh}
+          onDelete={onRefresh}
         />
       ))}
     </div>

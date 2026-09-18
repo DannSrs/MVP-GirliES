@@ -45,6 +45,8 @@ export type InstagramContextType = {
   columnOrder: string[];
   onDragEnd: (result: DropResult) => void;
   toggleChecklistItem: (taskId: string, checklistId: number) => void;
+  filterTag: string | null;
+  setFilterTag: (tag: string | null) => void;
 };
 
 const InstagramContext = createContext<InstagramContextType | undefined>(undefined);
@@ -67,14 +69,14 @@ function getAvatarForUser(id: number | undefined, users: Usuario[], roleName: st
   if (!user) {
     return {
       initial: roleName.charAt(0).toUpperCase(),
-      name: `${roleName} (Removido)`,
+      name: `${roleName}: Removido`,
       color: AVATAR_COLORS[colorIndex]
     };
   }
   
   return {
     initial: user.nome.charAt(0).toUpperCase(),
-    name: user.nome,
+    name: `${roleName}: ${user.nome}`,
     color: AVATAR_COLORS[colorIndex]
   };
 }
@@ -143,6 +145,7 @@ export function InstagramProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Record<string, TaskCard>>({});
   const [columns, setColumns] = useState(initialColumns);
   const [columnOrder] = useState(initialColumnOrder);
+  const [filterTag, setFilterTag] = useState<string | null>(null);
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -273,7 +276,7 @@ export function InstagramProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <InstagramContext.Provider value={{ tasks, columns, columnOrder, onDragEnd, toggleChecklistItem }}>
+    <InstagramContext.Provider value={{ tasks, columns, columnOrder, onDragEnd, toggleChecklistItem, filterTag, setFilterTag }}>
       {children}
     </InstagramContext.Provider>
   );

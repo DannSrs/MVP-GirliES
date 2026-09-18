@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, Clock, CheckSquare, Square } from 'lucide-react';
+import { CalendarDays, MapPin, Clock, CheckSquare, Square, Trash2 } from 'lucide-react';
 import type { EventoGeral } from '../../services/api';
 import { api } from '../../services/api';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { useState } from 'react';
 interface EventoCardProps {
   evento: EventoGeral;
   onChecklistToggle?: (eventoId: number) => void;
+  onDelete?: () => void;
 }
 
 const TIPO_CONFIG: Record<
@@ -59,7 +60,7 @@ function formatarData(data: string): string {
   });
 }
 
-export function EventoCard({ evento, onChecklistToggle }: EventoCardProps) {
+export function EventoCard({ evento, onChecklistToggle, onDelete }: EventoCardProps) {
   const config = TIPO_CONFIG[evento.tipoEvento] ?? TIPO_CONFIG['Outros'];
 
   const checklist = evento.logisticsChecklist ?? [];
@@ -68,6 +69,8 @@ export function EventoCard({ evento, onChecklistToggle }: EventoCardProps) {
   const progressPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   const [localChecklist, setLocalChecklist] = useState(checklist);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleToggle = async (itemId: number | undefined, index: number) => {
     if (itemId === undefined) return;
@@ -86,6 +89,19 @@ export function EventoCard({ evento, onChecklistToggle }: EventoCardProps) {
     }
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await api.deletarEvento(Number(evento.id));
+      onDelete?.();
+    } catch (err) {
+      console.error('Erro ao deletar evento', err);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
   const checklistLabel =
     evento.tipoEvento === 'Oficina Prática'
       ? 'Checklist do Laboratório'
@@ -94,9 +110,19 @@ export function EventoCard({ evento, onChecklistToggle }: EventoCardProps) {
       : 'Checklist Interno';
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover-card flex flex-col overflow-hidden">
-      {/* Card Body */}
-      <div className="p-5 flex flex-col gap-4 flex-1">
+    <>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover-card flex flex-col overflow-hidden relative">
+        {/* Botão de excluir — discreto, canto superior direito */}
+        <button
+          onClick={(e) => { e.preventDefault(); setShowDeleteModal(true); }}
+          className="absolute top-3 right-3 z-10 opacity-0 hover:opacity-100 group-hover:opacity-100 [.hover-card:hover_&]:opacity-100 w-6 h-6 flex items-center justify-center rounded-full text-slate-300 hover:text-red-400 hover:bg-red-50 transition-all"
+          title="Excluir evento"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+
+        {/* Card Body */}
+        <div className="p-5 flex flex-col gap-4 flex-1">
         {/* Badge de tipo */}
         <div>
           <span
@@ -149,7 +175,6 @@ export function EventoCard({ evento, onChecklistToggle }: EventoCardProps) {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-mono font-bold text-slate-500 flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-sm border-2 border-slate-400 inline-block" />
                   {checklistLabel}
                 </span>
                 <span className="text-[10px] font-mono font-bold text-slate-400">
@@ -200,15 +225,56 @@ export function EventoCard({ evento, onChecklistToggle }: EventoCardProps) {
         )}
       </div>
 
-      {/* Card Footer */}
-      <div className="px-5 pb-5">
-        <Link
-          to={`/eventos/${evento.id}`}
-          className={`block w-full py-2 rounded-lg text-sm font-semibold transition-colors text-center ${config.btnClass}`}
-        >
-          {config.btnLabel}
-        </Link>
+        {/* Card Footer */}
+        <div className="px-5 pb-5">
+          <Link
+            to={`/eventos/${evento.id}`}
+            className={`block w-full py-2 rounded-lg text-sm font-semibold transition-colors text-center ${config.btnClass}`}
+          >
+            {config.btnLabel}
+          </Link>
+        </div>
       </div>
-    </div>
+
+      {/* Modal de confirmação de exclusão */}
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 max-w-sm w-full mx-4 flex flex-col gap-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800">Excluir evento?</p>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  <span className="font-semibold text-slate-700">{evento.titulo}</span> será removido permanentemente. Esta ação não pode ser desfeita.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 text-xs font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+              >
+                {isDeleting ? 'Excluindo...' : 'Excluir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

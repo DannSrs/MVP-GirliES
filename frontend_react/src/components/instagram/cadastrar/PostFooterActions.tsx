@@ -7,7 +7,7 @@ import { api } from '../../../services/api';
 
 export function PostFooterActions() {
   const navigate = useNavigate();
-  const { formData } = usePostForm();
+  const { formData, isEditing, postId } = usePostForm();
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
@@ -43,12 +43,16 @@ export function PostFooterActions() {
         checklist: formData.checklist.map(c => ({ descricao: c.descricao, isCompleted: c.isCompleted }))
       };
 
-      await api.criarPost(payload);
+      if (isEditing && postId) {
+        await api.atualizarPost(postId, payload);
+      } else {
+        await api.criarPost(payload);
+      }
       
       // On success
       navigate('/instagram');
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Erro ao criar o post.');
+      setSubmitError(err instanceof Error ? err.message : `Erro ao ${isEditing ? 'atualizar' : 'criar'} o post.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -71,7 +75,7 @@ export function PostFooterActions() {
             className="bg-girlies-purple hover:bg-[#3d004d] text-white px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-md shadow-girlies-purple/30 flex items-center gap-2.5 hover:-translate-y-0.5"
           >
             <ArrowRight className="w-5 h-5" />
-            Criar Post
+            {isEditing ? 'Salvar Alterações' : 'Criar Post'}
           </button>
         </div>
       </div>
@@ -80,13 +84,13 @@ export function PostFooterActions() {
       <Modal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
-        title="Cancelar Cadastro"
+        title={isEditing ? 'Cancelar Edição' : 'Cancelar Cadastro'}
         icon={<AlertTriangle className="w-5 h-5" />}
         iconBgClass="bg-red-100 text-red-600"
       >
         <div className="flex flex-col gap-6">
           <p className="text-sm text-slate-600 font-medium">
-            Tem certeza que deseja cancelar o cadastro do post? Todos os dados preenchidos serão perdidos e não poderão ser recuperados.
+            Tem certeza que deseja cancelar {isEditing ? 'a edição' : 'o cadastro'} do post? Todos os dados preenchidos serão perdidos e não poderão ser recuperados.
           </p>
           <div className="flex items-center gap-3 justify-end mt-2">
             <button
@@ -111,13 +115,13 @@ export function PostFooterActions() {
       <Modal
         isOpen={isSubmitModalOpen}
         onClose={() => !isSubmitting && setIsSubmitModalOpen(false)}
-        title="Confirmar Criação de Post"
+        title={isEditing ? 'Confirmar Alterações' : 'Confirmar Criação de Post'}
         icon={<ArrowRight className="w-5 h-5" />}
       >
         <div className="flex flex-col gap-6">
           <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
             <p className="text-sm text-slate-700 font-medium mb-2">
-              Você está prestes a criar o post:
+              Você está prestes a {isEditing ? 'salvar as alterações do' : 'criar o'} post:
             </p>
             <p className="text-base font-bold text-girlies-purple">
               {formData.titulo || 'Sem título definido'}
@@ -152,10 +156,10 @@ export function PostFooterActions() {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Criando...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {isEditing ? 'Salvando...' : 'Criando...'}
                 </>
               ) : (
-                'Confirmar e Criar'
+                isEditing ? 'Salvar Alterações' : 'Confirmar e Criar'
               )}
             </button>
           </div>

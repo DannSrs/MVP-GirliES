@@ -92,7 +92,14 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       horario_inicio TEXT NOT NULL,
       horario_fim TEXT NOT NULL,
       local TEXT,
-      capacidade INTEGER
+      capacidade INTEGER,
+      descricao TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS Evento_Responsavel (
+      evento_id INTEGER NOT NULL REFERENCES Eventos(id) ON DELETE CASCADE,
+      usuario_id INTEGER NOT NULL REFERENCES Usuarios(id) ON DELETE CASCADE,
+      PRIMARY KEY (evento_id, usuario_id)
     );
 
     CREATE TABLE IF NOT EXISTS Checklists (
@@ -113,6 +120,22 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       link TEXT NOT NULL,
       descricao TEXT,
       criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Migration: add descricao to Eventos if it doesn't exist yet
+  try {
+    await db.exec(`ALTER TABLE Eventos ADD COLUMN descricao TEXT;`);
+  } catch (e) {
+    // Column might already exist, ignore
+  }
+
+  // Migration: create Evento_Responsavel if not exists
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS Evento_Responsavel (
+      evento_id INTEGER NOT NULL REFERENCES Eventos(id) ON DELETE CASCADE,
+      usuario_id INTEGER NOT NULL REFERENCES Usuarios(id) ON DELETE CASCADE,
+      PRIMARY KEY (evento_id, usuario_id)
     );
   `);
 

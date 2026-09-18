@@ -38,7 +38,7 @@ const AulaFormContext = createContext<AulaFormContextType | undefined>(undefined
 
 export function AulaFormProvider({ children, aulaId }: { children: ReactNode, aulaId?: number | string }) {
   const [formData, setFormData] = useState<AulaFormData>({
-    categoria: 'Módulo 2: Python Fundamentos & Estruturas',
+    categoria: '',
     titulo: '',
     descricao: '',
     dataHora: getNextWednesday(),
@@ -59,36 +59,43 @@ export function AulaFormProvider({ children, aulaId }: { children: ReactNode, au
 
   // Carregar dados se for edição
   useEffect(() => {
-    if (aulaId) {
+    if (isEditing && aulaId) {
       setIsLoading(true);
-      api.getAulaById(aulaId).then((data) => {
+      api.getAulaById(aulaId).then(aula => {
         setFormData({
-          categoria: data.categoria || 'Módulo 2: Python Fundamentos & Estruturas',
-          titulo: data.titulo,
-          descricao: data.descricao || '',
-          dataHora: data.dataHora,
-          local: data.local || 'Lab 04 - Bloco D (Linux/VS Code)',
-          linkSlide: data.linkSlide || '',
-          linkPlanoAula: data.linkPlanoAula || '',
-          linkRoteiro: data.linkRoteiro || '',
-          checklist: data.checklist || [],
-          links: data.links || [],
-          status: data.status || 'Em Preparação',
-          responsaveisId: data.responsaveisId || []
+          categoria: aula.categoria || '',
+          titulo: aula.titulo || '',
+          descricao: aula.descricao || '',
+          dataHora: aula.dataHora || getNextWednesday(),
+          local: aula.local || 'Lab 04 - Bloco D (Linux/VS Code)',
+          linkSlide: aula.linkSlide || '',
+          linkPlanoAula: aula.linkPlanoAula || '',
+          linkRoteiro: aula.linkRoteiro || '',
+          checklist: aula.checklist || [],
+          links: aula.links || [],
+          status: aula.status || 'Em Preparação',
+          responsaveisId: aula.responsaveisId || []
         });
       }).catch(err => {
-        console.error("Erro ao carregar aula para edição:", err);
+        console.error('Erro ao carregar aula para edição', err);
       }).finally(() => {
         setIsLoading(false);
       });
     }
-  }, [aulaId]);
+  }, [aulaId, isEditing]);
 
   const updateField = (field: keyof AulaFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const submitForm = async () => {
+    if (!formData.categoria) {
+      throw new Error('O módulo temático é obrigatório.');
+    }
+    if (!formData.titulo.trim()) {
+      throw new Error('O título da aula é obrigatório.');
+    }
+
     setIsSubmitting(true);
     try {
       const payload: Partial<PlanoAula> = {

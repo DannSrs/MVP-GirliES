@@ -79,6 +79,109 @@ export function TeamRoster({ usuarios, currentUser, onDelete, onEdit }: TeamRost
     }
   };
 
+  const currentUserInFiltered = filtered.find((u) => u.id === currentUser?.id);
+  const otherUsersInFiltered = filtered.filter((u) => u.id !== currentUser?.id);
+
+  const renderUserRow = (u: Usuario, isCurrentUser: boolean, i: number) => {
+    const roleCfg = getRoleConfig(u.role, u.nome);
+    const avatarColor = CORES_AVATAR[i % CORES_AVATAR.length];
+    const isMenuOpen = menuOpenId === u.id;
+    
+    // Se for o usuário atual, permitimos as opções se ele for adm, ou então a opção A (só ver token). Mas na verdade a opção A diz "só ver token para ele mesmo, sem editar".
+    // Se for outro usuário, só vê o botão se for ADM.
+    const showMenuButton = isCurrentUser || currentUser?.role === 'adm';
+
+    return (
+      <div key={u.id} className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl border transition-colors ${isCurrentUser ? 'bg-girlies-purple/5 hover:bg-girlies-purple/10 border-girlies-purple/20 shadow-sm' : 'bg-slate-50/50 hover:bg-slate-50 border-slate-100 hover:border-slate-200'}`}>
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-xl text-white flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-sm ${u.role === 'adm' ? 'bg-gradient-to-br from-girlies-purple to-violet-400' : avatarColor}`}>
+            {u.nome[0].toUpperCase()}
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-sm font-bold text-slate-800">{u.nome}</span>
+              <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold font-mono tracking-wider uppercase border border-transparent ${roleCfg.badgeClass}`}>
+                {roleCfg.label}
+              </span>
+              {isCurrentUser && (
+                <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[9px] font-bold font-mono tracking-wider uppercase border border-emerald-200">
+                  Você
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-slate-500 truncate max-w-[280px]">
+              {u.funcaoInterna} • {u.curso}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between md:justify-end gap-6 relative">
+          <div className="flex flex-col md:text-right">
+            <span className="text-[10px] text-girlies-purple font-mono font-bold uppercase tracking-wider">
+              {roleCfg.access}
+            </span>
+          </div>
+          
+          {showMenuButton ? (
+            <button
+              type="button"
+              onClick={() => setMenuOpenId(isMenuOpen ? null : u.id)}
+              className="w-8 h-8 rounded-lg hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+          ) : (
+            <div className="w-8 h-8" /> /* Espaçador para manter alinhamento */
+          )}
+
+          {/* Dropdown Menu */}
+          {isMenuOpen && showMenuButton && (
+            <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-10 animate-in fade-in zoom-in-95 duration-100">
+              {!isCurrentUser && (
+                <button
+                  onClick={() => {
+                    setMenuOpenId(null);
+                    onEdit(u);
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-girlies-purple transition-colors"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                  Editar perfil
+                </button>
+              )}
+              <button 
+                onClick={() => {
+                  setMenuOpenId(null);
+                  handleGenerateToken(u);
+                }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition-colors"
+              >
+                <Key className="w-3.5 h-3.5" />
+                Ver token de acesso
+              </button>
+              {!isCurrentUser && u.role !== 'adm' && (
+                <>
+                  <div className="h-px bg-slate-100 my-1.5" />
+                  <button
+                    onClick={() => {
+                      setMenuOpenId(null);
+                      onDelete(u.id);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Excluir membra
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
       {/* Header */}
@@ -113,91 +216,15 @@ export function TeamRoster({ usuarios, currentUser, onDelete, onEdit }: TeamRost
         {filtered.length === 0 ? (
           <p className="text-sm text-slate-500 text-center py-8">Nenhum membro encontrado.</p>
         ) : (
-          filtered.map((u, i) => {
-            const roleCfg = getRoleConfig(u.role, u.nome);
-            const avatarColor = CORES_AVATAR[i % CORES_AVATAR.length];
-            const isMenuOpen = menuOpenId === u.id;
+          <>
+            {currentUserInFiltered && renderUserRow(currentUserInFiltered, true, usuarios.findIndex(u => u.id === currentUserInFiltered.id))}
+            
+            {currentUserInFiltered && otherUsersInFiltered.length > 0 && (
+              <hr className="my-2 border-slate-100" />
+            )}
 
-            return (
-              <div key={u.id} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50/50 hover:bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl text-white flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-sm ${u.role === 'adm' ? 'bg-gradient-to-br from-girlies-purple to-violet-400' : avatarColor}`}>
-                    {u.nome[0].toUpperCase()}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-sm font-bold text-slate-800">{u.nome}</span>
-                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold font-mono tracking-wider uppercase border border-transparent ${roleCfg.badgeClass}`}>
-                        {roleCfg.label}
-                      </span>
-                    </div>
-                    <span className="text-xs text-slate-500 truncate max-w-[280px]">
-                      {u.funcaoInterna} • {u.curso}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between md:justify-end gap-6 relative">
-                  <div className="flex flex-col md:text-right">
-                    <span className="text-[10px] text-girlies-purple font-mono font-bold uppercase tracking-wider">
-                      {roleCfg.access}
-                    </span>
-                  </div>
-                  
-                  <button
-                    type="button"
-                    onClick={() => setMenuOpenId(isMenuOpen ? null : u.id)}
-                    className="w-8 h-8 rounded-lg hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {isMenuOpen && (
-                    <div className="absolute right-0 top-10 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-10 animate-in fade-in zoom-in-95 duration-100">
-                      {currentUser?.id !== u.id && (
-                        <button
-                          onClick={() => {
-                            setMenuOpenId(null);
-                            onEdit(u);
-                          }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-girlies-purple transition-colors"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                          Editar perfil
-                        </button>
-                      )}
-                      <button 
-                        onClick={() => {
-                          setMenuOpenId(null);
-                          handleGenerateToken(u);
-                        }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition-colors"
-                      >
-                        <Key className="w-3.5 h-3.5" />
-                        Ver token de acesso
-                      </button>
-                      {u.role !== 'adm' && (
-                        <>
-                          <div className="h-px bg-slate-100 my-1.5" />
-                          <button
-                            onClick={() => {
-                              setMenuOpenId(null);
-                              onDelete(u.id);
-                            }}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Excluir membra
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })
+            {otherUsersInFiltered.map((u) => renderUserRow(u, false, usuarios.findIndex(us => us.id === u.id)))}
+          </>
         )}
       </div>
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api, type PlanoAula } from '../services/api';
+import { api, type PlanoAula, type Usuario } from '../services/api';
 import { VisualizarAulaHeader } from '../components/aulas/visualizar/VisualizarAulaHeader';
 import { TerminalHeroCard } from '../components/aulas/visualizar/TerminalHeroCard';
 import { ChecklistOperacional } from '../components/aulas/visualizar/ChecklistOperacional';
@@ -10,24 +10,30 @@ import { EquipeEscalada } from '../components/aulas/visualizar/EquipeEscalada';
 export function VisualizarAula() {
   const { id } = useParams();
   const [aula, setAula] = useState<PlanoAula | null>(null);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadAula() {
+    async function loadData() {
       try {
         setLoading(true);
         if (id && id !== 'visualizar') {
-          const aulas = await api.getAulas();
-          const found = aulas.find(a => a.id === Number(id));
+          const [aulasData, usuariosData] = await Promise.all([
+            api.getAulas(),
+            api.getUsuarios()
+          ]);
+          
+          const found = aulasData.find(a => a.id === Number(id));
           if (found) setAula(found);
+          setUsuarios(usuariosData);
         }
       } catch (error) {
-        console.error("Erro ao carregar a aula:", error);
+        console.error("Erro ao carregar dados:", error);
       } finally {
         setLoading(false);
       }
     }
-    loadAula();
+    loadData();
   }, [id]);
 
   if (loading) {
@@ -55,7 +61,7 @@ export function VisualizarAula() {
 
         {/* Right Column (Equipe) */}
         <div className="w-full xl:w-[22rem] flex flex-col gap-6">
-          <EquipeEscalada />
+          <EquipeEscalada aula={aula || undefined} usuarios={usuarios} />
         </div>
         
       </div>

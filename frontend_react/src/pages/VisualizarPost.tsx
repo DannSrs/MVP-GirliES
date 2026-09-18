@@ -17,6 +17,7 @@ import {
 export function VisualizarPost() {
   const { id } = useParams();
   const [post, setPost] = useState<PostInstagram | null>(null);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
 
@@ -37,7 +38,11 @@ export function VisualizarPost() {
       try {
         setLoading(true);
         if (id && id !== 'cadastrar') {
-          const posts = await api.getPosts();
+          const [posts, users] = await Promise.all([
+            api.getPosts(),
+            api.getUsuarios()
+          ]);
+          setUsuarios(users);
           const found = posts.find(p => p.id === Number(id));
           if (found) setPost(found);
         }
@@ -49,6 +54,18 @@ export function VisualizarPost() {
     }
     loadPost();
   }, [id]);
+
+  const getInitials = (userId?: number) => {
+    if (!userId) return '??';
+    const u = usuarios.find(user => user.id === userId);
+    return u ? u.nome.charAt(0).toUpperCase() : '??';
+  };
+
+  const getNome = (userId?: number) => {
+    if (!userId) return 'Equipe';
+    const u = usuarios.find(user => user.id === userId);
+    return u ? u.nome : 'Desconhecido';
+  };
 
   if (loading) {
     return (
@@ -151,7 +168,10 @@ export function VisualizarPost() {
                 {['Backlog', 'Produção'].map(opt => (
                   <button 
                     key={opt}
-                    onClick={() => handleUpdateStatus(opt)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleUpdateStatus(opt);
+                    }}
                     className="w-full text-left px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-girlies-purple transition-colors"
                   >
                     {opt}
@@ -216,20 +236,20 @@ export function VisualizarPost() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
-                  {post.responsavelRoteiroId ? `R${post.responsavelRoteiroId}` : '??'}
+                  {getInitials(post.responsavelRoteiroId)}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-700">Equipe Roteiro</span>
+                  <span className="text-sm font-bold text-slate-700">{getNome(post.responsavelRoteiroId)}</span>
                   <span className="text-[10px] text-slate-500 font-mono uppercase">Redação / Roteiro</span>
                 </div>
               </div>
               
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
-                  {post.responsavelDesignId ? `D${post.responsavelDesignId}` : '??'}
+                  {getInitials(post.responsavelDesignId)}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-700">Equipe Design</span>
+                  <span className="text-sm font-bold text-slate-700">{getNome(post.responsavelDesignId)}</span>
                   <span className="text-[10px] text-slate-500 font-mono uppercase">Designer Responsável</span>
                 </div>
               </div>

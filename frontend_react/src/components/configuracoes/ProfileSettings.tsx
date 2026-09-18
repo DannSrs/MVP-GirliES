@@ -148,8 +148,8 @@ export function ProfileSettings({ currentUser, onProfileUpdate }: ProfileSetting
                 type="text"
                 name="email"
                 value={formData.email || ''}
-                onChange={handleChange}
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 bg-white outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all"
+                disabled
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-400 bg-slate-50 outline-none cursor-not-allowed"
               />
             </div>
 

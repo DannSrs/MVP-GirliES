@@ -35,7 +35,10 @@ export function FooterActions() {
         </button>
         <button
           type="button"
-          onClick={() => setIsSubmitModalOpen(true)}
+          onClick={() => {
+            setSubmitError(null);
+            setIsSubmitModalOpen(true);
+          }}
           className="bg-girlies-purple hover:bg-[#3d004d] text-white px-8 py-3 rounded-xl text-sm font-bold transition-all shadow-md shadow-girlies-purple/30 flex items-center gap-2.5 hover:-translate-y-0.5"
         >
           <CalendarCheck className="w-5 h-5" />

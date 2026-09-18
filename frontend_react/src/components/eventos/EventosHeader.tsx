@@ -21,7 +21,7 @@ export function EventosHeader() {
       {/* Badges de campus */}
       <div className="relative flex flex-wrap items-center gap-2 mb-3">
         <span className="bg-girlies-purple text-white font-mono text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase">
-          IFPE • CAMPUS BELO JARDIM / CARUARU
+          IFPE • CAMPUS BELO JARDIM
         </span>
         <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 font-mono text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase border border-emerald-200">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse" />
@@ -46,7 +46,7 @@ export function EventosHeader() {
           className="flex items-center justify-center gap-2 bg-girlies-purple hover:bg-[#3d004d] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-md shadow-girlies-purple/20 whitespace-nowrap"
         >
           <PlusCircle className="w-4 h-4" />
-          + Cadastrar Encontro Interno
+          Cadastrar Encontro Interno
         </Link>
       </div>
     </section>

@@ -72,19 +72,22 @@ export function Sidebar() {
       {/* User Profile */}
       <div className="px-3 pb-3">
         <div className="bg-slate-100 rounded-xl p-3">
-          <button 
-            onClick={handleLogout}
-            className="w-full text-left flex items-center gap-2.5 cursor-pointer hover:bg-slate-200 rounded-lg transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-girlies-purple flex items-center justify-center text-white text-xs font-bold shadow">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-girlies-purple flex items-center justify-center text-white text-xs font-bold shadow select-none">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-slate-800 text-xs font-semibold truncate">{currentUser?.nome || 'Usuário'}</p>
-              <p className="text-slate-500 text-[10px] truncate">{currentUser?.funcaoInterna || 'Cargo'}</p>
+              <p className="text-slate-800 text-xs font-semibold truncate select-none">{currentUser?.nome || 'Usuário'}</p>
+              <p className="text-slate-500 text-[10px] truncate select-none">{currentUser?.funcaoInterna || 'Cargo'}</p>
             </div>
-            <LogOut className="w-4 h-4 text-slate-500 flex-shrink-0" />
-          </button>
+            <button 
+              onClick={handleLogout}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+            </button>
+          </div>
           <div className="mt-3 flex items-center justify-between">
             <span className="text-girlies-purple text-[10px] font-mono font-semibold">GirliES Squad</span>
             <span className="text-emerald-600 text-[10px] font-mono font-bold">v2.6.2</span>

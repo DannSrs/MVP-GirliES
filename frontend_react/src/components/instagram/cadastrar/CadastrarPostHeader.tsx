@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { usePostForm } from '../../../contexts/PostFormContext';
 
 export function CadastrarPostHeader() {
+  const { isEditing } = usePostForm();
+
   return (
     <div className="flex items-start justify-between mb-8">
       <div>
@@ -16,12 +19,14 @@ export function CadastrarPostHeader() {
             INSTA LAB • IFPE
           </span>
           <span className="flex items-center gap-1 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 uppercase tracking-wider">
-            Novo Pipeline
+            {isEditing ? 'Edição de Pipeline' : 'Novo Pipeline'}
           </span>
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-800">Nova Ideia de Post</h1>
+        <h1 className="text-3xl font-extrabold text-slate-800">{isEditing ? 'Editar Post' : 'Nova Ideia de Post'}</h1>
         <p className="text-slate-500 text-sm mt-1">
-          Preencha os dados do post para adicioná-lo ao fluxo do Kanban.
+          {isEditing 
+            ? 'Edite os dados deste post no fluxo do Kanban.'
+            : 'Preencha os dados do post para adicioná-lo ao fluxo do Kanban.'}
         </p>
       </div>
     </div>

@@ -283,7 +283,7 @@ export function Dashboard() {
                       <span className="text-slate-700 text-xs font-medium">{postDestaque.publicoAlvo || 'Geral'}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-400 text-xs">Prazo Final:</span>
+                      <span className="text-slate-400 text-xs">Data de Postagem:</span>
                       <span className="text-xs font-semibold text-amber-600 flex items-center gap-1">
                         <AlarmClock className="w-3 h-3" />
                         {postDestaque.deadline ? new Date(postDestaque.deadline).toLocaleDateString('pt-BR') : '--'}
@@ -293,12 +293,12 @@ export function Dashboard() {
                       <span className="text-slate-400 text-xs">Design &amp; Copy:</span>
                       <div className="flex -space-x-1.5">
                         {postDestaque.responsavelRoteiroId && (
-                          <div title={`Roteiro: ${getNome(postDestaque.responsavelRoteiroId)}`} className="w-6 h-6 rounded-full bg-violet-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold cursor-help select-none">
+                          <div title={`Roteiro: ${getNome(postDestaque.responsavelRoteiroId)}`} className="w-6 h-6 rounded-full bg-violet-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold cursor-default select-none">
                             {getInitials(postDestaque.responsavelRoteiroId)}
                           </div>
                         )}
                         {postDestaque.responsavelDesignId && (
-                          <div title={`Design: ${getNome(postDestaque.responsavelDesignId)}`} className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold cursor-help select-none">
+                          <div title={`Design: ${getNome(postDestaque.responsavelDesignId)}`} className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold cursor-default select-none">
                             {getInitials(postDestaque.responsavelDesignId)}
                           </div>
                         )}

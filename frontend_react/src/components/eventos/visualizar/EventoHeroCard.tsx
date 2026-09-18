@@ -53,25 +53,12 @@ export function EventoHeroCard({ evento }: EventoHeroCardProps) {
             {titulo}
           </h1>
 
-          {/* Subtítulo */}
-          {evento?.regimeEvento && (
+          {/* Subtítulo / Resumo */}
+          {evento?.descricao && (
             <p className="text-slate-500 text-sm leading-relaxed max-w-2xl font-medium">
-              Acolhimento prático de software e hardware livre para meninas da graduação e do ensino médio técnico no IFPE Campus Belo Jardim.
+              {evento.descricao}
             </p>
           )}
-
-          {/* Público-alvo badge */}
-          <div className="flex items-center gap-2 mt-1">
-            <div className="w-6 h-6 rounded-full bg-girlies-purple/10 flex items-center justify-center">
-              <span className="text-[10px]">👩‍💻</span>
-            </div>
-            <span className="text-xs text-slate-500 font-medium">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 font-mono mr-1">PÚBLICO-ALVO</span>
-              {evento?.tipoEvento === 'Oficina Prática'
-                ? 'Calouras de Eng. de Software & Integrado'
-                : 'Comunidade GirliES • IFPE'}
-            </span>
-          </div>
         </div>
 
         {/* Direita — Info Cards */}

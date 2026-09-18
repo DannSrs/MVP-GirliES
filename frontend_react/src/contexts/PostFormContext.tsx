@@ -32,6 +32,8 @@ interface PostFormContextType {
   setFormData: React.Dispatch<React.SetStateAction<PostFormData>>;
   updateField: (field: keyof PostFormData, value: any) => void;
   resetForm: () => void;
+  isEditing: boolean;
+  postId?: string;
 }
 
 const defaultFormData: PostFormData = {
@@ -87,8 +89,10 @@ export function PostFormProvider({ children }: { children: ReactNode }) {
 
   const resetForm = () => setFormData(defaultFormData);
 
+  const isEditing = Boolean(id && id !== 'cadastrar');
+
   return (
-    <PostFormContext.Provider value={{ formData, setFormData, updateField, resetForm }}>
+    <PostFormContext.Provider value={{ formData, setFormData, updateField, resetForm, isEditing, postId: id }}>
       {children}
     </PostFormContext.Provider>
   );

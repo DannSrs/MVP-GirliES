@@ -11,17 +11,8 @@ export function LogisticaApoioSection({ evento }: LogisticaApoioSectionProps) {
   const [items, setItems] = useState<ChecklistItem[]>([]);
 
   useEffect(() => {
-    if (evento?.logisticsChecklist && evento.logisticsChecklist.length > 0) {
+    if (evento?.logisticsChecklist) {
       setItems(evento.logisticsChecklist);
-    } else {
-      // Mock de fallback quando o evento não tem checklist
-      setItems([
-        { id: 101, descricao: 'Ofício de liberação de chaves do Laboratório Maker', isCompleted: true },
-        { id: 102, descricao: '40 Kits de Boas-Vindas GirliES', isCompleted: true },
-        { id: 103, descricao: 'Equipamentos Audiovisuais', isCompleted: true },
-        { id: 104, descricao: '12 Kits Maker de Circuitos e Arduino', isCompleted: true },
-        { id: 105, descricao: 'Coffee Break Comunitário & Lanches', isCompleted: false },
-      ]);
     }
   }, [evento]);
 
@@ -107,6 +98,12 @@ export function LogisticaApoioSection({ evento }: LogisticaApoioSectionProps) {
             )}
           </div>
         ))}
+
+        {items.length === 0 && (
+          <p className="text-xs text-slate-400 text-center py-4 italic">
+            Nenhum item de logística foi cadastrado para este evento.
+          </p>
+        )}
       </div>
     </section>
   );
