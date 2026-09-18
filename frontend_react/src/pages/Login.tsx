@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { 
-  Sparkles, 
   ShieldCheck, 
   CheckCircle2, 
   ShieldAlert,
@@ -9,6 +8,7 @@ import {
   Lock,
   ArrowRight
 } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export function Login() {
   const navigate = useNavigate();
@@ -28,17 +28,8 @@ export function Login() {
 
       {/* Header Fixo */}
       <header className="relative z-10 w-full px-8 py-6 flex items-center justify-between">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg bg-[#2e1065] flex items-center justify-center shadow-md">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-slate-900 font-bold text-xl tracking-tight">GirliES</span>
-            <span className="bg-emerald-100 text-emerald-800 font-mono text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
-              CORE // IFPE
-            </span>
-          </div>
-          <p className="text-slate-500 text-[10px] font-mono pl-10">Girls in Software Engineering • Campus Belo Jardim / Caruaru</p>
+        <div className="flex items-center">
+          <img src={logo} alt="GirliES Logo" className="h-16 md:h-20 w-auto object-contain" />
         </div>
 
         <div className="hidden sm:flex items-center gap-2 bg-slate-100/50 backdrop-blur-sm border border-slate-200 px-3 py-1.5 rounded-full">

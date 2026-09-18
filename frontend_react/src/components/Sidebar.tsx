@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import {
-  Sparkles,
   LayoutDashboard,
   BookOpen,
   Camera,
@@ -8,6 +7,7 @@ import {
   Settings,
   LogOut
 } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export function Sidebar() {
   const getNavClass = ({ isActive }: { isActive: boolean }) => {
@@ -21,15 +21,8 @@ export function Sidebar() {
   return (
     <aside className="w-52 bg-white flex flex-col flex-shrink-0 h-full rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       {/* Logo */}
-      <div className="px-5 pt-6 pb-5 border-b border-slate-200">
-        <div className="flex items-center gap-2 mb-1">
-          <div className="w-8 h-8 rounded-lg bg-girlies-purple flex items-center justify-center shadow-lg shadow-girlies-purple/30">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-slate-800 font-bold text-lg tracking-tight">GirliES</span>
-          <span className="bg-emerald-400 text-emerald-900 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">CORE</span>
-        </div>
-        <p className="text-slate-500 text-[10px] font-mono pl-10">Girls in SE • IFPE</p>
+      <div className="px-5 pt-8 pb-6 border-b border-slate-200 flex items-center justify-center">
+        <img src={logo} alt="GirliES Logo" className="w-40 h-auto object-contain" />
       </div>
 
       {/* Nav */}
