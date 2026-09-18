@@ -63,7 +63,7 @@ export function PostTeamSidebar() {
           <div className="flex flex-col gap-2.5">
             {formData.redacao && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-2 rounded-lg">
-                <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[9px] font-bold">
+                <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-[9px] font-bold select-none">
                   {getInitials(formData.redacao)}
                 </div>
                 <span className="text-xs font-medium text-slate-700">{getName(formData.redacao)}</span>
@@ -97,7 +97,7 @@ export function PostTeamSidebar() {
           <div className="flex flex-col gap-2.5">
             {formData.designer && (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 p-2 rounded-lg">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] font-bold">
+                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[9px] font-bold select-none">
                   {getInitials(formData.designer)}
                 </div>
                 <span className="text-xs font-medium text-slate-700">{getName(formData.designer)}</span>

@@ -24,6 +24,7 @@ export interface PlanoAula {
   linkRoteiro?: string;
   checklist?: ChecklistItem[];
   links?: LinksAtividade[];
+  responsaveisId?: number[];
   semana?: number;
 }
 
@@ -67,6 +68,25 @@ export interface Usuario {
 const API_BASE = '/api';
 
 export const api = {
+  login: async (email: string, token: string): Promise<{ usuario: Usuario }> => {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, token })
+    });
+    if (!res.ok) {
+      let errorMsg = 'E-mail ou Token inválidos';
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorData.error || JSON.stringify(errorData);
+      } catch (e) {
+        errorMsg = `Erro ${res.status}: ${res.statusText}`;
+      }
+      throw new Error(errorMsg);
+    }
+    return res.json();
+  },
+
   getAulas: async (): Promise<PlanoAula[]> => {
     const res = await fetch(`${API_BASE}/aulas`);
     if (!res.ok) throw new Error('Erro ao buscar aulas');
@@ -278,6 +298,12 @@ export const api = {
   getUsuarios: async (): Promise<Usuario[]> => {
     const res = await fetch(`${API_BASE}/usuarios`);
     if (!res.ok) throw new Error('Erro ao buscar usuários');
+    return res.json();
+  },
+
+  getTokenUsuario: async (id: number): Promise<{ token: string }> => {
+    const res = await fetch(`${API_BASE}/usuarios/${id}/token`);
+    if (!res.ok) throw new Error('Erro ao buscar token do usuário');
     return res.json();
   },
 

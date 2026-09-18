@@ -19,12 +19,15 @@ import confetti from 'canvas-confetti';
 import { api, type PlanoAula, type PostInstagram, type EventoGeral } from '../services/api';
 
 import { useCicloAtivo } from '../hooks/useCicloAtivo';
+import { useAuth } from '../contexts/AuthContext';
 import { MiniChecklist } from '../components/MiniChecklist';
 
 export function Dashboard() {
+  const { currentUser } = useAuth();
   const [aulas, setAulas] = useState<PlanoAula[]>([]);
   const [posts, setPosts] = useState<PostInstagram[]>([]);
   const [eventos, setEventos] = useState<EventoGeral[]>([]);
+  const [usuarios, setUsuarios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Estados locais para checklists para manter interatividade rápida na UI antes de salvar no DB
@@ -41,15 +44,17 @@ export function Dashboard() {
         setLoading(true);
 
         // 2. Carrega as aulas da trilha e as coisas do ciclo calculado
-        const [todasAulas, postsCiclo, eventosCiclo] = await Promise.all([
+        const [todasAulas, postsCiclo, eventosCiclo, usuariosList] = await Promise.all([
           api.getAulas(),
           api.getPostsDaSemana(cicloAtivo),
-          api.getEventosDaSemana(cicloAtivo)
+          api.getEventosDaSemana(cicloAtivo),
+          api.getUsuarios()
         ]);
 
         setAulas(Array.isArray(todasAulas) ? todasAulas : []);
         setPosts(Array.isArray(postsCiclo) ? postsCiclo : []);
         setEventos(Array.isArray(eventosCiclo) ? eventosCiclo : []);
+        setUsuarios(Array.isArray(usuariosList) ? usuariosList : []);
 
         // 3. Inicializa as checklists locais para as prioridades
         const aulaAtual = Array.isArray(todasAulas) ? todasAulas.find(a => a.semana === cicloAtivo) : null;
@@ -147,6 +152,21 @@ export function Dashboard() {
     </div>
   );
 
+  const getInitials = (id?: number) => {
+    if (!id) return null;
+    const u = usuarios.find(user => user.id === id);
+    return u ? u.nome.charAt(0).toUpperCase() : '?';
+  };
+
+  const getNome = (id?: number) => {
+    if (!id) return null;
+    const u = usuarios.find(user => user.id === id);
+    return u ? u.nome : 'Desconhecido';
+  };
+
+  const primeiroNome = currentUser?.nome?.split(' ')[0] || 'Usuária';
+
+
   return (
     <>
       {/* ── Greeting Banner ── */}
@@ -162,7 +182,7 @@ export function Dashboard() {
           <span className="text-slate-400">&lt;girli_es:root&gt;</span>
         </div>
         <div className="relative">
-          <h1 className="text-3xl font-bold text-girlies-purple mb-1.5">Olá, Letícia! <span className="text-pink-500">♥</span></h1>
+          <h1 className="text-3xl font-bold text-girlies-purple mb-1.5">Olá, {primeiroNome}! <span className="text-pink-500">♥</span></h1>
           <p className="text-sm text-slate-500">
             Painel de Extensão Universitária •{' '}
             <a href="#" className="text-girlies-purple font-medium hover:underline">Engenharia de Software IFPE</a>{' '}
@@ -272,9 +292,19 @@ export function Dashboard() {
                     <div className="flex justify-between items-center">
                       <span className="text-slate-400 text-xs">Design &amp; Copy:</span>
                       <div className="flex -space-x-1.5">
-                        <div className="w-6 h-6 rounded-full bg-violet-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">LI</div>
-                        <div className="w-6 h-6 rounded-full bg-pink-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">MA</div>
-                        <div className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold">BI</div>
+                        {postDestaque.responsavelRoteiroId && (
+                          <div title={`Roteiro: ${getNome(postDestaque.responsavelRoteiroId)}`} className="w-6 h-6 rounded-full bg-violet-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold cursor-help select-none">
+                            {getInitials(postDestaque.responsavelRoteiroId)}
+                          </div>
+                        )}
+                        {postDestaque.responsavelDesignId && (
+                          <div title={`Design: ${getNome(postDestaque.responsavelDesignId)}`} className="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[9px] font-bold cursor-help select-none">
+                            {getInitials(postDestaque.responsavelDesignId)}
+                          </div>
+                        )}
+                        {!postDestaque.responsavelRoteiroId && !postDestaque.responsavelDesignId && (
+                          <span className="text-[10px] text-slate-400 font-medium">Nenhum designado</span>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -65,4 +65,15 @@ export class UsuarioController extends Controller {
     }
     return { success: true };
   }
+
+  @Get("{id}/token")
+  @Response(404, "Usuário ou token não encontrado")
+  public async getUsuarioToken(@Path() id: number): Promise<{ token: string }> {
+    const token = await this.service.getToken(id);
+    if (!token) {
+      this.setStatus(404);
+      throw new Error("Token não encontrado");
+    }
+    return { token };
+  }
 }

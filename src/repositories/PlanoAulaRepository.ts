@@ -19,6 +19,10 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                  FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
                 [String(r.id)]
             );
+            const responsaveisRows = await db.all<any[]>(
+                `SELECT usuario_id FROM Aula_Responsavel WHERE aula_id = ?`,
+                [String(r.id)]
+            );
 
             aulas.push({
                 id: r.id,
@@ -43,7 +47,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                     tipo: l.tipo,
                     titulo: l.titulo,
                     link: l.link
-                }))
+                })),
+                responsaveisId: responsaveisRows.map(r => Number(r.usuario_id))
             });
         }
         return aulas;
@@ -62,6 +67,10 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         const linksRows = await db.all<any[]>(
             `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
              FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`,
+            [String(r.id)]
+        );
+        const responsaveisRows = await db.all<any[]>(
+            `SELECT usuario_id FROM Aula_Responsavel WHERE aula_id = ?`,
             [String(r.id)]
         );
 
@@ -88,7 +97,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 tipo: l.tipo,
                 titulo: l.titulo,
                 link: l.link
-            }))
+            })),
+            responsaveisId: responsaveisRows.map(r => Number(r.usuario_id))
         };
     }
 
@@ -126,6 +136,15 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 await db.run(
                     `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'AULA', ?, ?, ?)`,
                     [String(createdId), link.tipo, link.titulo || null, link.link]
+                );
+            }
+        }
+
+        if (data.responsaveisId && data.responsaveisId.length > 0) {
+            for (const respId of data.responsaveisId) {
+                await db.run(
+                    `INSERT INTO Aula_Responsavel (aula_id, usuario_id) VALUES (?, ?)`,
+                    [createdId, respId]
                 );
             }
         }
@@ -181,6 +200,18 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 }
             }
         }
+
+        if (changes.responsaveisId !== undefined) {
+            await db.run(`DELETE FROM Aula_Responsavel WHERE aula_id = ?`, [id]);
+            if (changes.responsaveisId.length > 0) {
+                for (const respId of changes.responsaveisId) {
+                    await db.run(
+                        `INSERT INTO Aula_Responsavel (aula_id, usuario_id) VALUES (?, ?)`,
+                        [id, respId]
+                    );
+                }
+            }
+        }
         return this.findById(id);
     }
 
@@ -188,6 +219,7 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         const db = await getDb();
         await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
         await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'AULA'`, [String(id)]);
+        await db.run(`DELETE FROM Aula_Responsavel WHERE aula_id = ?`, [id]);
         const result = await db.run('DELETE FROM Aulas WHERE id = ?', id);
         return (result.changes ?? 0) > 0;
     }

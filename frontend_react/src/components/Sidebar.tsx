@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   BookOpen,
@@ -8,8 +8,12 @@ import {
   LogOut
 } from 'lucide-react';
 import logo from '../assets/logo.png';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Sidebar() {
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
+
   const getNavClass = ({ isActive }: { isActive: boolean }) => {
     const baseClass = "flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm transition-all";
     if (isActive) {
@@ -17,6 +21,13 @@ export function Sidebar() {
     }
     return `${baseClass} text-slate-500 hover:text-girlies-purple hover:bg-slate-50`;
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const initials = currentUser?.nome ? currentUser.nome.charAt(0).toUpperCase() : '?';
 
   return (
     <aside className="w-52 bg-white flex flex-col flex-shrink-0 h-full rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -61,16 +72,19 @@ export function Sidebar() {
       {/* User Profile */}
       <div className="px-3 pb-3">
         <div className="bg-slate-100 rounded-xl p-3">
-          <div className="flex items-center gap-2.5 cursor-pointer hover:bg-slate-200 rounded-lg transition-colors">
+          <button 
+            onClick={handleLogout}
+            className="w-full text-left flex items-center gap-2.5 cursor-pointer hover:bg-slate-200 rounded-lg transition-colors"
+          >
             <div className="w-8 h-8 rounded-full bg-girlies-purple flex items-center justify-center text-white text-xs font-bold shadow">
-              L
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-slate-800 text-xs font-semibold truncate">Letícia</p>
-              <p className="text-slate-500 text-[10px] truncate">Dev // Infra</p>
+              <p className="text-slate-800 text-xs font-semibold truncate">{currentUser?.nome || 'Usuário'}</p>
+              <p className="text-slate-500 text-[10px] truncate">{currentUser?.funcaoInterna || 'Cargo'}</p>
             </div>
             <LogOut className="w-4 h-4 text-slate-500 flex-shrink-0" />
-          </div>
+          </button>
           <div className="mt-3 flex items-center justify-between">
             <span className="text-girlies-purple text-[10px] font-mono font-semibold">GirliES Squad</span>
             <span className="text-emerald-600 text-[10px] font-mono font-bold">v2.6.2</span>

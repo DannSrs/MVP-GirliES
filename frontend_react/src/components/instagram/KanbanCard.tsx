@@ -129,10 +129,10 @@ export function KanbanCard({ task, index }: KanbanCardProps) {
                 {/* Avatars */}
                 <div className="flex -space-x-1.5">
                   {task.assignees.map((assignee, idx) => (
-                    <div 
+                    <div
                       key={idx}
                       title={assignee.name}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold border-2 border-white shadow-sm ${assignee.color}`}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold border-2 border-white shadow-sm cursor-help select-none ${assignee.color}`}
                     >
                       {assignee.initial}
                     </div>

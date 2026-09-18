@@ -39,9 +39,18 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
       curso TEXT,
       periodo TEXT,
       senha TEXT NOT NULL,
+      token TEXT,
       role TEXT DEFAULT 'voluntaria' CHECK (role IN ('professora', 'voluntaria', 'adm'))
     );
+  `);
 
+  try {
+    await db.exec(`ALTER TABLE Usuarios ADD COLUMN token TEXT;`);
+  } catch (e) {
+    // Column might already exist, ignore error
+  }
+
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS Aulas (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       titulo TEXT NOT NULL,
@@ -131,11 +140,20 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
     const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
     await db.run(
-      `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, role) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ['Leticia', leticiaEmail, 'Administração', 'Não Informado', 'Não Informado', hashedPassword, 'adm']
+      `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, token, role) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ['Leticia', leticiaEmail, 'Administração', 'Não Informado', 'Não Informado', hashedPassword, defaultPassword, 'adm']
     );
     console.log(`✅ Usuária admin padrão criada com sucesso: ${leticiaEmail} (Senha: ${defaultPassword})`);
+  } else {
+    // Se a Leticia já existe mas não tem token, a gente cria um
+    const adminComToken = await db.get(`SELECT token FROM Usuarios WHERE email = ?`, [leticiaEmail]);
+    if (!adminComToken || !adminComToken.token) {
+      const ano = new Date().getFullYear();
+      const username = leticiaEmail.split('@')[0].toUpperCase();
+      const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
+      await db.run(`UPDATE Usuarios SET token = ? WHERE email = ?`, [defaultPassword, leticiaEmail]);
+    }
   }
 
   return db;

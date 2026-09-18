@@ -39,9 +39,13 @@ export class UsuarioService {
     const senhaHash = await bcrypt.hash(senhaGerada, 10);
 
     // 4. Repositório salva no banco
-    const usuarioCriado = await this.repository.create(dto, senhaHash);
+    const usuarioCriado = await this.repository.create(dto, senhaHash, senhaGerada);
 
     return { ...usuarioCriado, senhaGerada };
+  }
+
+  public async getToken(id: number): Promise<string | undefined> {
+    return this.repository.getToken(id);
   }
 
   public async atualizarUsuario(id: number, dto: AtualizarUsuarioDTO): Promise<Usuario | undefined> {

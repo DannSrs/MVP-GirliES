@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -9,14 +10,30 @@ import {
   ArrowRight
 } from 'lucide-react';
 import logo from '../assets/logo.png';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  
+  const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Como o backend ainda não existe, simulamos a entrada e vamos pro painel
-    navigate('/');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await login(email, token);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message || 'Erro ao realizar login');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -110,56 +127,65 @@ export function Login() {
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-slate-700">Acesso Restrito ao Squad</span>
                   <span className="text-xs text-slate-500 leading-relaxed mt-0.5">
-                    Informe seu <span className="font-semibold text-girlies-purple">e-mail institucional IFPE</span> e a respectiva <span className="font-semibold text-girlies-purple">chave/token semestral</span> vinculada à coordenação ou monitoria.
+                    Informe seu <span className="font-semibold text-girlies-purple">e-mail</span> e a respectiva <span className="font-semibold text-girlies-purple">chave/token</span> vinculada à coordenação ou monitoria.
                   </span>
                 </div>
               </div>
+
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                  <ShieldAlert className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm font-medium text-red-700">{error}</p>
+                </div>
+              )}
 
               {/* Form */}
               <form onSubmit={handleLogin} className="flex flex-col gap-5">
                 {/* Input Email */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-700">E-mail Institucional IFPE</label>
+                  <label className="text-xs font-bold text-slate-700">E-mail</label>
                   <div className="relative">
                     <input
                       required
                       type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="seu.nome@discente.ifpe.edu.br"
                       className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50/50 border border-slate-200 text-sm font-medium focus:bg-white focus:outline-none focus:border-girlies-purple focus:ring-1 focus:ring-girlies-purple transition-all placeholder:text-slate-400 placeholder:font-normal"
                     />
                     <Mail className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
-                  <p className="text-[9px] font-mono text-slate-400 pl-1 mt-0.5">
-                    Aceito: <span className="text-slate-500">@discente.ifpe.edu.br</span> ou <span className="text-slate-500">@campus.ifpe.edu.br</span>
-                  </p>
                 </div>
 
                 {/* Input Token */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-700">Token de Autenticação / Chave de Acesso</label>
+                  <label className="text-xs font-bold text-slate-700">Token de Autenticação</label>
                   <div className="relative">
                     <input
                       required
-                      type="text"
-                      placeholder="GIRLIES-IFPE-2026-TOKEN-X7"
-                      className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50/50 border border-slate-200 text-sm font-medium font-mono uppercase tracking-wider focus:bg-white focus:outline-none focus:border-girlies-purple focus:ring-1 focus:ring-girlies-purple transition-all placeholder:text-slate-400 placeholder:tracking-normal placeholder:normal-case placeholder:font-sans"
+                      type="password"
+                      value={token}
+                      onChange={(e) => setToken(e.target.value)}
+                      placeholder="Sua chave de acesso"
+                      className="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50/50 border border-slate-200 text-sm font-medium focus:bg-white focus:outline-none focus:border-girlies-purple focus:ring-1 focus:ring-girlies-purple transition-all placeholder:text-slate-400 placeholder:font-normal"
                     />
                     <KeyRound className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
                   <p className="text-[9px] font-mono text-slate-400 pl-1 mt-0.5 flex items-center gap-1">
                     <span className="w-3 h-3 rounded-full border border-slate-300 flex items-center justify-center text-[7px]">i</span>
-                    Chave fornecida no onboarding da equipe ou coordenação do projeto.
+                    Chave fornecida no onboarding da equipe.
                   </p>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full mt-2 bg-[#6b21a8] hover:bg-[#581c87] text-white py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 group"
+                  disabled={isLoading}
+                  className="w-full mt-2 bg-[#6b21a8] hover:bg-[#581c87] disabled:opacity-70 text-white py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 group"
                 >
                   <Lock className="w-4 h-4 text-purple-200 group-hover:text-white transition-colors" />
-                  Entrar com E-mail e Token
-                  <ArrowRight className="w-4 h-4 text-purple-200 group-hover:translate-x-1 transition-all ml-1" />
+                  {isLoading ? 'Autenticando...' : 'Entrar no Sistema'}
+                  {!isLoading && <ArrowRight className="w-4 h-4 text-purple-200 group-hover:translate-x-1 transition-all ml-1" />}
                 </button>
               </form>
 

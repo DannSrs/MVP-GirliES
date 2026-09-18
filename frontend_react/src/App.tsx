@@ -13,31 +13,36 @@ import { CadastrarEvento } from './pages/CadastrarEvento';
 import { VisualizarEvento } from './pages/VisualizarEvento';
 import { Configuracoes } from './pages/Configuracoes';
 import { Login } from './pages/Login';
-
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="aulas" element={<Aulas />} />
-          <Route path="aulas/cadastrar" element={<CadastrarAula />} />
-          <Route path="aulas/:id/editar" element={<EditarAula />} />
-          <Route path="aulas/:id" element={<VisualizarAula />} />
-          <Route path="instagram" element={<Instagram />} />
-          <Route path="instagram/cadastrar" element={<CadastrarPost />} />
-          <Route path="instagram/:id/editar" element={<CadastrarPost />} />
-          <Route path="instagram/:id" element={<VisualizarPost />} />
-          <Route path="eventos" element={<Eventos />} />
-          <Route path="eventos/cadastrar" element={<CadastrarEvento />} />
-          <Route path="eventos/:id" element={<VisualizarEvento />} />
-          <Route path="configuracoes" element={<Configuracoes />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="aulas" element={<Aulas />} />
+              <Route path="aulas/cadastrar" element={<CadastrarAula />} />
+              <Route path="aulas/:id/editar" element={<EditarAula />} />
+              <Route path="aulas/:id" element={<VisualizarAula />} />
+              <Route path="instagram" element={<Instagram />} />
+              <Route path="instagram/cadastrar" element={<CadastrarPost />} />
+              <Route path="instagram/:id/editar" element={<CadastrarPost />} />
+              <Route path="instagram/:id" element={<VisualizarPost />} />
+              <Route path="eventos" element={<Eventos />} />
+              <Route path="eventos/cadastrar" element={<CadastrarEvento />} />
+              <Route path="eventos/:id" element={<VisualizarEvento />} />
+              <Route path="configuracoes" element={<Configuracoes />} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

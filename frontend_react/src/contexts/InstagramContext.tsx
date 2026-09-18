@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { DropResult } from '@hello-pangea/dnd';
 import { api } from '../services/api';
-import type { PostInstagram, ChecklistItem } from '../services/api';
+import type { PostInstagram, ChecklistItem, Usuario } from '../services/api';
 
 export type Assignee = {
   initial: string;
@@ -59,15 +59,22 @@ const AVATAR_COLORS = [
   'bg-orange-100 text-orange-700'
 ];
 
-function getMockAvatarForUser(id?: number, roleName: string = 'User'): Assignee | null {
+function getAvatarForUser(id: number | undefined, users: Usuario[], roleName: string = 'User'): Assignee | null {
   if (!id) return null;
-  // Simple deterministic pick
+  const user = users.find(u => u.id === id);
   const colorIndex = id % AVATAR_COLORS.length;
-  // Since we don't have the user's real name from the backend yet, we use a placeholder initial
-  const initial = roleName.charAt(0).toUpperCase();
+
+  if (!user) {
+    return {
+      initial: roleName.charAt(0).toUpperCase(),
+      name: `${roleName} (Removido)`,
+      color: AVATAR_COLORS[colorIndex]
+    };
+  }
+  
   return {
-    initial,
-    name: `${roleName} (ID: ${id})`,
+    initial: user.nome.charAt(0).toUpperCase(),
+    name: user.nome,
     color: AVATAR_COLORS[colorIndex]
   };
 }
@@ -80,12 +87,12 @@ function formatDate(isoString: string): string {
   return `${d.getDate()}/${meses[d.getMonth()]}`;
 }
 
-function mapPostToTaskCard(post: PostInstagram): TaskCard {
+function mapPostToTaskCard(post: PostInstagram, users: Usuario[]): TaskCard {
   const assignees: Assignee[] = [];
-  const rot = getMockAvatarForUser(post.responsavelRoteiroId, 'Roteiro');
+  const rot = getAvatarForUser(post.responsavelRoteiroId, users, 'Roteiro');
   if (rot) assignees.push(rot);
   
-  const des = getMockAvatarForUser(post.responsavelDesignId, 'Design');
+  const des = getAvatarForUser(post.responsavelDesignId, users, 'Design');
   if (des) assignees.push(des);
 
   // If no specific assignees, maybe add a fallback or leave empty. 
@@ -139,13 +146,16 @@ export function InstagramProvider({ children }: { children: ReactNode }) {
 
   const fetchPosts = useCallback(async () => {
     try {
-      const posts = await api.getPosts();
+      const [posts, users] = await Promise.all([
+        api.getPosts(),
+        api.getUsuarios()
+      ]);
       
       const newTasks: Record<string, TaskCard> = {};
       const newColumns = JSON.parse(JSON.stringify(initialColumns)) as Record<string, ColumnData>;
 
       posts.forEach(post => {
-        const task = mapPostToTaskCard(post);
+        const task = mapPostToTaskCard(post, users);
         newTasks[task.id] = task;
         
         const colId = post.status || 'Backlog';

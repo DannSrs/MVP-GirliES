@@ -35,7 +35,7 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
         };
     }
 
-    async findByEmail(email: string): Promise<Usuario | undefined> {
+    async findByEmail(email: string): Promise<(Usuario & { token?: string }) | undefined> {
         const db = await getDb();
         const r = await db.get<any>('SELECT * FROM Usuarios WHERE email = ?', [email]);
         
@@ -48,17 +48,18 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
             funcaoInterna: r.funcao_interna,
             curso: r.curso,
             periodo: r.periodo,
-            senha: r.senha, // Importante para validação posterior de login
+            senha: r.senha,
+            token: r.token,
             role: r.role
         };
     }
 
-    async create(data: CriarUsuarioDTO, senhaHash?: string): Promise<Usuario> {
+    async create(data: CriarUsuarioDTO, senhaHash?: string, plainToken?: string): Promise<Usuario> {
         const db = await getDb();
 
         const result = await db.run(
-            `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, role) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, token, role) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.nome,
                 data.email,
@@ -66,6 +67,7 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
                 data.curso,
                 data.periodo,
                 senhaHash || null,
+                plainToken || null,
                 data.role || 'voluntaria'
             ]
         );
@@ -101,6 +103,12 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
         );
 
         return this.findById(id);
+    }
+
+    async getToken(id: number | string): Promise<string | undefined> {
+        const db = await getDb();
+        const r = await db.get<any>('SELECT token FROM Usuarios WHERE id = ?', [id]);
+        return r?.token;
     }
 
     async delete(id: number | string): Promise<boolean> {
