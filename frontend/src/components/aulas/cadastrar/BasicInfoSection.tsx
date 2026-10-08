@@ -1,8 +1,23 @@
+import { useState, useEffect } from 'react';
 import { ChevronDown, FileCode2, GraduationCap, Type } from 'lucide-react';
 import { useAulaForm } from '../../../contexts/AulaFormContext';
+import { api, Modulo } from '../../../services/api';
 
 export function BasicInfoSection() {
   const { formData, updateField } = useAulaForm();
+  const [modulos, setModulos] = useState<Modulo[]>([]);
+
+  useEffect(() => {
+    async function loadModulos() {
+      try {
+        const data = await api.getModulos();
+        setModulos(data);
+      } catch (error) {
+        console.error('Erro ao carregar modulos:', error);
+      }
+    }
+    loadModulos();
+  }, []);
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
@@ -23,14 +38,14 @@ export function BasicInfoSection() {
           </label>
           <div className="relative group">
             <select
-              value={formData.categoria}
-              onChange={(e) => updateField('categoria', e.target.value)}
-              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none font-medium bg-slate-50 focus:bg-white cursor-pointer ${formData.categoria ? 'text-slate-700' : 'text-slate-400'}`}
+              value={formData.moduloId || ''}
+              onChange={(e) => updateField('moduloId', e.target.value ? Number(e.target.value) : undefined)}
+              className={`w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-girlies-purple/30 focus:border-girlies-purple transition-all appearance-none font-medium bg-slate-50 focus:bg-white cursor-pointer ${formData.moduloId ? 'text-slate-700' : 'text-slate-400'}`}
             >
               <option value="" disabled hidden>Selecione um módulo...</option>
-              <option value="Módulo 1: Lógica & Pensamento">Módulo 1: Lógica & Pensamento</option>
-              <option value="Módulo 2: Python Fundamentos & Estruturas">Módulo 2: Python Fundamentos & Estruturas</option>
-              <option value="Módulo 3: Projetos & Git">Módulo 3: Projetos & Git</option>
+              {modulos.map(m => (
+                <option key={m.id} value={m.id}>{m.nome}</option>
+              ))}
             </select>
             <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-girlies-purple transition-colors" />
           </div>

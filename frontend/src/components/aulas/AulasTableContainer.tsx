@@ -1,34 +1,45 @@
 import { useState, useMemo } from 'react';
 import { Search, Terminal } from 'lucide-react';
 import { AulasTableRow } from './AulasTableRow';
-import type { PlanoAula, Usuario } from '../../services/api';
+import type { PlanoAula, Usuario, Modulo } from '../../services/api';
 import { useCicloAtivo } from '../../hooks/useCicloAtivo';
 
 interface AulasTableContainerProps {
   aulas: PlanoAula[];
   usuarios?: Usuario[];
+  modulos?: Modulo[];
 }
 
-const TABS = [
-  { id: 'all', label: 'Todas as Aulas' },
-  { id: 'mod1', label: 'Módulo 1: Lógica & Pensamento' },
-  { id: 'mod2', label: 'Módulo 2: Python Fundamentos' },
-  { id: 'mod3', label: 'Módulo 3: Projetos & Git' }
-];
-
-export function AulasTableContainer({ aulas, usuarios = [] }: AulasTableContainerProps) {
+export function AulasTableContainer({ aulas, usuarios = [], modulos = [] }: AulasTableContainerProps) {
   const { cicloAtivo } = useCicloAtivo();
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const dynamicTabs = useMemo(() => {
+    const tabs = [{ id: 'all', label: 'Todas as Aulas', matchId: null }];
+    
+    // Sort modulos by ordem
+    const sortedModulos = [...modulos].sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+    
+    sortedModulos.forEach(m => {
+      let tabLabel = m.nome;
+      if (!tabLabel.toLowerCase().startsWith('módulo')) {
+        tabLabel = `Módulo ${m.ordem || ''}: ${tabLabel}`;
+      }
+      tabs.push({ id: `mod${m.id}`, label: tabLabel, matchId: m.id as any });
+    });
+    return tabs;
+  }, [modulos]);
 
   const filteredAulas = useMemo(() => {
     return aulas.filter((aula) => {
       // 1. Filtrar por Tab (Módulo)
       if (activeTab !== 'all') {
-        const tab = TABS.find(t => t.id === activeTab);
-        const prefix = tab?.label.split(':')[0]; // Ex: "Módulo 1"
-        if (prefix && !aula.categoria?.includes(prefix)) {
-          return false;
+        const tab = dynamicTabs.find(t => t.id === activeTab);
+        if (tab && tab.matchId !== null) {
+          if (aula.moduloId !== tab.matchId && !aula.categoria?.includes(tab.label.split(':')[0])) {
+            return false;
+          }
         }
       }
 
@@ -58,7 +69,7 @@ export function AulasTableContainer({ aulas, usuarios = [] }: AulasTableContaine
       {/* Tabs & Search */}
       <div className="px-6 py-4 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="flex gap-2 overflow-x-auto pb-2 xl:pb-0 hide-scrollbar">
-          {TABS.map(tab => (
+          {dynamicTabs.map(tab => (
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -147,13 +158,21 @@ export function AulasTableContainer({ aulas, usuarios = [] }: AulasTableContaine
                     letra: "?"
                   };
 
+                  let formattedModuloNome = aula.moduloNome;
+                  if (formattedModuloNome && !formattedModuloNome.toLowerCase().startsWith('módulo')) {
+                    const moduloRef = modulos.find(m => m.id === aula.moduloId);
+                    if (moduloRef) {
+                      formattedModuloNome = `Módulo ${moduloRef.ordem || ''}: ${formattedModuloNome}`;
+                    }
+                  }
+
                   return (
                   <AulasTableRow 
                     key={aula.id} 
                     id={aula.id}
                     semana={aula.semana?.toString().padStart(2, '0') || '00'}
                     tema={aula.titulo}
-                    categoria={aula.categoria}
+                    categoria={formattedModuloNome || aula.categoria}
                     descricao={aula.descricao}
                     data={dataFormatada}
                     horario={horarioFormatado}

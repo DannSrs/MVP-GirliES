@@ -6,6 +6,8 @@ export interface PlanoAula {
   titulo: string;
   descricao?: string;
   categoria?: string;
+  moduloId?: number;
+  moduloNome?: string;
   dataHora: string;
   local?: string;
   status?: 'Em Preparação' | 'Confirmada' | 'Concluída' | 'Cancelada';

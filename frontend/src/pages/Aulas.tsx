@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { api, type PlanoAula } from '../services/api';
+import { api, type PlanoAula, type Usuario, type Modulo } from '../services/api';
 import { AulasHeader } from '../components/aulas/AulasHeader';
 import { AulasStats } from '../components/aulas/AulasStats';
 import { AulasTableContainer } from '../components/aulas/AulasTableContainer';
@@ -7,18 +7,21 @@ import { AulasTableContainer } from '../components/aulas/AulasTableContainer';
 export function Aulas() {
   const [aulas, setAulas] = useState<PlanoAula[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [modulos, setModulos] = useState<Modulo[]>([]);
   const [monitorasTotais, setMonitorasTotais] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [aulasData, usuariosData] = await Promise.all([
+        const [aulasData, usuariosData, modulosData] = await Promise.all([
           api.getAulas(),
-          api.getUsuarios()
+          api.getUsuarios(),
+          api.getModulos()
         ]);
         setAulas(Array.isArray(aulasData) ? aulasData : []);
         setUsuarios(Array.isArray(usuariosData) ? usuariosData : []);
+        setModulos(Array.isArray(modulosData) ? modulosData : []);
         
         const monitoras = Array.isArray(usuariosData) 
           ? usuariosData.filter(u => u.role === 'voluntaria' || u.funcaoInterna?.toLowerCase().includes('monitora'))
@@ -62,7 +65,7 @@ export function Aulas() {
           <p className="text-slate-400">Carregando aulas...</p>
         </div>
       ) : (
-        <AulasTableContainer aulas={aulas} usuarios={usuarios} />
+        <AulasTableContainer aulas={aulas} usuarios={usuarios} modulos={modulos} />
       )}
     </div>
   );
