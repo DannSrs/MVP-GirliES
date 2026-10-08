@@ -4,19 +4,19 @@ import { IRepository } from './IRepository';
 
 export class EventoGeralRepository implements IRepository<EventoGeral, CriarEventoGeralDTO, AtualizarEventoGeralDTO> {
     async findAll(): Promise<EventoGeral[]> {
-        const db = await getDb();
-        const rows = await db.all<any[]>('SELECT * FROM Eventos');
+        const pool = await getDb();
+        const result = await pool.query('SELECT * FROM Eventos');
         
         const eventos: EventoGeral[] = [];
-        for (const r of rows) {
-            const checklistRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
-                 FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`,
+        for (const r of result.rows) {
+            const checklistResult = await pool.query(
+                `SELECT id, atividade_id as "atividadeId", descricao, concluido as "isCompleted" 
+                 FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`,
                 [String(r.id)]
             );
-            const linksRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
-                 FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`,
+            const linksResult = await pool.query(
+                `SELECT id, atividade_id as "atividadeId", tipo, titulo, link 
+                 FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`,
                 [String(r.id)]
             );
 
@@ -31,13 +31,13 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
                 horarioFim: r.horario_fim,
                 local: r.local,
                 capacidade: r.capacidade,
-                logisticsChecklist: checklistRows.map(c => ({
+                logisticsChecklist: checklistResult.rows.map(c => ({
                     id: Number(c.id),
                     atividadeId: Number(c.atividadeId),
                     descricao: c.descricao,
                     isCompleted: Boolean(c.isCompleted)
                 })),
-                links: linksRows.map(l => ({
+                links: linksResult.rows.map(l => ({
                     id: Number(l.id),
                     atividadeId: Number(l.atividadeId),
                     tipo: l.tipo,
@@ -50,18 +50,19 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
     }
 
     async findById(id: number | string): Promise<EventoGeral | undefined> {
-        const db = await getDb();
-        const r = await db.get<any>('SELECT * FROM Eventos WHERE id = ?', [id]);
-        if (!r) return undefined;
+        const pool = await getDb();
+        const result = await pool.query('SELECT * FROM Eventos WHERE id = $1', [id]);
+        if (result.rows.length === 0) return undefined;
+        const r = result.rows[0];
 
-        const checklistRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
-             FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`,
+        const checklistResult = await pool.query(
+            `SELECT id, atividade_id as "atividadeId", descricao, concluido as "isCompleted" 
+             FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`,
             [String(r.id)]
         );
-        const linksRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
-             FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`,
+        const linksResult = await pool.query(
+            `SELECT id, atividade_id as "atividadeId", tipo, titulo, link 
+             FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`,
             [String(r.id)]
         );
 
@@ -76,13 +77,13 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
             horarioFim: r.horario_fim,
             local: r.local,
             capacidade: r.capacidade,
-            logisticsChecklist: checklistRows.map(c => ({
+            logisticsChecklist: checklistResult.rows.map(c => ({
                 id: Number(c.id),
                 atividadeId: Number(c.atividadeId),
                 descricao: c.descricao,
                 isCompleted: Boolean(c.isCompleted)
             })),
-            links: linksRows.map(l => ({
+            links: linksResult.rows.map(l => ({
                 id: Number(l.id),
                 atividadeId: Number(l.atividadeId),
                 tipo: l.tipo,
@@ -93,10 +94,10 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
     }
 
     async create(data: CriarEventoGeralDTO): Promise<EventoGeral> {
-        const db = await getDb();
-        const result = await db.run(
+        const pool = await getDb();
+        const result = await pool.query(
             `INSERT INTO Eventos (titulo, tipo_evento, regime_evento, data, horario_inicio, horario_fim, local, capacidade)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
             [
                 data.titulo,
                 data.tipoEvento,
@@ -108,22 +109,22 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
                 data.capacidade || null
             ]
         );
-        const createdId = result.lastID;
-        if (!createdId) throw new Error('Falha ao inserir evento no SQLite');
+        const createdId = result.rows[0]?.id;
+        if (!createdId) throw new Error('Falha ao inserir evento no PostgreSQL');
 
         if (data.logisticsChecklist && data.logisticsChecklist.length > 0) {
             for (const item of data.logisticsChecklist) {
-                await db.run(
-                    `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'EVENTO', ?, ?)`,
-                    [String(createdId), item.descricao, item.isCompleted ? 1 : 0]
+                await pool.query(
+                    `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES ($1, 'EVENTO', $2, $3)`,
+                    [String(createdId), item.descricao, item.isCompleted]
                 );
             }
         }
 
         if (data.links && data.links.length > 0) {
             for (const link of data.links) {
-                await db.run(
-                    `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'EVENTO', ?, ?, ?)`,
+                await pool.query(
+                    `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES ($1, 'EVENTO', $2, $3, $4)`,
                     [String(createdId), link.tipo, link.titulo || null, link.link]
                 );
             }
@@ -139,10 +140,10 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
         if (!existing) return undefined;
 
         const updated = { ...existing, ...changes };
-        const db = await getDb();
-        await db.run(
-            `UPDATE Eventos SET titulo = ?, tipo_evento = ?, regime_evento = ?, data = ?, horario_inicio = ?, horario_fim = ?, local = ?, capacidade = ?
-             WHERE id = ?`,
+        const pool = await getDb();
+        await pool.query(
+            `UPDATE Eventos SET titulo = $1, tipo_evento = $2, regime_evento = $3, data = $4, horario_inicio = $5, horario_fim = $6, local = $7, capacidade = $8
+             WHERE id = $9`,
             [
                 updated.titulo,
                 updated.tipoEvento,
@@ -157,23 +158,23 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
         );
 
         if (changes.logisticsChecklist !== undefined) {
-            await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
+            await pool.query(`DELETE FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`, [String(id)]);
             if (changes.logisticsChecklist.length > 0) {
                 for (const item of changes.logisticsChecklist) {
-                    await db.run(
-                        `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'EVENTO', ?, ?)`,
-                        [String(id), item.descricao, item.isCompleted ? 1 : 0]
+                    await pool.query(
+                        `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES ($1, 'EVENTO', $2, $3)`,
+                        [String(id), item.descricao, item.isCompleted]
                     );
                 }
             }
         }
 
         if (changes.links !== undefined) {
-            await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
+            await pool.query(`DELETE FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`, [String(id)]);
             if (changes.links.length > 0) {
                 for (const link of changes.links) {
-                    await db.run(
-                        `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'EVENTO', ?, ?, ?)`,
+                    await pool.query(
+                        `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES ($1, 'EVENTO', $2, $3, $4)`,
                         [String(id), link.tipo, link.titulo || null, link.link]
                     );
                 }
@@ -184,10 +185,10 @@ export class EventoGeralRepository implements IRepository<EventoGeral, CriarEven
     }
 
     async delete(id: number | string): Promise<boolean> {
-        const db = await getDb();
-        await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
-        await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'EVENTO'`, [String(id)]);
-        const result = await db.run('DELETE FROM Eventos WHERE id = ?', id);
-        return (result.changes ?? 0) > 0;
+        const pool = await getDb();
+        await pool.query(`DELETE FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`, [String(id)]);
+        await pool.query(`DELETE FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'EVENTO'`, [String(id)]);
+        const result = await pool.query('DELETE FROM Eventos WHERE id = $1', [id]);
+        return (result.rowCount ?? 0) > 0;
     }
 }

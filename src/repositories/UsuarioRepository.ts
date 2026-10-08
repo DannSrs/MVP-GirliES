@@ -4,10 +4,10 @@ import { IRepository } from './IRepository';
 
 export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, AtualizarUsuarioDTO> {
     async findAll(): Promise<Usuario[]> {
-        const db = await getDb();
-        const rows = await db.all<any[]>('SELECT id, nome, email, funcao_interna as funcaoInterna, curso, periodo, role FROM Usuarios');
+        const pool = await getDb();
+        const result = await pool.query('SELECT id, nome, email, funcao_interna as "funcaoInterna", curso, periodo, role FROM Usuarios');
         
-        return rows.map(r => ({
+        return result.rows.map(r => ({
             id: r.id,
             nome: r.nome,
             email: r.email,
@@ -19,10 +19,11 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
     }
 
     async findById(id: number | string): Promise<Usuario | undefined> {
-        const db = await getDb();
-        const r = await db.get<any>('SELECT id, nome, email, funcao_interna as funcaoInterna, curso, periodo, role FROM Usuarios WHERE id = ?', [id]);
+        const pool = await getDb();
+        const result = await pool.query('SELECT id, nome, email, funcao_interna as "funcaoInterna", curso, periodo, role FROM Usuarios WHERE id = $1', [id]);
         
-        if (!r) return undefined;
+        if (result.rows.length === 0) return undefined;
+        const r = result.rows[0];
 
         return {
             id: r.id,
@@ -36,10 +37,11 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
     }
 
     async findByEmail(email: string): Promise<Usuario | undefined> {
-        const db = await getDb();
-        const r = await db.get<any>('SELECT * FROM Usuarios WHERE email = ?', [email]);
+        const pool = await getDb();
+        const result = await pool.query('SELECT * FROM Usuarios WHERE email = $1', [email]);
         
-        if (!r) return undefined;
+        if (result.rows.length === 0) return undefined;
+        const r = result.rows[0];
 
         return {
             id: r.id,
@@ -54,11 +56,11 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
     }
 
     async create(data: CriarUsuarioDTO, senhaHash?: string): Promise<Usuario> {
-        const db = await getDb();
+        const pool = await getDb();
 
-        const result = await db.run(
+        const result = await pool.query(
             `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, role) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
             [
                 data.nome,
                 data.email,
@@ -70,7 +72,7 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
             ]
         );
 
-        const createdId = result.lastID;
+        const createdId = result.rows[0]?.id;
         if (!createdId) throw new Error('Falha ao inserir usuário no banco.');
 
         const user = await this.findById(createdId);
@@ -84,11 +86,11 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
         if (!existing) return undefined;
 
         const updated = { ...existing, ...changes };
-        const db = await getDb();
+        const pool = await getDb();
 
-        await db.run(
-            `UPDATE Usuarios SET nome = ?, email = ?, funcao_interna = ?, curso = ?, periodo = ?, role = ?
-             WHERE id = ?`,
+        await pool.query(
+            `UPDATE Usuarios SET nome = $1, email = $2, funcao_interna = $3, curso = $4, periodo = $5, role = $6
+             WHERE id = $7`,
             [
                 updated.nome,
                 updated.email,
@@ -104,8 +106,8 @@ export class UsuarioRepository implements IRepository<Usuario, CriarUsuarioDTO, 
     }
 
     async delete(id: number | string): Promise<boolean> {
-        const db = await getDb();
-        const result = await db.run('DELETE FROM Usuarios WHERE id = ?', [id]);
-        return (result.changes ?? 0) > 0;
+        const pool = await getDb();
+        const result = await pool.query('DELETE FROM Usuarios WHERE id = $1', [id]);
+        return (result.rowCount ?? 0) > 0;
     }
 }
