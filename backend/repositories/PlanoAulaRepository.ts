@@ -5,7 +5,12 @@ import { IRepository } from './IRepository';
 export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAulaDTO, AtualizarPlanoAulaDTO> {
     async findAll(): Promise<PlanoAula[]> {
         const pool = await getDb();
-        const result = await pool.query('SELECT * FROM Aulas ORDER BY data_hora ASC');
+        const result = await pool.query(`
+            SELECT a.*, m.nome as modulo_nome 
+            FROM Aulas a 
+            LEFT JOIN Modulos m ON a.modulo_id = m.id 
+            ORDER BY a.data_hora ASC
+        `);
         
         const aulas: PlanoAula[] = [];
         for (const r of result.rows) {
@@ -29,6 +34,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
                 titulo: r.titulo,
                 descricao: r.descricao,
                 categoria: r.categoria,
+                moduloId: r.modulo_id ? Number(r.modulo_id) : undefined,
+                moduloNome: r.modulo_nome || undefined,
                 dataHora: r.data_hora,
                 local: r.local,
                 status: r.status,
@@ -56,7 +63,12 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
 
     async findById(id: number | string): Promise<PlanoAula | undefined> {
         const pool = await getDb();
-        const result = await pool.query('SELECT * FROM Aulas WHERE id = $1', [id]);
+        const result = await pool.query(`
+            SELECT a.*, m.nome as modulo_nome 
+            FROM Aulas a 
+            LEFT JOIN Modulos m ON a.modulo_id = m.id 
+            WHERE a.id = $1
+        `, [id]);
         if (result.rows.length === 0) return undefined;
         const r = result.rows[0];
 
@@ -80,6 +92,8 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
             titulo: r.titulo,
             descricao: r.descricao,
             categoria: r.categoria,
+            moduloId: r.modulo_id ? Number(r.modulo_id) : undefined,
+            moduloNome: r.modulo_nome || undefined,
             dataHora: r.data_hora,
             local: r.local,
             status: r.status,
@@ -106,12 +120,13 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
     async create(data: CriarPlanoAulaDTO): Promise<PlanoAula> {
         const pool = await getDb();
         const result = await pool.query(
-            `INSERT INTO Aulas (titulo, descricao, categoria, data_hora, local, status, link_plano_aula, link_slide, link_roteiro)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+            `INSERT INTO Aulas (titulo, descricao, categoria, modulo_id, data_hora, local, status, link_plano_aula, link_slide, link_roteiro)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
             [
                 data.titulo,
                 data.descricao || null,
                 data.categoria || null,
+                data.moduloId || null,
                 data.dataHora,
                 data.local || null,
                 data.status || 'Em Preparação',
@@ -162,12 +177,13 @@ export class PlanoAulaRepository implements IRepository<PlanoAula, CriarPlanoAul
         const updated = { ...existing, ...changes };
         const pool = await getDb();
         await pool.query(
-            `UPDATE Aulas SET titulo = $1, descricao = $2, categoria = $3, data_hora = $4, local = $5, status = $6, link_plano_aula = $7, link_slide = $8, link_roteiro = $9
-             WHERE id = $10`,
+            `UPDATE Aulas SET titulo = $1, descricao = $2, categoria = $3, modulo_id = $4, data_hora = $5, local = $6, status = $7, link_plano_aula = $8, link_slide = $9, link_roteiro = $10
+             WHERE id = $11`,
             [
                 updated.titulo,
                 updated.descricao || null,
                 updated.categoria || null,
+                updated.moduloId || null,
                 updated.dataHora,
                 updated.local || null,
                 updated.status || 'Em Preparação',

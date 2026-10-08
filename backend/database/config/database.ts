@@ -48,6 +48,7 @@ export async function initializeDatabase(): Promise<Pool> {
       titulo TEXT NOT NULL,
       descricao TEXT,
       categoria TEXT,
+      modulo_id INTEGER REFERENCES Modulos(id) ON DELETE SET NULL,
       data_hora TIMESTAMP NOT NULL,
       local TEXT,
       status TEXT DEFAULT 'Planejada',
@@ -178,6 +179,24 @@ export async function initializeDatabase(): Promise<Pool> {
       ('Módulo 3: Projetos & Git', 3)`
     );
     console.log('✅ Módulos iniciais criados com sucesso.');
+  }
+
+  // Migration: Adicionar coluna modulo_id e associar as aulas existentes
+  try {
+    await pool.query(`ALTER TABLE Aulas ADD COLUMN IF NOT EXISTS modulo_id INTEGER REFERENCES Modulos(id) ON DELETE SET NULL`);
+    
+    // Atualizar aulas que têm categoria preenchida mas modulo_id nulo
+    const aulasMigrationResult = await pool.query(`
+      UPDATE Aulas a
+      SET modulo_id = m.id
+      FROM Modulos m
+      WHERE a.categoria = m.nome AND a.modulo_id IS NULL
+    `);
+    if (aulasMigrationResult.rowCount && aulasMigrationResult.rowCount > 0) {
+      console.log(`✅ Migração concluída: ${aulasMigrationResult.rowCount} aulas associadas aos módulos.`);
+    }
+  } catch (error) {
+    console.error('Erro na migração de Aulas para Modulos:', error);
   }
 
   return pool;
