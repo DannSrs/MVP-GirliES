@@ -3,21 +3,22 @@ import { ConfiguracaoGlobal } from '../models/Configuracao';
 
 export class ConfiguracaoRepository {
     async findAll(): Promise<ConfiguracaoGlobal[]> {
-        const db = await getDb();
-        return db.all<ConfiguracaoGlobal[]>('SELECT chave, valor FROM ConfiguracoesGlobais');
+        const pool = await getDb();
+        const result = await pool.query('SELECT chave, valor FROM ConfiguracoesGlobais');
+        return result.rows;
     }
 
     async getByKey(chave: string): Promise<string | undefined> {
-        const db = await getDb();
-        const row = await db.get<ConfiguracaoGlobal>('SELECT valor FROM ConfiguracoesGlobais WHERE chave = ?', [chave]);
-        return row?.valor;
+        const pool = await getDb();
+        const result = await pool.query('SELECT valor FROM ConfiguracoesGlobais WHERE chave = $1', [chave]);
+        return result.rows[0]?.valor;
     }
 
     async upsert(chave: string, valor: string): Promise<void> {
-        const db = await getDb();
-        await db.run(
-            `INSERT INTO ConfiguracoesGlobais (chave, valor) VALUES (?, ?)
-             ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor`,
+        const pool = await getDb();
+        await pool.query(
+            `INSERT INTO ConfiguracoesGlobais (chave, valor) VALUES ($1, $2)
+             ON CONFLICT(chave) DO UPDATE SET valor = EXCLUDED.valor`,
             [chave, valor]
         );
     }

@@ -2,29 +2,22 @@ import { getDb } from '../database/config/database';
 import { PostInstagram, CriarPostInstagramDTO, AtualizarPostInstagramDTO } from '../models/PostInstagram';
 import { IRepository } from './IRepository';
 
-function normalizarTipoLink(tipo?: string): 'Material' | 'Link Auxiliar' {
-    if (!tipo) return 'Link Auxiliar';
-    const lower = tipo.trim().toLowerCase();
-    if (lower === 'material') return 'Material';
-    return 'Link Auxiliar';
-}
-
 export class PostInstagramRepository implements IRepository<PostInstagram, CriarPostInstagramDTO, AtualizarPostInstagramDTO> {
     async findAll(): Promise<PostInstagram[]> {
-        const db = await getDb();
-        const rows = await db.all<any[]>('SELECT * FROM Conteudo_IG');
+        const pool = await getDb();
+        const result = await pool.query('SELECT * FROM Conteudo_IG');
         
         const posts: PostInstagram[] = [];
-        for (const r of rows) {
-            const checklistRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
-                 FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'POST'`,
-                [r.id]
+        for (const r of result.rows) {
+            const checklistResult = await pool.query(
+                `SELECT id, atividade_id as "atividadeId", descricao, concluido as "isCompleted" 
+                 FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'POST'`,
+                [String(r.id)]
             );
-            const linksRows = await db.all<any[]>(
-                `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
-                 FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'POST'`,
-                [r.id]
+            const linksResult = await pool.query(
+                `SELECT id, atividade_id as "atividadeId", tipo, titulo, link 
+                 FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'POST'`,
+                [String(r.id)]
             );
 
             posts.push({
@@ -37,13 +30,13 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
                 deadline: r.data_programada,
                 responsavelRoteiroId: r.responsavel_roteiro,
                 responsavelDesignId: r.responsavel_design,
-                checklist: checklistRows.map(c => ({
+                checklist: checklistResult.rows.map(c => ({
                     id: Number(c.id),
                     atividadeId: Number(c.atividadeId),
                     descricao: c.descricao,
-                    isCompleted: Boolean(c.concluido || c.isCompleted)
+                    isCompleted: Boolean(c.isCompleted)
                 })),
-                links: linksRows.map(l => ({
+                links: linksResult.rows.map(l => ({
                     id: Number(l.id),
                     atividadeId: Number(l.atividadeId),
                     tipo: l.tipo,
@@ -55,19 +48,20 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
     }
 
     async findById(id: number | string): Promise<PostInstagram | undefined> {
-        const db = await getDb();
-        const r = await db.get<any>('SELECT * FROM Conteudo_IG WHERE id = ?', [id]);
-        if (!r) return undefined;
+        const pool = await getDb();
+        const result = await pool.query('SELECT * FROM Conteudo_IG WHERE id = $1', [id]);
+        if (result.rows.length === 0) return undefined;
+        const r = result.rows[0];
 
-        const checklistRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, descricao, concluido as isCompleted 
-             FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'POST'`,
-            [r.id]
+        const checklistResult = await pool.query(
+            `SELECT id, atividade_id as "atividadeId", descricao, concluido as "isCompleted" 
+             FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'POST'`,
+            [String(r.id)]
         );
-        const linksRows = await db.all<any[]>(
-            `SELECT id, atividade_id as atividadeId, tipo, titulo, link 
-             FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'POST'`,
-            [r.id]
+        const linksResult = await pool.query(
+            `SELECT id, atividade_id as "atividadeId", tipo, titulo, link 
+             FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'POST'`,
+            [String(r.id)]
         );
 
         return {
@@ -80,13 +74,13 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
             deadline: r.data_programada,
             responsavelRoteiroId: r.responsavel_roteiro,
             responsavelDesignId: r.responsavel_design,
-            checklist: checklistRows.map(c => ({
+            checklist: checklistResult.rows.map(c => ({
                 id: Number(c.id),
                 atividadeId: Number(c.atividadeId),
                 descricao: c.descricao,
-                isCompleted: Boolean(c.concluido || c.isCompleted)
+                isCompleted: Boolean(c.isCompleted)
             })),
-            links: linksRows.map(l => ({
+            links: linksResult.rows.map(l => ({
                 id: Number(l.id),
                 atividadeId: Number(l.atividadeId),
                 tipo: l.tipo,
@@ -96,10 +90,10 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
     }
 
     async create(data: CriarPostInstagramDTO): Promise<PostInstagram> {
-        const db = await getDb();
-        const result = await db.run(
+        const pool = await getDb();
+        const result = await pool.query(
             `INSERT INTO Conteudo_IG (titulo, descricao, status, data_programada, tipo_post, publico_alvo, responsavel_roteiro, responsavel_design)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
             [
                 data.titulo,
                 data.descricao || null,
@@ -111,22 +105,22 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
                 data.responsavelDesignId || null
             ]
         );
-        const createdId = result.lastID;
-        if (!createdId) throw new Error('Falha ao gerar o ID automático no SQLite');
+        const createdId = result.rows[0]?.id;
+        if (!createdId) throw new Error('Falha ao gerar o ID automático no PostgreSQL');
 
         if (data.checklist && data.checklist.length > 0) {
             for (const item of data.checklist) {
-                await db.run(
-                    `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'POST', ?, ?)`,
-                    [createdId, item.descricao, item.isCompleted ? 1 : 0]
+                await pool.query(
+                    `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES ($1, 'POST', $2, $3)`,
+                    [createdId, item.descricao, item.isCompleted]
                 );
             }
         }
 
         if (data.links && data.links.length > 0) {
             for (const link of data.links) {
-                await db.run(
-                    `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'POST', ?, ?, ?)`,
+                await pool.query(
+                    `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES ($1, 'POST', $2, $3, $4)`,
                     [createdId, link.tipo, link.link, link.link]
                 );
             }
@@ -142,10 +136,10 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
         if (!existing) return undefined;
 
         const updated = { ...existing, ...changes };
-        const db = await getDb();
-        await db.run(
-            `UPDATE Conteudo_IG SET titulo = ?, descricao = ?, status = ?, data_programada = ?, tipo_post = ?, publico_alvo = ?, responsavel_roteiro = ?, responsavel_design = ?
-             WHERE id = ?`,
+        const pool = await getDb();
+        await pool.query(
+            `UPDATE Conteudo_IG SET titulo = $1, descricao = $2, status = $3, data_programada = $4, tipo_post = $5, publico_alvo = $6, responsavel_roteiro = $7, responsavel_design = $8
+             WHERE id = $9`,
             [
                 updated.titulo,
                 updated.descricao || null,
@@ -160,23 +154,23 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
         );
 
         if (changes.checklist !== undefined) {
-            await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'POST'`, [String(id)]);
+            await pool.query(`DELETE FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'POST'`, [String(id)]);
             if (changes.checklist.length > 0) {
                 for (const item of changes.checklist) {
-                    await db.run(
-                        `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES (?, 'POST', ?, ?)`,
-                        [String(id), item.descricao, item.isCompleted ? 1 : 0]
+                    await pool.query(
+                        `INSERT INTO Checklists (atividade_id, tipo_atividade, descricao, concluido) VALUES ($1, 'POST', $2, $3)`,
+                        [String(id), item.descricao, item.isCompleted]
                     );
                 }
             }
         }
 
         if (changes.links !== undefined) {
-            await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'POST'`, [String(id)]);
+            await pool.query(`DELETE FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'POST'`, [String(id)]);
             if (changes.links.length > 0) {
                 for (const link of changes.links) {
-                    await db.run(
-                        `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES (?, 'POST', ?, ?, ?)`,
+                    await pool.query(
+                        `INSERT INTO LinksAtividade (atividade_id, tipo_atividade, tipo, titulo, link) VALUES ($1, 'POST', $2, $3, $4)`,
                         [String(id), link.tipo, link.link, link.link]
                     );
                 }
@@ -186,10 +180,10 @@ export class PostInstagramRepository implements IRepository<PostInstagram, Criar
     }
 
     async delete(id: number | string): Promise<boolean> {
-        const db = await getDb();
-        await db.run(`DELETE FROM Checklists WHERE atividade_id = ? AND tipo_atividade = 'POST'`, [id]);
-        await db.run(`DELETE FROM LinksAtividade WHERE atividade_id = ? AND tipo_atividade = 'POST'`, [id]);
-        const result = await db.run('DELETE FROM Conteudo_IG WHERE id = ?', id);
-        return (result.changes ?? 0) > 0;
+        const pool = await getDb();
+        await pool.query(`DELETE FROM Checklists WHERE atividade_id = $1 AND tipo_atividade = 'POST'`, [String(id)]);
+        await pool.query(`DELETE FROM LinksAtividade WHERE atividade_id = $1 AND tipo_atividade = 'POST'`, [String(id)]);
+        const result = await pool.query('DELETE FROM Conteudo_IG WHERE id = $1', [id]);
+        return (result.rowCount ?? 0) > 0;
     }
 }

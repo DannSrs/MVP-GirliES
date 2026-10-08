@@ -47,9 +47,9 @@ class App {
   public async start(): Promise<void> {
     try {
       await initializeDatabase();
-      console.log('Conexão com SQLite inicializada com sucesso.');
+      console.log('Conexão com PostgreSQL inicializada com sucesso.');
     } catch (error) {
-      console.error('Erro ao inicializar o banco de dados SQLite:', error);
+      console.error('Erro ao inicializar o banco de dados PostgreSQL:', error);
     }
 
     this.server.listen(this.port, () => {
