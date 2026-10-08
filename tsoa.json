@@ -1,9 +1,9 @@
 {
-  "entryFile": "src/index.ts",
+  "entryFile": "backend/index.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
-  "controllerPathGlobs": ["src/controllers/**/*.ts"],
+  "controllerPathGlobs": ["backend/controllers/**/*.ts"],
   "routes": {
-    "routesDir": "src",
+    "routesDir": "backend",
     "middleware": "express"
   },
   "spec": {

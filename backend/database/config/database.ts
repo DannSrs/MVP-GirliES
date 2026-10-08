@@ -143,7 +143,7 @@ export async function initializeDatabase(): Promise<Pool> {
   if (existingAdminResult.rows.length === 0) {
     const ano = new Date().getFullYear();
     const username = leticiaEmail.split('@')[0].toUpperCase();
-    const defaultPassword = \`GIRLIES-IFPE-\${ano}-ADM-\${username}-X0\`;
+    const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
     await pool.query(
       `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, token, role) 
@@ -157,7 +157,7 @@ export async function initializeDatabase(): Promise<Pool> {
     if (!adminComToken || !adminComToken.token) {
       const ano = new Date().getFullYear();
       const username = leticiaEmail.split('@')[0].toUpperCase();
-      const defaultPassword = \`GIRLIES-IFPE-\${ano}-ADM-\${username}-X0\`;
+      const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
       await pool.query(`UPDATE Usuarios SET token = $1 WHERE email = $2`, [defaultPassword, leticiaEmail]);
     }
   }

@@ -4,10 +4,10 @@
   "description": "Este é um projeto inicializado.",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "npm install --prefix frontend_react",
+    "postinstall": "npm install --prefix frontend",
     "swagger": "tsoa spec-and-routes",
-    "dev": "tsoa spec-and-routes && tsx watch src/index.ts",
-    "dev:react": "npm run dev --prefix frontend_react",
+    "dev": "tsoa spec-and-routes && tsx watch backend/index.ts",
+    "dev:react": "npm run dev --prefix frontend",
     "build": "tsoa spec-and-routes && tsc",
     "start": "node dist/index.js",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/style.css",
