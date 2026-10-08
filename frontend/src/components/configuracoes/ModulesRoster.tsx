@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Edit2, Trash2, BookOpen, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import type { DropResult } from '@hello-pangea/dnd';
+import type { DropResult, DragUpdate, DragStart } from '@hello-pangea/dnd';
 
 export interface Modulo {
   id: number;
@@ -17,17 +17,32 @@ interface ModulesRosterProps {
 }
 
 export function ModulesRoster({ modulos, onDelete, onEdit, onAddClick, onReorder }: ModulesRosterProps) {
-  const [enabled, setEnabled] = useState(false);
+  const [dragState, setDragState] = useState<{ sourceIndex: number, destinationIndex: number } | null>(null);
 
-  useEffect(() => {
-    const animation = requestAnimationFrame(() => setEnabled(true));
-    return () => {
-      cancelAnimationFrame(animation);
-      setEnabled(false);
-    };
-  }, []);
+  const handleDragStart = (start: DragStart) => {
+    setDragState({ sourceIndex: start.source.index, destinationIndex: start.source.index });
+  };
+
+  const handleDragUpdate = (update: DragUpdate) => {
+    if (update.destination) {
+      setDragState({ sourceIndex: update.source.index, destinationIndex: update.destination.index });
+    } else {
+      setDragState({ sourceIndex: update.source.index, destinationIndex: update.source.index });
+    }
+  };
+
+  const getVisualIndex = (index: number) => {
+    if (!dragState) return index + 1;
+    const { sourceIndex, destinationIndex } = dragState;
+  
+    if (index === sourceIndex) return destinationIndex + 1;
+    if (index < sourceIndex && index >= destinationIndex) return index + 2;
+    if (index > sourceIndex && index <= destinationIndex) return index;
+    return index + 1;
+  };
 
   const handleDragEnd = (result: DropResult) => {
+    setDragState(null);
     if (!result.destination) return;
     if (result.source.index === result.destination.index) return;
 
@@ -62,8 +77,12 @@ export function ModulesRoster({ modulos, onDelete, onEdit, onAddClick, onReorder
             <p className="font-medium text-slate-600">Nenhum módulo cadastrado</p>
             <p className="text-sm mt-1">Clique em "Novo Módulo" para começar a organizar as aulas.</p>
           </div>
-        ) : enabled ? (
-          <DragDropContext onDragEnd={handleDragEnd}>
+        ) : (
+          <DragDropContext 
+            onDragStart={handleDragStart}
+            onDragUpdate={handleDragUpdate}
+            onDragEnd={handleDragEnd}
+          >
             <Droppable droppableId="modulos-list">
               {(provided) => (
                 <div 
@@ -91,7 +110,7 @@ export function ModulesRoster({ modulos, onDelete, onEdit, onAddClick, onReorder
                             </div>
                             
                             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold group-hover:bg-girlies-purple/10 group-hover:text-girlies-purple transition-colors">
-                              {index + 1}
+                              {getVisualIndex(index)}
                             </div>
                             <h3 className="font-bold text-slate-800">{modulo.nome}</h3>
                           </div>
@@ -121,7 +140,7 @@ export function ModulesRoster({ modulos, onDelete, onEdit, onAddClick, onReorder
               )}
             </Droppable>
           </DragDropContext>
-        ) : null}
+        )}
       </div>
     </div>
   );

@@ -25,6 +25,12 @@ export async function initializeDatabase(): Promise<Pool> {
       valor TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS Modulos (
+      id SERIAL PRIMARY KEY,
+      nome TEXT NOT NULL UNIQUE,
+      ordem INTEGER DEFAULT 0
+    );
+
     CREATE TABLE IF NOT EXISTS Usuarios (
       id SERIAL PRIMARY KEY,
       nome TEXT NOT NULL,
@@ -160,6 +166,18 @@ export async function initializeDatabase(): Promise<Pool> {
       const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
       await pool.query(`UPDATE Usuarios SET token = $1 WHERE email = $2`, [defaultPassword, leticiaEmail]);
     }
+  }
+
+  // Seeding de Módulos Iniciais
+  const modulosCountResult = await pool.query(`SELECT COUNT(*) as count FROM Modulos`);
+  if (parseInt(modulosCountResult.rows[0].count) === 0) {
+    await pool.query(
+      `INSERT INTO Modulos (nome, ordem) VALUES 
+      ('Módulo 1: Lógica & Pensamento', 1),
+      ('Módulo 2: Python Fundamentos & Estruturas', 2),
+      ('Módulo 3: Projetos & Git', 3)`
+    );
+    console.log('✅ Módulos iniciais criados com sucesso.');
   }
 
   return pool;

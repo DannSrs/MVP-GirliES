@@ -57,6 +57,12 @@ export interface EventoGeral {
   semana?: number;
 }
 
+export interface Modulo {
+  id: number;
+  nome: string;
+  ordem?: number;
+}
+
 export interface Usuario {
   id: number;
   nome: string;
@@ -332,5 +338,45 @@ export const api = {
     });
     if (!res.ok) throw new Error('Erro ao atualizar usuário');
     return res.json();
+  },
+
+  getModulos: async (): Promise<Modulo[]> => {
+    const res = await fetch(`${API_BASE}/modulos`);
+    if (!res.ok) throw new Error('Erro ao carregar módulos');
+    return res.json();
+  },
+
+  criarModulo: async (data: Omit<Modulo, 'id'>): Promise<Modulo> => {
+    const res = await fetch(`${API_BASE}/modulos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Erro ao criar módulo');
+    return res.json();
+  },
+
+  atualizarModulo: async (id: number, data: Partial<Modulo>): Promise<Modulo> => {
+    const res = await fetch(`${API_BASE}/modulos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Erro ao atualizar módulo');
+    return res.json();
+  },
+
+  deletarModulo: async (id: number): Promise<void> => {
+    const res = await fetch(`${API_BASE}/modulos/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Erro ao excluir módulo');
+  },
+
+  reordenarModulos: async (ids: number[]): Promise<void> => {
+    const res = await fetch(`${API_BASE}/modulos/reorder`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids }),
+    });
+    if (!res.ok) throw new Error('Erro ao reordenar módulos');
   }
 };
