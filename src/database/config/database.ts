@@ -1,38 +1,32 @@
-import fs from 'fs';
-import path from 'path';
-import sqlite3 from 'sqlite3';
-import { open, type Database as SqliteDatabase } from 'sqlite';
+import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
-const dbPath = process.env.DB_PATH || path.resolve(process.cwd(), 'database', 'app.db');
-let db: SqliteDatabase | null = null;
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres';
 
-export async function initializeDatabase(): Promise<SqliteDatabase> {
-  if (db) {
-    return db;
+let pool: Pool | null = null;
+
+export async function initializeDatabase(): Promise<Pool> {
+  if (pool) {
+    return pool;
   }
 
-  const directory = path.dirname(dbPath);
-  fs.mkdirSync(directory, { recursive: true });
-
-  db = await open({
-    filename: dbPath,
-    driver: sqlite3.Database,
+  pool = new Pool({
+    connectionString,
+    // se estiver conectando a um banco remoto como Supabase, ssl pode ser necessário
+    ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false }
   });
 
-  await db.exec(`
-    PRAGMA foreign_keys = ON;
-
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS ConfiguracoesGlobais (
       chave TEXT PRIMARY KEY,
       valor TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS Usuarios (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       nome TEXT NOT NULL,
       email TEXT UNIQUE NOT NULL CHECK (email LIKE '%@discente.ifpe.edu.br'),
       funcao_interna TEXT,
@@ -43,11 +37,11 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
     );
 
     CREATE TABLE IF NOT EXISTS Aulas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       titulo TEXT NOT NULL,
       descricao TEXT,
       categoria TEXT,
-      data_hora DATETIME NOT NULL,
+      data_hora TIMESTAMP NOT NULL,
       local TEXT,
       status TEXT DEFAULT 'Planejada',
       link_plano_aula TEXT,
@@ -63,11 +57,11 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
     );
 
     CREATE TABLE IF NOT EXISTS Conteudo_IG (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       titulo TEXT NOT NULL,
       descricao TEXT,
       status TEXT DEFAULT 'Backlog',
-      data_programada DATETIME,
+      data_programada TIMESTAMP,
       tipo_post TEXT,
       publico_alvo TEXT,
       responsavel_roteiro INTEGER REFERENCES Usuarios(id) ON DELETE SET NULL,
@@ -75,7 +69,7 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
     );
 
     CREATE TABLE IF NOT EXISTS Eventos (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       titulo TEXT NOT NULL,
       tipo_evento TEXT NOT NULL,
       regime_evento TEXT NOT NULL,
@@ -87,71 +81,70 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
     );
 
     CREATE TABLE IF NOT EXISTS Checklists (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       atividade_id TEXT NOT NULL,
       tipo_atividade TEXT NOT NULL CHECK (tipo_atividade IN ('AULA', 'POST', 'EVENTO')),
       descricao TEXT NOT NULL,
       concluido BOOLEAN DEFAULT FALSE,
-      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS LinksAtividade (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       atividade_id TEXT NOT NULL,
       tipo_atividade TEXT NOT NULL CHECK (tipo_atividade IN ('AULA', 'POST', 'EVENTO')),
       tipo TEXT NOT NULL CHECK (tipo IN ('Material', 'Link Auxiliar')),
       titulo TEXT NOT NULL,
       link TEXT NOT NULL,
       descricao TEXT,
-      criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
   // Seeding Configurações Globais (Data Início e Data Fim Padrão do MVP)
   // Definindo datas padrão: Início 01/09, Fim 12/12.
-  const dataInicioAtual = await db.get(`SELECT valor FROM ConfiguracoesGlobais WHERE chave = 'DATA_INICIO_PROJETO'`);
-  if (!dataInicioAtual) {
+  const dataInicioResult = await pool.query(`SELECT valor FROM ConfiguracoesGlobais WHERE chave = 'DATA_INICIO_PROJETO'`);
+  if (dataInicioResult.rows.length === 0) {
     const ano = new Date().getFullYear();
-    // No JavaScript os meses começam em 0 (Janeiro = 0, Setembro = 8, Dezembro = 11)
     const dataAtual = new Date(ano, 8, 1); // 01 de Setembro
     const dataFim = new Date(ano, 11, 12); // 12 de Dezembro
     
-    await db.run(
-      `INSERT INTO ConfiguracoesGlobais (chave, valor) VALUES ('DATA_INICIO_PROJETO', ?), ('DATA_FIM_PROJETO', ?)`,
-      [dataAtual.toISOString(), dataFim.toISOString()]
+    await pool.query(
+      `INSERT INTO ConfiguracoesGlobais (chave, valor) VALUES ($1, $2), ($3, $4)`,
+      ['DATA_INICIO_PROJETO', dataAtual.toISOString(), 'DATA_FIM_PROJETO', dataFim.toISOString()]
     );
   }
 
   // Seeding da usuária admin (Leticia)
   const leticiaEmail = 'mlsb5@discente.ifpe.edu.br';
-  const existingAdmin = await db.get(`SELECT id FROM Usuarios WHERE email = ?`, [leticiaEmail]);
-  if (!existingAdmin) {
+  const existingAdminResult = await pool.query(`SELECT id FROM Usuarios WHERE email = $1`, [leticiaEmail]);
+  if (existingAdminResult.rows.length === 0) {
     const ano = new Date().getFullYear();
     const username = leticiaEmail.split('@')[0].toUpperCase();
     const defaultPassword = `GIRLIES-IFPE-${ano}-ADM-${username}-X0`;
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-    await db.run(
+    await pool.query(
       `INSERT INTO Usuarios (nome, email, funcao_interna, curso, periodo, senha, role) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       ['Leticia', leticiaEmail, 'Administração', 'Não Informado', 'Não Informado', hashedPassword, 'adm']
     );
     console.log(`✅ Usuária admin padrão criada com sucesso: ${leticiaEmail} (Senha: ${defaultPassword})`);
   }
 
-  return db;
+  return pool;
 }
 
 export async function testDatabaseConnection(): Promise<void> {
   const connection = await initializeDatabase();
-  const result = await connection.get('SELECT 1 AS ok');
+  const result = await connection.query('SELECT 1 AS ok');
 
-  if (!result || result.ok !== 1) {
-    throw new Error('SQLite não respondeu corretamente');
+  if (!result || result.rows[0].ok !== 1) {
+    throw new Error('PostgreSQL não respondeu corretamente');
   }
 
-  console.log('Conexão com SQLite OK');
+  console.log('Conexão com PostgreSQL OK');
 }
 
-export async function getDb(): Promise<SqliteDatabase> {
+export async function getDb(): Promise<Pool> {
   return initializeDatabase();
 }
