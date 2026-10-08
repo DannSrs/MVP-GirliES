@@ -3,12 +3,12 @@
     "target": "es2022",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./backend",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["src/**/*"]
+  "include": ["backend/**/*"]
 }
