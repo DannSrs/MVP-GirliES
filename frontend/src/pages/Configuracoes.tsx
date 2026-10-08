@@ -18,18 +18,14 @@ export function Configuracoes() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingUsuario, setEditingUsuario] = useState<Usuario | null>(null);
-  
   const [deleteModalId, setDeleteModalId] = useState<number | null>(null);
 
   // Tabs State
   const [activeTab, setActiveTab] = useState<'equipe' | 'modulos'>('equipe');
 
-  // Modulos Prototype State
-  const [modulos, setModulos] = useState<Modulo[]>([
-    { id: 1, nome: "Módulo 1: Lógica & Pensamento" },
-    { id: 2, nome: "Módulo 2: Python Fundamentos & Estruturas" },
-    { id: 3, nome: "Módulo 3: Projetos & Git" }
-  ]);
+  // Modulos State
+  const [modulos, setModulos] = useState<Modulo[]>([]);
+  const [modulosLoading, setModulosLoading] = useState(false);
   const [isModuloModalOpen, setIsModuloModalOpen] = useState(false);
   const [moduloModalMode, setModuloModalMode] = useState<'create' | 'edit'>('create');
   const [editingModulo, setEditingModulo] = useState<Modulo | null>(null);
@@ -47,9 +43,22 @@ export function Configuracoes() {
     }
   }, []);
 
+  const loadModulos = useCallback(async () => {
+    try {
+      setModulosLoading(true);
+      const data = await api.getModulos();
+      setModulos(data);
+    } catch (error) {
+      console.error('Erro ao carregar módulos:', error);
+    } finally {
+      setModulosLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadUsuarios();
-  }, [loadUsuarios]);
+    loadModulos();
+  }, [loadUsuarios, loadModulos]);
 
   const handleDelete = (id: number) => {
     setDeleteModalId(id);
@@ -89,7 +98,7 @@ export function Configuracoes() {
     await loadUsuarios();
   };
 
-  // Modulo Handlers (Prototype)
+  // Modulo Handlers
   const handleOpenCreateModulo = () => {
     setModuloModalMode('create');
     setEditingModulo(null);
@@ -106,25 +115,41 @@ export function Configuracoes() {
     setDeleteModuloId(id);
   };
 
-  const confirmDeleteModulo = () => {
+  const confirmDeleteModulo = async () => {
     if (deleteModuloId === null) return;
-    setModulos(prev => prev.filter(m => m.id !== deleteModuloId));
-    setDeleteModuloId(null);
-  };
-
-  const handleSaveModulo = (data: Omit<Modulo, 'id'>, id?: number) => {
-    if (moduloModalMode === 'create') {
-      const novoId = modulos.length > 0 ? Math.max(...modulos.map(m => m.id)) + 1 : 1;
-      setModulos(prev => [...prev, { id: novoId, ...data }]);
-    } else if (moduloModalMode === 'edit' && id !== undefined) {
-      setModulos(prev => prev.map(m => m.id === id ? { ...m, ...data } : m));
+    try {
+      await api.deletarModulo(deleteModuloId);
+      await loadModulos();
+    } catch (error) {
+      console.error('Erro ao excluir módulo:', error);
+      alert('Erro ao excluir módulo.');
+    } finally {
+      setDeleteModuloId(null);
     }
   };
 
-  const handleReorderModulos = (newModulos: Modulo[]) => {
-    setModulos(newModulos);
-    // Aqui seria chamada a API silenciosamente para persistir a nova ordem
-    // api.reordenarModulos(newModulos.map(m => m.id));
+  const handleSaveModulo = async (data: Omit<Modulo, 'id'>, id?: number) => {
+    try {
+      if (moduloModalMode === 'create') {
+        await api.criarModulo(data);
+      } else if (moduloModalMode === 'edit' && id !== undefined) {
+        await api.atualizarModulo(id, data);
+      }
+      await loadModulos();
+    } catch (error) {
+      console.error('Erro ao salvar módulo:', error);
+      alert('Erro ao salvar módulo.');
+    }
+  };
+
+  const handleReorderModulos = async (newModulos: Modulo[]) => {
+    setModulos(newModulos); // Optimistic UI update
+    try {
+      await api.reordenarModulos(newModulos.map(m => m.id));
+    } catch (error) {
+      console.error('Erro ao reordenar módulos:', error);
+      await loadModulos(); // Rollback local state on error
+    }
   };
 
   return (
@@ -168,6 +193,10 @@ export function Configuracoes() {
                 onEdit={handleOpenEdit}
               />
             )
+          ) : modulosLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <div className="w-8 h-8 rounded-full border-4 border-girlies-purple border-t-transparent animate-spin" />
+            </div>
           ) : (
             <ModulesRoster 
               modulos={modulos}

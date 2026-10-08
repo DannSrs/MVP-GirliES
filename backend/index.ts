@@ -6,7 +6,7 @@ import { setupSwagger } from './swagger';
 import { initializeDatabase } from './database/config/database';
 
 dotenv.config();
-
+console.log('Restarting backend...');
 class App {
   public server: Application;
   private port: number = Number(process.env.PORT) || 3000;
